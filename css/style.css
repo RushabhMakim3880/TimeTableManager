@@ -1,0 +1,968 @@
+/* 
+ * School Timetable Management System
+ * Executive Academic & Institutional Theme
+ * Designed for professional presentation to school superiors, principals, and administrative boards.
+ */
+
+:root {
+  /* Institutional Color Palette */
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-hover: #f8fafc;
+  
+  --border-color: #cbd5e1;
+  --border-light: #e2e8f0;
+  --border-dark: #94a3b8;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
+  
+  /* Primary Executive Navy */
+  --primary-navy: #1e3a8a;
+  --primary-hover: #1d4ed8;
+  --primary-light: #eff6ff;
+  --primary-border: #bfdbfe;
+  
+  /* Official Word Brand Blue */
+  --word-blue: #185abd;
+  --word-hover: #10438c;
+  --word-light: #eff6ff;
+  
+  /* Status Colors */
+  --status-success: #15803d;
+  --status-success-bg: #f0fdf4;
+  --status-success-border: #bbf7d0;
+  
+  --status-warning: #b45309;
+  --status-warning-bg: #fffbeb;
+  --status-warning-border: #fde68a;
+  
+  --status-danger: #b91c1c;
+  --status-danger-bg: #fef2f2;
+  --status-danger-border: #fecaca;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  
+  /* Radius & Shadows */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-popover: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+  --shadow-dropdown: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 90px;
+}
+
+/* Header */
+.app-header {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-light);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 12px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon-box {
+  width: 38px;
+  height: 38px;
+  background: var(--primary-navy);
+  color: #ffffff;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-icon-box svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.brand-info h1 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+}
+
+.status-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--status-success-bg);
+  color: var(--status-success);
+  border: 1px solid var(--status-success-border);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-pill .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--status-success);
+}
+
+.brand-info p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.header-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Button System */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.btn-secondary {
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  border-color: var(--border-dark);
+}
+
+.btn-primary {
+  background: var(--primary-navy);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-word {
+  background: var(--word-blue);
+  color: #ffffff;
+}
+
+.btn-word:hover {
+  background: var(--word-hover);
+}
+
+.btn-danger-outline {
+  background: transparent;
+  border-color: #fecaca;
+  color: var(--status-danger);
+}
+
+.btn-danger-outline:hover {
+  background: var(--status-danger-bg);
+  border-color: var(--status-danger);
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.btn-lg {
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Main Content Container */
+.main-wrapper {
+  max-width: 1560px;
+  margin: 20px auto;
+  padding: 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Day Navigation Toolbar */
+.day-nav-bar {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-card);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.day-segmented-control {
+  display: flex;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 2px;
+}
+
+.day-tab-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.12s ease;
+}
+
+.day-tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.day-tab-btn.active {
+  background: #ffffff;
+  color: var(--primary-navy);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.day-tab-badge {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--border-light);
+  color: var(--text-muted);
+}
+
+.day-tab-btn.active .day-tab-badge {
+  background: var(--primary-light);
+  color: var(--primary-navy);
+}
+
+.day-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Staff Attendance Strip */
+.attendance-strip {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  box-shadow: var(--shadow-card);
+}
+
+.attendance-strip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.attendance-strip-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.attendance-strip-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.teacher-badges-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.teacher-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.teacher-badge-btn:hover {
+  border-color: var(--border-dark);
+  background: var(--bg-subtle);
+}
+
+.teacher-badge-btn .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--status-success);
+}
+
+.teacher-badge-btn.on-leave {
+  background: var(--status-danger-bg);
+  border-color: var(--status-danger-border);
+  color: var(--status-danger);
+  text-decoration: line-through;
+}
+
+.teacher-badge-btn.on-leave .dot {
+  background: var(--status-danger);
+}
+
+/* Conflict Callout */
+.conflict-callout {
+  display: none;
+  background: var(--status-danger-bg);
+  border: 1px solid var(--status-danger-border);
+  border-left: 4px solid var(--status-danger);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--status-danger);
+  align-items: center;
+  gap: 10px;
+}
+
+.conflict-callout.visible {
+  display: flex;
+}
+
+/* Timetable Document Canvas */
+.timetable-document-sheet {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 24px 28px;
+  overflow-x: auto;
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--text-primary);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.sheet-title-group h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.sheet-title-group p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.sheet-meta-info {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* Official Timetable Grid */
+.official-grid-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 13px;
+  table-layout: fixed;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.official-grid-table th,
+.official-grid-table td {
+  border: 1px solid var(--border-color);
+  vertical-align: middle;
+  padding: 10px 6px;
+  position: relative;
+}
+
+/* Header styling */
+.official-grid-table thead th {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 10px 4px;
+}
+
+.col-lecture-w {
+  width: 10.5%;
+}
+
+.col-std-w {
+  width: 12.6%;
+}
+
+.col-free-w {
+  width: 13.9%;
+  background: #fcfdfd !important;
+}
+
+/* Period Header Cell */
+.period-header-cell {
+  background: #fafafa;
+}
+
+.period-header-num {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 13.5px;
+}
+
+.period-header-time {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Recess Row */
+.recess-break-row {
+  background: #fffbeb;
+}
+
+.recess-break-row td {
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 12px;
+  color: #92400e;
+  letter-spacing: 0.04em;
+}
+
+/* Period Allocation Interactive Cell */
+.grid-period-cell {
+  cursor: pointer;
+  height: 80px;
+  background: var(--bg-surface);
+  transition: background 0.12s ease;
+}
+
+.grid-period-cell:hover {
+  background: #f1f5f9;
+}
+
+.grid-cell-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 100%;
+  width: 100%;
+}
+
+.subject-label {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.teacher-sublabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.empty-prompt {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  border: 1px dashed var(--border-color);
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  width: 85%;
+  transition: all 0.12s ease;
+}
+
+.grid-period-cell:hover .empty-prompt {
+  border-color: var(--primary-navy);
+  color: var(--primary-navy);
+  background: var(--primary-light);
+}
+
+/* Conflict state */
+.grid-period-cell.has-conflict {
+  background: #fef2f2 !important;
+  border: 2px solid var(--status-danger) !important;
+}
+
+.grid-period-cell.has-conflict .teacher-sublabel {
+  color: var(--status-danger);
+  font-weight: 700;
+}
+
+/* Free Teachers Column */
+.free-staff-cell {
+  background: #ffffff;
+  padding: 8px 6px;
+}
+
+.free-staff-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  justify-content: center;
+}
+
+.free-staff-name {
+  font-size: 12px;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.free-staff-none {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* Sticky Export Action Bar */
+.sticky-export-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+  padding: 12px 28px;
+  z-index: 90;
+}
+
+.sticky-export-container {
+  max-width: 1560px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.export-desc-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.export-word-badge {
+  width: 36px;
+  height: 36px;
+  background: var(--word-light);
+  border: 1px solid var(--primary-border);
+  color: var(--word-blue);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.export-word-badge svg {
+  width: 20px;
+  height: 20px;
+}
+
+.export-desc-text h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.export-desc-text p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.export-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Fast In-Place Popover for Period Editing */
+.period-popover-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.25);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.period-popover-overlay.active {
+  display: flex;
+}
+
+.period-popover-card {
+  background: #ffffff;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-popover);
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  animation: popoverFadeIn 0.15s ease-out;
+}
+
+.popover-header {
+  padding: 12px 18px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popover-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.popover-close-btn {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.popover-close-btn:hover {
+  color: var(--text-primary);
+}
+
+.popover-body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.popover-section-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.quick-select-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill-choice {
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  padding: 5px 11px;
+  border-radius: var(--radius-xs);
+  font-size: 12.5px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pill-choice:hover {
+  border-color: var(--primary-navy);
+  color: var(--primary-navy);
+  background: var(--primary-light);
+}
+
+.pill-choice.selected {
+  background: var(--primary-navy);
+  color: #ffffff;
+  border-color: var(--primary-navy);
+  font-weight: 600;
+}
+
+.pill-choice.is-busy {
+  background: var(--status-warning-bg);
+  border-color: var(--status-warning-border);
+  color: var(--status-warning);
+}
+
+.pill-choice.is-leave {
+  background: var(--status-danger-bg);
+  border-color: var(--status-danger-border);
+  color: var(--status-danger);
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.popover-input {
+  width: 100%;
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+}
+
+.popover-input:focus {
+  outline: none;
+  border-color: var(--primary-navy);
+  box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+}
+
+.popover-footer {
+  padding: 10px 18px;
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Modals (Roster & Copy) */
+.enterprise-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.enterprise-modal-overlay.active {
+  display: flex;
+}
+
+.enterprise-modal-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-popover);
+  width: 100%;
+  max-width: 560px;
+  overflow: hidden;
+}
+
+.modal-title-bar {
+  padding: 14px 20px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title-bar h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-content-area {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.modal-actions-bar {
+  padding: 12px 20px;
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Toast Notifications */
+.toast-area {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.toast-msg {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary-navy);
+  border-radius: var(--radius-xs);
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-dropdown);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+
+.toast-msg.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-msg.success {
+  border-left-color: var(--status-success);
+}
+
+.toast-msg.error {
+  border-left-color: var(--status-danger);
+}
+
+/* Animations */
+@keyframes popoverFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Print Layout */
+@media print {
+  body {
+    background: #ffffff !important;
+    padding-bottom: 0 !important;
+  }
+  
+  .app-header,
+  .day-nav-bar,
+  .attendance-strip,
+  .sticky-export-bar,
+  .period-popover-overlay,
+  .enterprise-modal-overlay,
+  .toast-area {
+    display: none !important;
+  }
+  
+  .main-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+  
+  .timetable-document-sheet {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  
+  .official-grid-table {
+    border: 1px solid #000000 !important;
+  }
+  
+  .official-grid-table th,
+  .official-grid-table td {
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+  }
+}

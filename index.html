@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Timetable Management System • Academic Scheduling Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Executive Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-wrapper">
+        <div class="brand-icon-box">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>
+            School Timetable Management
+            <span class="status-pill" id="save-status-badge">
+              <span class="dot"></span> Auto-Saved
+            </span>
+          </h1>
+          <p>Academic Period Scheduling & Word Export Portal</p>
+        </div>
+      </div>
+
+      <div class="header-toolbar">
+        <button id="btn-open-settings" class="btn btn-secondary" title="Manage Teachers and Subjects Roster">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          Staff & Subject Roster
+        </button>
+        <button id="btn-export-json" class="btn btn-secondary" title="Export JSON backup file">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+          Backup Data
+        </button>
+        <button id="btn-import-json" class="btn btn-secondary" title="Restore timetable data from backup">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+          Restore
+        </button>
+        <input type="file" id="import-file-input" accept=".json" style="display: none;">
+        <button id="btn-reset-data" class="btn btn-secondary" title="Reset to original template data">
+          Reset
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-wrapper">
+
+    <!-- Day Navigation Toolbar -->
+    <section class="day-nav-bar">
+      <div class="day-segmented-control" id="day-tabs-container">
+        <!-- Generated dynamically in app.js -->
+      </div>
+
+      <div class="day-nav-actions">
+        <button id="btn-open-copy-modal" class="btn btn-secondary btn-sm" title="Duplicate this schedule to other days">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Duplicate Schedule...
+        </button>
+        <button id="btn-clear-current-day" class="btn btn-danger-outline btn-sm" title="Clear periods for this day">
+          Clear Day
+        </button>
+      </div>
+    </section>
+
+    <!-- Staff Availability & Attendance Bar -->
+    <section class="attendance-strip">
+      <div class="attendance-strip-header">
+        <span class="attendance-strip-title">
+          Staff Attendance & Duty Status
+        </span>
+        <span class="attendance-strip-hint">
+          Click any teacher to mark <strong>On Leave</strong> (automatically excluded from Free Teachers calculation)
+        </span>
+      </div>
+      <div class="teacher-badges-flow" id="attendance-chips-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- Conflict Callout Banner -->
+    <section class="conflict-callout" id="conflict-banner">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+      </svg>
+      <div id="conflict-message">
+        <strong>Schedule Conflict Detected:</strong> Staff member double-booked in the same period.
+      </div>
+    </section>
+
+    <!-- Timetable Document Canvas -->
+    <section class="timetable-document-sheet">
+      <div class="sheet-header">
+        <div class="sheet-title-group">
+          <h2 id="display-day-name">Monday</h2>
+          <p>Academic Period Allocation & Free Staff Distribution</p>
+        </div>
+        <div class="sheet-meta-info">
+          <div style="font-weight: 600; color: var(--text-primary);" id="display-day-stats">Standards: 3rd to 8th • Lectures: 1 to 6</div>
+          <div style="color: var(--text-dim);">Click any cell to edit assignment</div>
+        </div>
+      </div>
+
+      <table class="official-grid-table" id="timetable-table">
+        <thead id="timetable-thead">
+          <!-- Dynamic Header -->
+        </thead>
+        <tbody id="timetable-tbody">
+          <!-- Dynamic Rows -->
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <!-- Sticky Bottom Action Bar -->
+  <footer class="sticky-export-bar">
+    <div class="sticky-export-container">
+      <div class="export-desc-group">
+        <div class="export-word-badge">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+        </div>
+        <div class="export-desc-text">
+          <h4>Export Official Documents</h4>
+          <p>Generates formatted Word (.docx) documents ready to share with school administration.</p>
+        </div>
+      </div>
+
+      <div class="export-action-buttons">
+        <button id="btn-download-single-day" class="btn btn-word btn-lg">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download <span id="btn-download-day-name">Monday</span>.docx
+        </button>
+        <button id="btn-download-all-days" class="btn btn-primary btn-lg" title="All days in one master Word document with clean page breaks">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          Download Full Week (.docx)
+        </button>
+        <button id="btn-print-view" class="btn btn-secondary btn-lg" title="Print document or save as PDF">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+          Print / PDF
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Fast In-Place Popover for Period Editing -->
+  <div class="period-popover-overlay" id="period-modal">
+    <div class="period-popover-card">
+      <div class="popover-header">
+        <h3 id="period-modal-title">Period Assignment</h3>
+        <button class="popover-close-btn" id="btn-close-period-modal">&times;</button>
+      </div>
+      <div class="popover-body">
+        
+        <!-- Subject Selection -->
+        <div>
+          <div class="popover-section-label">Select Subject</div>
+          <div class="quick-select-pills" id="modal-subject-chips">
+            <!-- Dynamic Subject Pills -->
+          </div>
+          <div style="margin-top: 6px;">
+            <input type="text" id="modal-custom-subject" class="popover-input" placeholder="Or enter subject name...">
+          </div>
+        </div>
+
+        <!-- Teacher Selection -->
+        <div>
+          <div class="popover-section-label">Select Teacher</div>
+          <div class="quick-select-pills" id="modal-teacher-chips">
+            <!-- Dynamic Teacher Pills with Availability status -->
+          </div>
+          <div style="margin-top: 6px;">
+            <input type="text" id="modal-custom-teacher" class="popover-input" placeholder="Or enter teacher name...">
+          </div>
+        </div>
+
+      </div>
+      <div class="popover-footer">
+        <button id="btn-modal-clear-cell" class="btn btn-danger-outline btn-sm">Clear Period</button>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-modal-cancel" class="btn btn-secondary btn-sm">Cancel</button>
+          <button id="btn-modal-save-cell" class="btn btn-primary btn-sm">Save Assignment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enterprise Modal: Duplicate / Copy Schedule -->
+  <div class="enterprise-modal-overlay" id="copy-modal">
+    <div class="enterprise-modal-card">
+      <div class="modal-title-bar">
+        <h3>Duplicate Timetable Schedule</h3>
+        <button class="popover-close-btn" id="btn-close-copy-modal">&times;</button>
+      </div>
+      <div class="modal-content-area">
+        <p style="font-size: 13px; color: var(--text-secondary);">
+          Quickly duplicate periods from one day to another to accelerate timetable preparation.
+        </p>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">SOURCE DAY (COPY FROM)</label>
+          <select id="copy-source-day" class="popover-input">
+            <!-- Dynamic options -->
+          </select>
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">TARGET DAY (COPY TO)</label>
+          <select id="copy-target-day" class="popover-input">
+            <!-- Dynamic options -->
+          </select>
+        </div>
+
+        <div style="background: var(--bg-subtle); border-left: 3px solid var(--primary-navy); padding: 8px 12px; font-size: 12px; color: var(--text-secondary); border-radius: 4px;">
+          Free teachers will be automatically re-computed for the target day.
+        </div>
+      </div>
+      <div class="modal-actions-bar">
+        <button id="btn-cancel-copy" class="btn btn-secondary btn-sm">Cancel</button>
+        <button id="btn-confirm-copy" class="btn btn-primary btn-sm">Apply Duplicate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enterprise Modal: Manage Staff & Subjects Roster -->
+  <div class="enterprise-modal-overlay" id="settings-modal">
+    <div class="enterprise-modal-card" style="max-width: 620px;">
+      <div class="modal-title-bar">
+        <h3>Staff Roster & Subject Settings</h3>
+        <button class="popover-close-btn" id="btn-close-settings-modal">&times;</button>
+      </div>
+      <div class="modal-content-area">
+        
+        <!-- Manage Teachers -->
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">
+            TEACHERS ROSTER (<span id="settings-teacher-count">10</span>)
+          </label>
+          <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+            <input type="text" id="settings-new-teacher" class="popover-input" placeholder="e.g. Meera Ma'am">
+            <button id="btn-add-teacher" class="btn btn-primary btn-sm">+ Add</button>
+          </div>
+          <div id="settings-teachers-list" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 120px; overflow-y: auto; padding: 6px; border: 1px solid var(--border-light); border-radius: 4px; background: var(--bg-subtle);">
+            <!-- Dynamic items -->
+          </div>
+        </div>
+
+        <!-- Manage Subjects -->
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">
+            ACADEMIC SUBJECTS (<span id="settings-subject-count">11</span>)
+          </label>
+          <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+            <input type="text" id="settings-new-subject" class="popover-input" placeholder="e.g. Sanskrit">
+            <button id="btn-add-subject" class="btn btn-primary btn-sm">+ Add</button>
+          </div>
+          <div id="settings-subjects-list" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 120px; overflow-y: auto; padding: 6px; border: 1px solid var(--border-light); border-radius: 4px; background: var(--bg-subtle);">
+            <!-- Dynamic items -->
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-actions-bar">
+        <button id="btn-close-settings" class="btn btn-primary btn-sm">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-area" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/vendor/jszip.min.js"></script>
+  <script src="js/template-assets.js"></script>
+  <script src="js/default-data.js"></script>
+  <script src="js/docx-generator.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
