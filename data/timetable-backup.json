@@ -1,7 +1,7 @@
-// Default presets for School Timetable Management System
-// Auto-synchronized from user data for Funland English Medium School
-
-const DEFAULT_DATA = {
+{
+  "activeView": "general-duty-view",
+  "currentDay": "Monday",
+  "selectedTeacher": "Astha Ma'am",
   "schoolProfile": {
     "name": "FUNLAND ENGLISH MEDIUM SCHOOL",
     "tagline": "Centre of Academic Excellence & Holistic Development",
@@ -164,7 +164,7 @@ const DEFAULT_DATA = {
     "Friday",
     "Saturday"
   ],
-  "initialSchedules": {
+  "schedules": {
     "Monday": {
       "p1": {
         "std_3": {
@@ -952,69 +952,66 @@ const DEFAULT_DATA = {
       }
     }
   },
-  "weeklyDutyPresets": [
-    {
-      "label": "3 to 5 Maths",
-      "grade": "3 to 5",
-      "subject": "Maths",
-      "colorClass": "maths"
+  "leaves": {
+    "Monday": []
+  },
+  "substitutions": {
+    "Monday": {
+      "p1_std_4": "Alpa Ma'am",
+      "p3_std_5": "Dolly Ma'am"
     },
-    {
-      "label": "3 to 5 English",
-      "grade": "3 to 5",
-      "subject": "English",
-      "colorClass": "eng"
-    },
-    {
-      "label": "3 to 5 Science",
-      "grade": "3 to 5",
-      "subject": "Science",
-      "colorClass": "sci"
-    },
-    {
-      "label": "3 to 5 Environment",
-      "grade": "3 to 5",
-      "subject": "Environment",
-      "colorClass": "env"
-    },
-    {
-      "label": "3 to 5 Gujarati",
-      "grade": "3 to 5",
-      "subject": "Gujarati",
-      "colorClass": "guj"
-    },
-    {
-      "label": "6 to 8 Maths",
-      "grade": "6 to 8",
-      "subject": "Maths",
-      "colorClass": "maths"
-    },
-    {
-      "label": "6 to 8 English",
-      "grade": "6 to 8",
-      "subject": "English",
-      "colorClass": "eng"
-    },
-    {
-      "label": "6 to 8 Science",
-      "grade": "6 to 8",
-      "subject": "Science",
-      "colorClass": "sci"
-    },
-    {
-      "label": "6 to 8 Sci + Eng",
-      "grade": "6 to 8",
-      "subject": "Sci + Eng",
-      "colorClass": "sci-eng"
-    },
-    {
-      "label": "6 to 8 Gujarati",
-      "grade": "6 to 8",
-      "subject": "Gujarati",
-      "colorClass": "guj"
-    }
+    "Tuesday": {},
+    "Wednesday": {},
+    "Thursday": {},
+    "Friday": {}
+  },
+  "dutyPresets": [
+    "Library Supervision",
+    "Corridor & Hallway Monitoring",
+    "Science Lab Assistance",
+    "Computer Lab Duty",
+    "Exam Paper Evaluation & Grading",
+    "Remedial Coaching / Doubt Solving",
+    "Reception & Administrative Duty",
+    "Lesson Planning & Preparation",
+    "Playground / Recess Duty",
+    "Discipline & Gate Supervision"
   ],
-  "initialWeeklyDuties": {
+  "duties": {
+    "Thursday": {
+      "p1": {},
+      "p2": {},
+      "p3": {},
+      "p4": {},
+      "p5": {},
+      "p6": {}
+    },
+    "Friday": {
+      "p1": {},
+      "p2": {},
+      "p3": {},
+      "p4": {},
+      "p5": {},
+      "p6": {}
+    },
+    "Saturday": {
+      "p1": {},
+      "p2": {},
+      "p3": {},
+      "p4": {},
+      "p5": {},
+      "p6": {}
+    },
+    "Monday": {
+      "p1": {},
+      "p2": {},
+      "p3": {},
+      "p4": {},
+      "p5": {},
+      "p6": {}
+    }
+  },
+  "weeklyDuties": {
     "Payal Ma'am": {
       "Wednesday": "3 to 5 Eng",
       "Friday": "3 to 5 Eng"
@@ -1047,45 +1044,24 @@ const DEFAULT_DATA = {
       "Wednesday": "3 to 5 Env"
     }
   },
-  "generalDutyPresets": [
-    {
-      "name": "Morning Assembly & Prayer Duty",
-      "time": "12:45 PM – 1:00 PM",
-      "location": "Assembly Ground",
-      "notes": "Lead prayer and check row alignments"
-    },
-    {
-      "name": "Kids Present / Absent Roll Call",
-      "time": "1:30 PM – 1:45 PM",
-      "location": "Classrooms",
-      "notes": "Take attendance registers and submit headcounts"
-    },
-    {
-      "name": "Recess & Corridor Supervision",
-      "time": "3:15 PM – 3:45 PM",
-      "location": "Corridors & Stairs",
-      "notes": "Monitor student discipline during lunch break"
-    },
-    {
-      "name": "Main Gate & Morning Entry Duty",
-      "time": "12:30 PM – 1:00 PM",
-      "location": "Main Entrance Gate",
-      "notes": "Ensure neat uniforms, ID cards, and orderly entry"
-    },
-    {
-      "name": "Dispersal & Gate Duty",
-      "time": "5:50 PM – 6:15 PM",
-      "location": "Main Gate & Bus Stop",
-      "notes": "Supervise bus boarding and van departures"
-    },
-    {
-      "name": "Drinking Water & Washroom Discipline",
-      "time": "Recess Hours",
-      "location": "Water Area",
-      "notes": "Ensure orderly queues and hygiene"
-    }
-  ],
-  "initialGeneralDuties": [
+  "excludedFreeTeachers": {
+    "Monday_p1": [
+      "Khushi Ma'am"
+    ],
+    "Monday_p2": [
+      "Khushi Ma'am"
+    ],
+    "Monday_p4": [
+      "Sakina Ma'am"
+    ],
+    "Monday_p5": [
+      "Sakina Ma'am"
+    ],
+    "Monday_p6": [
+      "Sakina Ma'am"
+    ]
+  },
+  "generalDuties": [
     {
       "id": "gd_1",
       "dutyName": "Morning Assembly & Prayer Duty",
@@ -1175,54 +1151,5 @@ const DEFAULT_DATA = {
       ]
     }
   ],
-  "dutyPresets": [
-    "Library Supervision",
-    "Corridor & Hallway Monitoring",
-    "Science Lab Assistance",
-    "Computer Lab Duty",
-    "Exam Paper Evaluation & Grading",
-    "Remedial Coaching / Doubt Solving",
-    "Reception & Administrative Duty",
-    "Lesson Planning & Preparation",
-    "Playground / Recess Duty",
-    "Discipline & Gate Supervision"
-  ],
-  "initialDuties": {
-    "Thursday": {
-      "p1": {},
-      "p2": {},
-      "p3": {},
-      "p4": {},
-      "p5": {},
-      "p6": {}
-    },
-    "Friday": {
-      "p1": {},
-      "p2": {},
-      "p3": {},
-      "p4": {},
-      "p5": {},
-      "p6": {}
-    },
-    "Saturday": {
-      "p1": {},
-      "p2": {},
-      "p3": {},
-      "p4": {},
-      "p5": {},
-      "p6": {}
-    },
-    "Monday": {
-      "p1": {},
-      "p2": {},
-      "p3": {},
-      "p4": {},
-      "p5": {},
-      "p6": {}
-    }
-  }
-};
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = DEFAULT_DATA;
+  "activeGeneralDutyDay": "all"
 }

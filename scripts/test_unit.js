@@ -30,7 +30,7 @@ async function runTests() {
     state.schoolProfile,
     DEFAULT_DATA.initialDuties
   );
-  assert(classXml.includes("St. Xavier"), 'Must include school name in header');
+  assert(classXml.includes("FUNLAND"), 'Must include school name in header');
   assert(classXml.includes('Prepared By:'), 'Must include sign-off prepared by');
   assert(classXml.includes('Approved By:'), 'Must include sign-off approved by');
   assert(!classXml.includes('Duty &amp; Supervision Schedule'), 'Must NOT include Duty & Supervision Schedule table in weekly class timetable');

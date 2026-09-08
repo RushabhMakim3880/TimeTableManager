@@ -6,7 +6,7 @@
 (function() {
   'use strict';
 
-  const STORAGE_KEY = 'school_timetable_mgmt_v3';
+  const STORAGE_KEY = 'school_timetable_mgmt_v4';
 
   // --- Core Application State ---
   let state = {
@@ -252,22 +252,32 @@
         resetToDefaults();
       }
     } else {
-      // Migrate from v2 if available
-      const v2 = localStorage.getItem('school_timetable_mgmt_v2') || localStorage.getItem('timetable_studio_v1_state');
-      if (v2) {
+      // Migrate from v3 if available and not old placeholder
+      const v3 = localStorage.getItem('school_timetable_mgmt_v3');
+      if (v3) {
         try {
-          const old = JSON.parse(v2);
-          resetToDefaults();
-          if (old.schedules) state.schedules = old.schedules;
-          if (old.teachers) state.teachers = old.teachers;
-          if (old.subjects) state.subjects = old.subjects;
-          if (old.leaves) state.leaves = old.leaves;
+          const old = JSON.parse(v3);
+          if (old.schoolProfile && old.schoolProfile.name && old.schoolProfile.name.includes('Xavier')) {
+            resetToDefaults();
+          } else {
+            state = Object.assign({}, state, old);
+            saveState(true);
+          }
         } catch(e) {
           resetToDefaults();
         }
       } else {
         resetToDefaults();
       }
+    }
+
+    // Guarantee that if any browser has old demo placeholder cached, it upgrades to Funland DEFAULT_DATA
+    if (!state.schoolProfile || !state.schoolProfile.name || state.schoolProfile.name.includes('Xavier')) {
+      state.schoolProfile = JSON.parse(JSON.stringify(DEFAULT_DATA.schoolProfile));
+      state.schedules = JSON.parse(JSON.stringify(DEFAULT_DATA.initialSchedules));
+      state.weeklyDuties = JSON.parse(JSON.stringify(DEFAULT_DATA.initialWeeklyDuties));
+      state.generalDuties = JSON.parse(JSON.stringify(DEFAULT_DATA.initialGeneralDuties));
+      saveState(true);
     }
 
     if (!state.dutyPresets || state.dutyPresets.length === 0) {
@@ -316,11 +326,6 @@
       });
     }
 
-    // Synchronize Monday schedule if still on old demo data
-    if (state.schedules && state.schedules["Monday"] && state.schedules["Monday"]["p1"] &&
-        state.schedules["Monday"]["p1"]["std_3"] && state.schedules["Monday"]["p1"]["std_3"].teacher === "Payal Ma'am") {
-      state.schedules["Monday"] = JSON.parse(JSON.stringify(DEFAULT_DATA.initialSchedules["Monday"]));
-    }
 
     if (!state.selectedTeacher && state.teachers.length > 0) {
       state.selectedTeacher = state.teachers[0];
