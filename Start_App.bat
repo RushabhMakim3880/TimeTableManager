@@ -4,14 +4,20 @@ echo ========================================================
 echo    Launching TimeTable Studio Web Panel...
 echo ========================================================
 
-:: Try launching with python server if available
-where python >nul 2>nul
+:: Check for Node.js first, then Python
+where node >nul 2>nul
 if %errorlevel% equ 0 (
-    echo Starting local server with Python...
-    start "" python "%~dp0server.py"
+    echo Starting local Auto-Save server with Node.js...
+    start "" node "%~dp0server.js"
 ) else (
-    echo Opening application directly in default web browser...
-    start "" "%~dp0index.html"
+    where python >nul 2>nul
+    if %errorlevel% equ 0 (
+        echo Starting local Auto-Save server with Python...
+        start "" python "%~dp0server.py"
+    ) else (
+        echo Opening application directly in default web browser...
+        start "" "%~dp0index.html"
+    )
 )
 
 echo.

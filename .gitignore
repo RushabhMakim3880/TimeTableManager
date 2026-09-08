@@ -4,3 +4,4 @@ node_modules/
 ~$*.docx
 Test_*.docx
 docx_template/
+__pycache__/

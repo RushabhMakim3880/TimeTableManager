@@ -238,6 +238,8 @@
         switchView(hashView);
       }
     });
+    // On local startup, ensure disk matches current localStorage state
+    syncStateToDisk();
   }
 
   // --- State Persistence ---
@@ -355,6 +357,31 @@
         DOM.saveBadge.innerHTML = '<span class="dot"></span> Auto-Saved';
       }, 1500);
     }
+    syncStateToDisk();
+  }
+
+  let syncDiskTimeout = null;
+  function syncStateToDisk() {
+    // Only auto-save to disk when running on local development server
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocal) return;
+
+    if (syncDiskTimeout) clearTimeout(syncDiskTimeout);
+    syncDiskTimeout = setTimeout(() => {
+      fetch('/api/save-state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
+      })
+      .then(res => {
+        if (res.ok && DOM.saveBadge) {
+          DOM.saveBadge.title = 'Saved to browser & disk (js/default-data.js)';
+        }
+      })
+      .catch(() => {
+        // Silent catch if server is static
+      });
+    }, 350);
   }
 
   // --- School Profile & Branding ---
