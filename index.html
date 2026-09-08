@@ -4,120 +4,550 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>School Timetable Management System • Academic Scheduling Portal</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231E3A8A'%3E%3Cpath d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z'/%3E%3C/svg%3E">
+  <link rel="alternate icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
 
-  <!-- Executive Header -->
+  <!-- Executive Header with Institutional Identity -->
   <header class="app-header">
     <div class="header-inner">
       <div class="brand-wrapper">
-        <div class="brand-icon-box">
-          <svg viewBox="0 0 24 24">
-            <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"/>
-          </svg>
+        <div id="school-logo-container" style="display: flex; align-items: center;">
+          <!-- Displayed if logo uploaded, else default academic icon -->
+          <div class="brand-icon-box" id="default-brand-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"/>
+            </svg>
+          </div>
+          <img id="header-school-logo" class="brand-logo-img" style="display: none;" alt="School Crest">
         </div>
         <div class="brand-info">
           <h1>
-            School Timetable Management
+            <span id="header-school-name">St. Xavier's International Academy</span>
             <span class="status-pill" id="save-status-badge">
               <span class="dot"></span> Auto-Saved
             </span>
           </h1>
-          <p>Academic Period Scheduling & Word Export Portal</p>
+          <p id="header-school-meta">Affiliation No: 1130452 • Academic Session: 2026–2027</p>
         </div>
       </div>
 
       <div class="header-toolbar">
-        <button id="btn-open-settings" class="btn btn-secondary" title="Manage Teachers and Subjects Roster">
+        <button id="btn-open-school-profile" class="btn btn-secondary" title="Configure School Name, Logo & Signatories">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+          School Profile & Logo
+        </button>
+        <button id="btn-open-settings" class="btn btn-secondary" title="Manage Staff and Subjects Roster">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
           Staff & Subject Roster
         </button>
         <button id="btn-export-json" class="btn btn-secondary" title="Export JSON backup file">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
-          Backup Data
+          Backup
         </button>
         <button id="btn-import-json" class="btn btn-secondary" title="Restore timetable data from backup">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
           Restore
         </button>
         <input type="file" id="import-file-input" accept=".json" style="display: none;">
-        <button id="btn-reset-data" class="btn btn-secondary" title="Reset to original template data">
-          Reset
-        </button>
       </div>
     </div>
   </header>
 
+  <!-- Multi-Perspective View Switcher Bar -->
+  <nav class="view-switcher-bar">
+    <div class="view-switcher-inner">
+      <button class="view-tab-btn active" data-view="class-view">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        Class Timetable View
+      </button>
+      <button class="view-tab-btn" data-view="teacher-view">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Teacher-Wise Timetable
+      </button>
+      <button class="view-tab-btn" data-view="duty-view">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        Faculty Extra Duties
+      </button>
+      <button class="view-tab-btn" data-view="general-duty-view">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        School &amp; Assembly Duties
+      </button>
+      <button class="view-tab-btn" data-view="substitution-view">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
+        Daily Substitution &amp; Proxy
+      </button>
+      <button class="view-tab-btn" data-view="workload-view">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+        Faculty Workload Analytics
+      </button>
+    </div>
+  </nav>
+
   <!-- Main Container -->
   <main class="main-wrapper">
 
-    <!-- Day Navigation Toolbar -->
-    <section class="day-nav-bar">
-      <div class="day-segmented-control" id="day-tabs-container">
-        <!-- Generated dynamically in app.js -->
-      </div>
+    <!-- ====================================================================
+         SECTION 1: CLASS-WISE TIMETABLE VIEW
+         ==================================================================== -->
+    <section class="view-section active" id="section-class-view">
 
-      <div class="day-nav-actions">
-        <button id="btn-open-copy-modal" class="btn btn-secondary btn-sm" title="Duplicate this schedule to other days">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-          Duplicate Schedule...
-        </button>
-        <button id="btn-clear-current-day" class="btn btn-danger-outline btn-sm" title="Clear periods for this day">
-          Clear Day
-        </button>
-      </div>
-    </section>
-
-    <!-- Staff Availability & Attendance Bar -->
-    <section class="attendance-strip">
-      <div class="attendance-strip-header">
-        <span class="attendance-strip-title">
-          Staff Attendance & Duty Status
-        </span>
-        <span class="attendance-strip-hint">
-          Click any teacher to mark <strong>On Leave</strong> (automatically excluded from Free Teachers calculation)
-        </span>
-      </div>
-      <div class="teacher-badges-flow" id="attendance-chips-container">
-        <!-- Rendered dynamically -->
-      </div>
-    </section>
-
-    <!-- Conflict Callout Banner -->
-    <section class="conflict-callout" id="conflict-banner">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
-      </svg>
-      <div id="conflict-message">
-        <strong>Schedule Conflict Detected:</strong> Staff member double-booked in the same period.
-      </div>
-    </section>
-
-    <!-- Timetable Document Canvas -->
-    <section class="timetable-document-sheet">
-      <div class="sheet-header">
-        <div class="sheet-title-group">
-          <h2 id="display-day-name">Monday</h2>
-          <p>Academic Period Allocation & Free Staff Distribution</p>
+      <!-- Day Navigation Toolbar -->
+      <div class="day-nav-bar">
+        <div class="day-segmented-control" id="day-tabs-container">
+          <!-- Rendered in app.js -->
         </div>
-        <div class="sheet-meta-info">
-          <div style="font-weight: 600; color: var(--text-primary);" id="display-day-stats">Standards: 3rd to 8th • Lectures: 1 to 6</div>
-          <div style="color: var(--text-dim);">Click any cell to edit assignment</div>
+
+        <div class="day-nav-actions">
+          <button id="btn-open-copy-modal" class="btn btn-secondary btn-sm" title="Duplicate schedule to other days">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            Duplicate Schedule...
+          </button>
+          <button id="btn-clear-current-day" class="btn btn-danger-outline btn-sm" title="Clear periods for this day">
+            Clear Day
+          </button>
         </div>
       </div>
 
-      <table class="official-grid-table" id="timetable-table">
-        <thead id="timetable-thead">
-          <!-- Dynamic Header -->
-        </thead>
-        <tbody id="timetable-tbody">
-          <!-- Dynamic Rows -->
-        </tbody>
-      </table>
+      <!-- Staff Attendance Strip -->
+      <div class="attendance-strip">
+        <div class="attendance-strip-header">
+          <span class="attendance-strip-title">Staff Attendance & Duty Status</span>
+          <span class="attendance-strip-hint">Click a staff member to mark <strong>On Leave</strong> (auto-excluded from free teachers)</span>
+        </div>
+        <div class="teacher-badges-flow" id="attendance-chips-container">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Conflict Callout Banner -->
+      <div class="conflict-callout" id="conflict-banner">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        <div id="conflict-message">
+          <strong>Schedule Conflict Detected:</strong> Staff member double-booked in the same period.
+        </div>
+      </div>
+
+      <!-- Timetable Document Canvas -->
+      <div class="timetable-document-sheet">
+        <div class="sheet-header">
+          <div class="sheet-title-group">
+            <h2 id="display-day-name">Monday</h2>
+            <p id="display-sheet-sublabel">Academic Period Allocation & Free Staff Distribution</p>
+          </div>
+          <div class="sheet-meta-info">
+            <div style="font-weight: 600; color: var(--text-primary);" id="display-day-stats">Standards: 3rd to 8th • Lectures: 1 to 6</div>
+            <div style="color: var(--text-dim);">Click any cell to edit assignment</div>
+          </div>
+        </div>
+
+        <table class="official-grid-table" id="timetable-table">
+          <thead id="timetable-thead"></thead>
+          <tbody id="timetable-tbody"></tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         SECTION 2: TEACHER-WISE INDIVIDUAL TIMETABLE VIEW
+         ==================================================================== -->
+    <section class="view-section" id="section-teacher-view">
+
+      <div class="teacher-filter-bar">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Select Faculty Member:</label>
+          <select id="select-teacher-filter" class="popover-input" style="width: auto; min-width: 220px; font-weight: 600;">
+            <!-- Rendered in app.js -->
+          </select>
+        </div>
+
+        <div class="teacher-stats-badge" id="teacher-stats-badge">
+          <span>Total Teaching Load: <strong id="teacher-load-stat">0</strong> periods/week</span>
+          <span>•</span>
+          <span>Free/Prep Periods: <strong id="teacher-free-stat">0</strong> periods/week</span>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-download-teacher-docx" class="btn btn-word btn-sm">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Download Teacher's Schedule (.docx)
+          </button>
+          <button id="btn-download-all-teachers-docx" class="btn btn-primary btn-sm">
+            Download All Staff Schedules (.docx)
+          </button>
+        </div>
+      </div>
+
+      <div class="timetable-document-sheet">
+        <div class="sheet-header">
+          <div class="sheet-title-group">
+            <h2 id="display-teacher-name">Faculty Schedule</h2>
+            <p>Weekly Personal Timetable & Free Preparation Slots</p>
+          </div>
+          <div class="sheet-meta-info">
+            <div style="font-weight: 600; color: var(--text-primary);">Monday through Friday Schedule</div>
+            <div style="color: var(--text-dim);">Generated automatically from master class timetable</div>
+          </div>
+        </div>
+
+        <table class="official-grid-table" id="teacher-grid-table">
+          <thead id="teacher-grid-thead"></thead>
+          <tbody id="teacher-grid-tbody"></tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         SECTION 3: FACULTY EXTRA DUTY ROSTER (NOTEBOOK FORMAT)
+         ==================================================================== -->
+    <section class="view-section" id="section-duty-view">
+
+      <div class="teacher-filter-bar">
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-navy);"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Faculty Extra Duties Configuration &amp; Roster
+          </h3>
+          <p style="font-size: 12.5px; color: var(--text-muted);">Configure and allocate supervision &amp; remedial duties (e.g. 3 to 5 Maths, 6 to 8 Sci) for faculty members across Monday to Friday</p>
+        </div>
+
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button id="btn-download-weekly-duty-docx" class="btn btn-word btn-sm">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Download Extra Duties (.docx)
+          </button>
+          <button id="btn-print-duty-view" class="btn btn-secondary btn-sm" title="Print document or save as PDF">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+            Print / PDF
+          </button>
+          <button id="btn-clear-all-weekly-duties" class="btn btn-danger-outline btn-sm" title="Clear all weekly duties">
+            Clear All Duties
+          </button>
+        </div>
+      </div>
+
+      <div class="timetable-document-sheet">
+        <div class="sheet-header">
+          <div class="sheet-title-group">
+            <h2>Faculty Extra Duty Allocation Matrix</h2>
+            <p>Official Weekly Allocation • Click any cell to configure or modify duty</p>
+          </div>
+          <div class="sheet-meta-info">
+            <div style="font-weight: 600; color: var(--text-primary);">Standards: 3 to 5 &amp; 6 to 8</div>
+            <div style="color: var(--text-dim);">Monday through Friday Schedule</div>
+          </div>
+        </div>
+
+        <table class="official-grid-table weekly-duty-table" id="weekly-duty-table">
+          <thead>
+            <tr>
+              <th style="width: 22%;">Faculty Member</th>
+              <th style="width: 13%;">Monday</th>
+              <th style="width: 13%;">Tuesday</th>
+              <th style="width: 13%;">Wednesday</th>
+              <th style="width: 13%;">Thursday</th>
+              <th style="width: 13%;">Friday</th>
+              <th style="width: 13%;">Total Duties</th>
+            </tr>
+          </thead>
+          <tbody id="weekly-duty-tbody">
+            <!-- Rendered dynamically in app.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Live Duty Breakdown / Notebook Tally -->
+      <div class="timetable-document-sheet" style="margin-top: 20px;">
+        <div class="sheet-header">
+          <div class="sheet-title-group">
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-navy);"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+              Duty Allocation Summary &amp; Subject Breakdown (Notebook Tally)
+            </h3>
+            <p style="font-size: 12px; color: var(--text-muted);">Real-time count of allocated supervision duties by subject and standard group</p>
+          </div>
+          <div id="weekly-duty-total-badge" style="font-size: 13px; font-weight: 700; color: var(--primary-navy); background: var(--primary-light); padding: 4px 12px; border-radius: 12px;">
+            Total Duties: 0
+          </div>
+        </div>
+
+        <div id="weekly-duty-summary-container" class="duty-summary-grid">
+          <!-- Rendered in app.js: e.g. Maths 3 to 5: 2, Eng 3 to 5: 4, etc. -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         SECTION: SCHOOL & ASSEMBLY GENERAL DUTIES
+         ==================================================================== -->
+    <section class="view-section" id="section-general-duty-view">
+      
+      <!-- Top Action Bar -->
+      <div class="teacher-filter-bar">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <button id="btn-add-general-duty" class="btn btn-primary btn-sm">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Add New Duty
+          </button>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label style="font-size: 12.5px; font-weight: 600; color: var(--text-muted);">Filter by Staff:</label>
+            <select id="select-general-duty-filter-teacher" class="popover-input" style="width: auto; padding: 4px 8px; font-size: 12.5px;">
+              <option value="">All Faculty Members</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button id="btn-download-general-duties-docx" class="btn btn-secondary btn-sm" title="Download official Word .docx format">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            Export Duty Roster (.docx)
+          </button>
+          <button id="btn-print-general-duties" class="btn btn-secondary btn-sm" title="Print this duty roster">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+            Print
+          </button>
+          <button id="btn-clear-all-general-duties" class="btn btn-danger-outline btn-sm">Clear All</button>
+        </div>
+      </div>
+
+      <!-- General Duties Document Sheet -->
+      <div class="timetable-document-sheet" style="margin-top: 14px;">
+        <div class="sheet-header">
+          <div class="sheet-title-group">
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-navy);"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              Faculty General &amp; Special School Duties Roster
+            </h3>
+            <p style="font-size: 12.5px; color: var(--text-muted);">
+              Assembly duties, student attendance roll count, corridor/recess supervision, gate and dispersal duties.
+            </p>
+          </div>
+          <div id="general-duty-total-badge" style="font-size: 13px; font-weight: 700; color: var(--primary-navy); background: var(--primary-light); padding: 4px 12px; border-radius: 12px;">
+            Total Duties: 0
+          </div>
+        </div>
+
+        <!-- Day-Wise Selector Tabs -->
+        <div class="day-segmented-control" id="general-duty-day-tabs" style="margin-bottom: 16px;">
+          <button class="day-tab-btn active" data-day="all">All Days (Weekly Matrix)</button>
+          <button class="day-tab-btn" data-day="Monday">Monday</button>
+          <button class="day-tab-btn" data-day="Tuesday">Tuesday</button>
+          <button class="day-tab-btn" data-day="Wednesday">Wednesday</button>
+          <button class="day-tab-btn" data-day="Thursday">Thursday</button>
+          <button class="day-tab-btn" data-day="Friday">Friday</button>
+        </div>
+
+        <div style="overflow-x: auto; padding: 0 4px 16px 4px;">
+          <table class="official-grid-table general-duty-table" id="general-duty-table">
+            <thead id="general-duty-thead">
+              <!-- Rendered dynamically for All Days or Daily View -->
+            </thead>
+            <tbody id="general-duty-tbody">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         SECTION 4: DAILY SUBSTITUTION & PROXY MANAGER
+         ==================================================================== -->
+    <section class="view-section" id="section-substitution-view">
+
+      <div class="substitution-panel">
+        <div class="sub-header-row">
+          <div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary);">Daily Relief & Faculty Substitution Engine</h3>
+            <p style="font-size: 12.5px; color: var(--text-muted);">Manage emergency teacher absences, auto-suggest free proxies, and export substitution duty notices.</p>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <label style="font-size: 13px; font-weight: 600;">Day:</label>
+            <select id="sub-day-select" class="popover-input" style="width: auto;">
+              <!-- Monday to Saturday options -->
+            </select>
+            <button id="btn-download-substitution-docx" class="btn btn-word btn-sm">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Export Substitution Notice (.docx)
+            </button>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px 16px;">
+          <div style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">
+            1. Select Absent / On Leave Faculty Today:
+          </div>
+          <div class="teacher-badges-flow" id="sub-absent-selection-container">
+            <!-- Toggle absent teachers -->
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span>2. Vacant Classes Requiring Substitution (<span id="sub-vacant-count">0</span> classes):</span>
+            <button id="btn-auto-assign-all-proxies" class="btn btn-primary btn-sm">⚡ Auto-Assign Best Free Proxies</button>
+          </div>
+
+          <table class="official-grid-table" id="substitution-table">
+            <thead>
+              <tr>
+                <th style="width: 12%;">Period</th>
+                <th style="width: 14%;">Timing</th>
+                <th style="width: 14%;">Standard / Class</th>
+                <th style="width: 18%;">Subject & Absent Teacher</th>
+                <th style="width: 28%;">Designated Proxy Staff</th>
+                <th style="width: 14%;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="substitution-tbody">
+              <!-- Rendered in app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         SECTION 4: FACULTY WORKLOAD & ANALYTICS
+         ==================================================================== -->
+    <!-- ====================================================================
+         SECTION 5: FACULTY WORKLOAD & ANALYTICS
+         ==================================================================== -->
+    <section class="view-section" id="section-workload-view">
+
+      <!-- Executive Header Bar -->
+      <div class="teacher-filter-bar" style="margin-bottom: 20px;">
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-navy);"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            Academic Workload &amp; Faculty Capacity Analytics
+          </h3>
+          <p style="font-size: 12.5px; color: var(--text-muted);">Institutional monitoring of teaching distributions, labor compliance ceilings, and standard-wise curriculum hours</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-print-workload" class="btn btn-secondary btn-sm" onclick="window.print()" title="Print Analytics Report">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+            Print Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Executive KPI Stat Cards (4 Cards Grid) -->
+      <div class="workload-kpi-grid">
+        <div class="workload-kpi-card">
+          <div class="kpi-icon icon-blue">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">TOTAL SCHEDULED PERIODS</div>
+            <div class="kpi-value" id="kpi-total-lectures">0</div>
+            <div class="kpi-subtext">Across Standards 3rd to 8th (Mon–Fri)</div>
+          </div>
+        </div>
+
+        <div class="workload-kpi-card">
+          <div class="kpi-icon icon-green">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">AVERAGE FACULTY LOAD</div>
+            <div class="kpi-value" id="kpi-avg-load">0 <span style="font-size: 13px; font-weight: 500; color: var(--text-muted);">periods/wk</span></div>
+            <div class="kpi-subtext">Standard institutional target: 16–22</div>
+          </div>
+        </div>
+
+        <div class="workload-kpi-card">
+          <div class="kpi-icon icon-purple">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">PEAK FACULTY LOAD</div>
+            <div class="kpi-value" id="kpi-max-teacher">--</div>
+            <div class="kpi-subtext" id="kpi-max-periods">Highest individual allocation</div>
+          </div>
+        </div>
+
+        <div class="workload-kpi-card">
+          <div class="kpi-icon icon-emerald">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">LABOR COMPLIANCE STATUS</div>
+            <div class="kpi-value" id="kpi-compliance-status" style="color: #059669;">100%</div>
+            <div class="kpi-subtext" id="kpi-compliance-subtext">All faculty ≤ 26 periods ceiling</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Analytics 2-Column Dashboard Grid -->
+      <div class="workload-main-grid">
+
+        <!-- Column 1: Weekly Faculty Teaching Load Distribution -->
+        <div class="workload-panel">
+          <div class="panel-title-row">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-navy);"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+              <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text-primary); margin: 0;">Weekly Teaching Load Distribution</h4>
+            </div>
+            <span class="panel-badge" id="workload-staff-count">10 Staff Members</span>
+          </div>
+          <div class="panel-subtitle">Sorted from highest to lowest load • Ceiling: 26 periods/week (Monday to Friday)</div>
+
+          <div id="workload-bars-container" class="workload-bars-list">
+            <!-- Rendered in app.js with teacher avatars, status badges, and styled progress bars -->
+          </div>
+        </div>
+
+        <!-- Column 2: Right Column with Diagnostics & Subject Hours -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <!-- Diagnostics & Health Checks -->
+          <div class="workload-panel">
+            <div class="panel-title-row">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: #059669;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text-primary); margin: 0;">Pedagogical Compliance &amp; Faculty Health</h4>
+              </div>
+              <span class="badge-optimal">Verified</span>
+            </div>
+            <div class="panel-subtitle">Audits fatigue limits, consecutive period strain, and free preparation capacity</div>
+
+            <div id="compliance-alerts-container" class="compliance-alerts-flow">
+              <!-- Rendered in app.js -->
+            </div>
+          </div>
+
+          <!-- Subject Curriculum Allocation (Per Standard) -->
+          <div class="workload-panel">
+            <div class="panel-title-row">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-navy);"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+                <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text-primary); margin: 0;">Subject Curriculum Allocation (Per Standard)</h4>
+              </div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Weekly Hours</span>
+            </div>
+            <div class="panel-subtitle">Total teaching periods allocated to each subject across standards 3rd to 8th</div>
+
+            <div id="subject-distribution-container" class="subject-dist-table-wrapper">
+              <!-- Rendered in app.js -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
     </section>
 
   </main>
@@ -132,8 +562,8 @@
           </svg>
         </div>
         <div class="export-desc-text">
-          <h4>Export Official Documents</h4>
-          <p>Generates formatted Word (.docx) documents ready to share with school administration.</p>
+          <h4 id="export-bar-title">Export Official School Documents</h4>
+          <p id="export-bar-desc">Outputs formatted Microsoft Word (.docx) with school letterhead and principal sign-off.</p>
         </div>
       </div>
 
@@ -163,23 +593,31 @@
       </div>
       <div class="popover-body">
         
-        <!-- Subject Selection -->
         <div>
-          <div class="popover-section-label">Select Subject</div>
-          <div class="quick-select-pills" id="modal-subject-chips">
-            <!-- Dynamic Subject Pills -->
+          <div class="popover-section-label" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>⚡ 1-Click Fast Assign (Subject + Faculty)</span>
+            <span style="font-size: 11px; font-weight: normal; color: var(--text-muted); text-transform: none;">Assigns &amp; saves immediately</span>
           </div>
+          <div class="quick-select-pills" id="modal-quick-pairs"></div>
+        </div>
+
+        <div>
+          <div class="popover-section-label" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Select Subject</span>
+            <span id="modal-subject-hint" style="font-size: 11px; font-weight: 600; color: var(--primary-navy); text-transform: none;"></span>
+          </div>
+          <div class="quick-select-pills" id="modal-subject-chips"></div>
           <div style="margin-top: 6px;">
             <input type="text" id="modal-custom-subject" class="popover-input" placeholder="Or enter subject name...">
           </div>
         </div>
 
-        <!-- Teacher Selection -->
         <div>
-          <div class="popover-section-label">Select Teacher</div>
-          <div class="quick-select-pills" id="modal-teacher-chips">
-            <!-- Dynamic Teacher Pills with Availability status -->
+          <div class="popover-section-label" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Select Teacher</span>
+            <span id="modal-teacher-hint" style="font-size: 11px; font-weight: 600; color: var(--primary-navy); text-transform: none;"></span>
           </div>
+          <div class="quick-select-pills" id="modal-teacher-chips"></div>
           <div style="margin-top: 6px;">
             <input type="text" id="modal-custom-teacher" class="popover-input" placeholder="Or enter teacher name...">
           </div>
@@ -196,7 +634,208 @@
     </div>
   </div>
 
-  <!-- Enterprise Modal: Duplicate / Copy Schedule -->
+  <!-- Fast In-Place Popover for Weekly Duty Editing -->
+  <div class="period-popover-overlay" id="duty-cell-modal">
+    <div class="period-popover-card" style="max-width: 480px;">
+      <div class="popover-header">
+        <h3 id="duty-cell-modal-title">Assign Weekly Extra Duty</h3>
+        <button class="popover-close-btn" id="btn-close-duty-cell-modal">&times;</button>
+      </div>
+      <div class="popover-body">
+        
+        <div>
+          <div class="popover-section-label">⚡ Fast Presets (from Notebook)</div>
+          <div class="quick-select-pills" id="modal-duty-preset-pills"></div>
+        </div>
+
+        <div>
+          <div class="popover-section-label">1. Select Standard / Grade Group</div>
+          <div class="quick-select-pills" id="modal-duty-grade-pills">
+            <button type="button" class="pill-choice" data-grade="3 to 5">3 to 5 (Primary)</button>
+            <button type="button" class="pill-choice" data-grade="6 to 8">6 to 8 (Upper Primary)</button>
+            <button type="button" class="pill-choice" data-grade="3 to 8">3 to 8 (Combined)</button>
+            <button type="button" class="pill-choice" data-grade="All">All Standards</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="popover-section-label">2. Select Subject / Task</div>
+          <div class="quick-select-pills" id="modal-duty-subject-pills">
+            <button type="button" class="pill-choice" data-subj="Maths">Maths</button>
+            <button type="button" class="pill-choice" data-subj="Eng">Eng</button>
+            <button type="button" class="pill-choice" data-subj="Sci">Sci</button>
+            <button type="button" class="pill-choice" data-subj="Env">Env</button>
+            <button type="button" class="pill-choice" data-subj="Guj">Guj</button>
+            <button type="button" class="pill-choice" data-subj="Sci/Eng">Sci/Eng</button>
+            <button type="button" class="pill-choice" data-subj="Social Science">Social Science</button>
+            <button type="button" class="pill-choice" data-subj="Computer">Computer</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="popover-section-label">Duty / Task Text</div>
+          <input type="text" id="modal-duty-custom-text" class="popover-input" placeholder="e.g. 3 to 5 Maths, Library Supervision, etc.">
+        </div>
+
+      </div>
+      <div class="popover-footer">
+        <button id="btn-modal-clear-duty" class="btn btn-danger-outline btn-sm">Clear Duty</button>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-modal-cancel-duty" class="btn btn-secondary btn-sm">Cancel</button>
+          <button id="btn-modal-save-duty" class="btn btn-primary btn-sm">Save Duty</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enterprise Modal: Add / Edit General School Duty -->
+  <div class="enterprise-modal-overlay" id="general-duty-modal">
+    <div class="enterprise-modal-card" style="max-width: 560px;">
+      <div class="modal-title-bar">
+        <h3 id="general-duty-modal-title">Add / Edit School Duty</h3>
+        <button class="popover-close-btn" id="btn-close-general-duty-modal">&times;</button>
+      </div>
+      <div class="modal-content-area">
+        <input type="hidden" id="input-general-duty-id" value="">
+
+        <!-- Fast Presets Pills -->
+        <div>
+          <label style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px; letter-spacing: 0.03em;">⚡ FAST PRESETS (CLICK TO AUTO-FILL)</label>
+          <div class="quick-select-pills" id="modal-general-duty-presets-container"></div>
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">DUTY / RESPONSIBILITY NAME *</label>
+          <input type="text" id="input-general-duty-name" class="popover-input" placeholder="e.g. Morning Assembly Duty, Present/Absent of kids, Gate Duty" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">TIMING / TIME SLOT</label>
+            <input type="text" id="input-general-duty-time" class="popover-input" placeholder="e.g. 12:45 PM – 1:00 PM">
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">LOCATION / AREA</label>
+            <input type="text" id="input-general-duty-location" class="popover-input" placeholder="e.g. Assembly Ground, Admin Office, Main Gate">
+          </div>
+        </div>
+
+        <!-- Day-Wise Faculty Allocation -->
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px; margin-top: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label style="font-size: 11.5px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.03em;">
+              Day-Wise Faculty Allocation (Mon – Fri)
+            </label>
+            <span style="font-size: 11px; color: var(--text-muted);">Assign per day or use quick autofill</span>
+          </div>
+
+          <!-- Quick Fill Bar -->
+          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+            <select id="select-general-duty-quick-teacher" class="popover-input" style="font-size: 12px; padding: 5px 8px; flex: 1;">
+              <option value="">-- Choose Faculty to Apply to All Days --</option>
+            </select>
+            <button type="button" id="btn-gduty-apply-all-days" class="btn btn-secondary btn-sm" style="font-size: 11.5px; white-space: nowrap;">
+              ⚡ Set for All Days
+            </button>
+          </div>
+
+          <!-- 5 Day Dropdowns Grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;" id="gduty-day-allocations-container">
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: #1e40af; display: block; margin-bottom: 2px;">Monday</label>
+              <select id="select-gduty-day-Monday" class="popover-input gduty-day-select" data-day="Monday" style="font-size: 12px; padding: 4px 6px;"></select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: #b45309; display: block; margin-bottom: 2px;">Tuesday</label>
+              <select id="select-gduty-day-Tuesday" class="popover-input gduty-day-select" data-day="Tuesday" style="font-size: 12px; padding: 4px 6px;"></select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: #7e22ce; display: block; margin-bottom: 2px;">Wednesday</label>
+              <select id="select-gduty-day-Wednesday" class="popover-input gduty-day-select" data-day="Wednesday" style="font-size: 12px; padding: 4px 6px;"></select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: #047857; display: block; margin-bottom: 2px;">Thursday</label>
+              <select id="select-gduty-day-Thursday" class="popover-input gduty-day-select" data-day="Thursday" style="font-size: 12px; padding: 4px 6px;"></select>
+            </div>
+            <div style="grid-column: span 2;">
+              <label style="font-size: 11px; font-weight: 700; color: #be123c; display: block; margin-bottom: 2px;">Friday</label>
+              <select id="select-gduty-day-Friday" class="popover-input gduty-day-select" data-day="Friday" style="font-size: 12px; padding: 4px 6px;"></select>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">SPECIFIC GUIDELINES / INSTRUCTIONS</label>
+          <textarea id="input-general-duty-notes" class="popover-input" rows="2" style="resize: vertical;" placeholder="e.g. Lead prayer, take absentee register headcount by 1:30 PM"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions-bar">
+        <button id="btn-cancel-general-duty" class="btn btn-secondary btn-sm">Cancel</button>
+        <button id="btn-save-general-duty" class="btn btn-primary btn-sm">Save Duty</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enterprise Modal: School Profile & Branding -->
+  <div class="enterprise-modal-overlay" id="school-profile-modal">
+    <div class="enterprise-modal-card" style="max-width: 580px;">
+      <div class="modal-title-bar">
+        <h3>School Institutional Profile & Branding</h3>
+        <button class="popover-close-btn" id="btn-close-profile-modal">&times;</button>
+      </div>
+      <div class="modal-content-area">
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">SCHOOL NAME</label>
+          <input type="text" id="input-school-name" class="popover-input" placeholder="e.g. St. Xavier's International Academy">
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">AFFILIATION & BOARD CODE</label>
+          <input type="text" id="input-school-affiliation" class="popover-input" placeholder="e.g. Affiliation No: 1130452 • School Code: 40381">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">ACADEMIC SESSION</label>
+            <input type="text" id="input-academic-year" class="popover-input" placeholder="e.g. 2026–2027">
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">TERM / SEMESTER</label>
+            <input type="text" id="input-academic-term" class="popover-input" placeholder="e.g. Term 1">
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">SCHOOL CREST / LOGO (PNG or JPG)</label>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="file" id="input-logo-file" accept="image/*" class="popover-input" style="padding: 4px;">
+            <button id="btn-remove-logo" class="btn btn-danger-outline btn-sm">Remove</button>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Logo appears on the web header, print sheets, and generated Word documents.</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">PREPARED BY</label>
+            <input type="text" id="input-sign-prep" class="popover-input" placeholder="Coordinator">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">VERIFIED BY</label>
+            <input type="text" id="input-sign-ver" class="popover-input" placeholder="Vice Principal">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">APPROVED BY</label>
+            <input type="text" id="input-sign-app" class="popover-input" placeholder="Principal">
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions-bar">
+        <button id="btn-save-school-profile" class="btn btn-primary btn-sm">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enterprise Modal: Duplicate Schedule -->
   <div class="enterprise-modal-overlay" id="copy-modal">
     <div class="enterprise-modal-card">
       <div class="modal-title-bar">
@@ -204,26 +843,14 @@
         <button class="popover-close-btn" id="btn-close-copy-modal">&times;</button>
       </div>
       <div class="modal-content-area">
-        <p style="font-size: 13px; color: var(--text-secondary);">
-          Quickly duplicate periods from one day to another to accelerate timetable preparation.
-        </p>
-
+        <p style="font-size: 13px; color: var(--text-secondary);">Quickly duplicate periods from one day to another to accelerate timetable preparation.</p>
         <div>
           <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">SOURCE DAY (COPY FROM)</label>
-          <select id="copy-source-day" class="popover-input">
-            <!-- Dynamic options -->
-          </select>
+          <select id="copy-source-day" class="popover-input"></select>
         </div>
-
         <div>
           <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">TARGET DAY (COPY TO)</label>
-          <select id="copy-target-day" class="popover-input">
-            <!-- Dynamic options -->
-          </select>
-        </div>
-
-        <div style="background: var(--bg-subtle); border-left: 3px solid var(--primary-navy); padding: 8px 12px; font-size: 12px; color: var(--text-secondary); border-radius: 4px;">
-          Free teachers will be automatically re-computed for the target day.
+          <select id="copy-target-day" class="popover-input"></select>
         </div>
       </div>
       <div class="modal-actions-bar">
@@ -241,8 +868,6 @@
         <button class="popover-close-btn" id="btn-close-settings-modal">&times;</button>
       </div>
       <div class="modal-content-area">
-        
-        <!-- Manage Teachers -->
         <div>
           <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">
             TEACHERS ROSTER (<span id="settings-teacher-count">10</span>)
@@ -251,12 +876,9 @@
             <input type="text" id="settings-new-teacher" class="popover-input" placeholder="e.g. Meera Ma'am">
             <button id="btn-add-teacher" class="btn btn-primary btn-sm">+ Add</button>
           </div>
-          <div id="settings-teachers-list" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 120px; overflow-y: auto; padding: 6px; border: 1px solid var(--border-light); border-radius: 4px; background: var(--bg-subtle);">
-            <!-- Dynamic items -->
-          </div>
+          <div id="settings-teachers-list" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 120px; overflow-y: auto; padding: 6px; border: 1px solid var(--border-light); border-radius: 4px; background: var(--bg-subtle);"></div>
         </div>
 
-        <!-- Manage Subjects -->
         <div>
           <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">
             ACADEMIC SUBJECTS (<span id="settings-subject-count">11</span>)
@@ -265,11 +887,18 @@
             <input type="text" id="settings-new-subject" class="popover-input" placeholder="e.g. Sanskrit">
             <button id="btn-add-subject" class="btn btn-primary btn-sm">+ Add</button>
           </div>
-          <div id="settings-subjects-list" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 120px; overflow-y: auto; padding: 6px; border: 1px solid var(--border-light); border-radius: 4px; background: var(--bg-subtle);">
-            <!-- Dynamic items -->
-          </div>
+          <div id="settings-subjects-list" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 120px; overflow-y: auto; padding: 6px; border: 1px solid var(--border-light); border-radius: 4px; background: var(--bg-subtle);"></div>
         </div>
 
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">
+            FACULTY SUBJECT MAPPING (ASSIGN PRIMARY SUBJECT TO EACH MA'AM)
+          </label>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 8px;">
+            Sets each teacher's default subject to enable instant 1-click period scheduling.
+          </div>
+          <div id="settings-teacher-subject-mapping" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 190px; overflow-y: auto; padding: 8px; border: 1px solid var(--border-light); border-radius: 4px; background: var(--bg-subtle);"></div>
+        </div>
       </div>
       <div class="modal-actions-bar">
         <button id="btn-close-settings" class="btn btn-primary btn-sm">Done</button>
@@ -282,10 +911,10 @@
 
   <!-- Scripts -->
   <script src="js/vendor/jszip.min.js"></script>
-  <script src="js/template-assets.js"></script>
-  <script src="js/default-data.js"></script>
-  <script src="js/docx-generator.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/template-assets.js?v=5"></script>
+  <script src="js/default-data.js?v=5"></script>
+  <script src="js/docx-generator.js?v=5"></script>
+  <script src="js/app.js?v=5"></script>
 
 </body>
 </html>
