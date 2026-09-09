@@ -8,16 +8,28 @@
 
   const STORAGE_KEY = 'school_timetable_mgmt_v4';
 
+  const AUTH_SESSION_KEY = 'timetable_auth_session';
+
+  function getStoredAuthUser() {
+    try {
+      const stored = localStorage.getItem(AUTH_SESSION_KEY) || sessionStorage.getItem(AUTH_SESSION_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.email && parsed.role) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to parse stored auth session', e);
+    }
+    return null;
+  }
+
   // --- Core Application State ---
   let state = {
     auth: {
-      isAuthenticated: true,
-      currentUser: {
-        name: "Admin User",
-        email: "admin@funland.edu",
-        role: "Admin",
-        avatar: "👑"
-      }
+      isAuthenticated: false,
+      currentUser: null
     },
     currentShift: 'afternoon', // 'morning' | 'afternoon'
     shifts: {
@@ -282,6 +294,8 @@
     headerUserRole: document.getElementById('header-user-role'),
     btnLogout: document.getElementById('btn-logout'),
 
+    appShell: document.getElementById('app-shell'),
+
     // Auth Login Modal
     authLoginOverlay: document.getElementById('auth-login-overlay'),
     authLoginForm: document.getElementById('auth-login-form'),
@@ -289,7 +303,7 @@
     authPassword: document.getElementById('auth-password'),
     btnAuthSubmit: document.getElementById('btn-auth-submit'),
     authErrorBanner: document.getElementById('auth-error-banner'),
-    authRoleChips: document.querySelectorAll('.auth-role-chip'),
+    authRememberMe: document.getElementById('auth-remember-me'),
     btnCloseAuthModal: document.getElementById('btn-close-auth-modal'),
     btnTogglePassword: document.getElementById('btn-toggle-password'),
     pwEyeIcon: document.getElementById('pw-eye-icon'),
@@ -509,16 +523,17 @@
       resetToDefaults();
     }
 
-    // Initialize auth if missing
-    if (!state.auth || !state.auth.currentUser) {
+    // Initialize auth from session storage if available
+    const savedUser = getStoredAuthUser();
+    if (savedUser) {
       state.auth = {
         isAuthenticated: true,
-        currentUser: {
-          name: "Admin User",
-          email: "admin@funland.edu",
-          role: "Admin",
-          avatar: "👑"
-        }
+        currentUser: savedUser
+      };
+    } else {
+      state.auth = {
+        isAuthenticated: false,
+        currentUser: null
       };
     }
 
@@ -809,14 +824,10 @@
   }
 
   function resetToDefaults() {
+    const savedUser = getStoredAuthUser();
     state.auth = {
-      isAuthenticated: true,
-      currentUser: {
-        name: "Admin User",
-        email: "admin@funland.edu",
-        role: "Admin",
-        avatar: "👑"
-      }
+      isAuthenticated: !!savedUser,
+      currentUser: savedUser || null
     };
     state.currentShift = 'afternoon';
     state.shifts = {
@@ -1235,19 +1246,11 @@
   function initAuth() {
     renderUserProfileBadge();
 
-    // If user previously logged out, present the sign-in modal
-    if (state.auth && state.auth.isAuthenticated === false) {
+    // Check auth status: show full-page sign-in screen immediately if not logged in
+    if (!state.auth || !state.auth.isAuthenticated) {
       showLoginOverlay();
-    }
-
-    // 1-Click Role switcher chips in login overlay
-    if (DOM.authRoleChips) {
-      DOM.authRoleChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-          const role = chip.getAttribute('data-role');
-          switchDemoRole(role);
-        });
-      });
+    } else {
+      hideLoginOverlay();
     }
 
     // Submit button
@@ -1280,10 +1283,12 @@
       });
     }
 
-    // Close modal (dismiss button)
+    // Dismiss close button if present
     if (DOM.btnCloseAuthModal) {
       DOM.btnCloseAuthModal.addEventListener('click', () => {
-        hideLoginOverlay();
+        if (state.auth && state.auth.isAuthenticated) {
+          hideLoginOverlay();
+        }
       });
     }
 
@@ -1292,7 +1297,7 @@
       DOM.btnLogout.addEventListener('click', handleLogout);
     }
 
-    // Clicking sidebar user badge opens switch role modal
+    // Clicking sidebar user badge opens switch role / auth
     if (DOM.headerUserBadge) {
       DOM.headerUserBadge.addEventListener('click', (e) => {
         if (e.target.closest('#btn-logout')) return;
@@ -1311,82 +1316,105 @@
     }
   }
 
-  window.switchDemoRole = function(role) {
-    if (!DEMO_USERS[role]) return;
-    const user = DEMO_USERS[role];
-    if (DOM.authEmail) DOM.authEmail.value = user.email;
-    if (DOM.authPassword) DOM.authPassword.value = user.password;
-    if (DOM.authRoleChips) {
-      DOM.authRoleChips.forEach(c => c.classList.toggle('active', c.getAttribute('data-role') === role));
-    }
-    if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
-  };
-
   function handleLogin() {
-    const email = DOM.authEmail ? DOM.authEmail.value.trim().toLowerCase() : '';
+    const emailInput = DOM.authEmail ? DOM.authEmail.value.trim().toLowerCase() : '';
     const password = DOM.authPassword ? DOM.authPassword.value.trim() : '';
     let matchedUser = null;
 
+    if (!emailInput || !password) {
+      if (DOM.authErrorBanner) {
+        const txt = DOM.authErrorBanner.querySelector('#auth-error-text');
+        if (txt) txt.textContent = 'Please enter both institutional email/ID and password.';
+        DOM.authErrorBanner.style.display = 'flex';
+      }
+      return;
+    }
+
+    // Match by full email, role name, or username key
     for (const key of Object.keys(DEMO_USERS)) {
-      if (DEMO_USERS[key].email.toLowerCase() === email) {
-        matchedUser = DEMO_USERS[key];
+      const u = DEMO_USERS[key];
+      if (u.email.toLowerCase() === emailInput || u.role.toLowerCase() === emailInput || key.toLowerCase() === emailInput) {
+        matchedUser = u;
         break;
       }
     }
 
-    // Fallback search by role name
-    if (!matchedUser) {
-      for (const key of Object.keys(DEMO_USERS)) {
-        if (DEMO_USERS[key].role.toLowerCase() === email) {
-          matchedUser = DEMO_USERS[key];
-          break;
-        }
-      }
-    }
-
-    if (!matchedUser) {
+    if (!matchedUser || matchedUser.password !== password) {
       if (DOM.authErrorBanner) {
-        DOM.authErrorBanner.textContent = 'Account not found. Select one of the 4 roles above or enter a valid email.';
-        DOM.authErrorBanner.style.display = 'block';
+        const txt = DOM.authErrorBanner.querySelector('#auth-error-text');
+        if (txt) txt.textContent = 'Invalid institutional email or password. Please verify your credentials.';
+        DOM.authErrorBanner.style.display = 'flex';
       }
       return;
     }
 
-    if (password && password !== matchedUser.password && password !== 'admin123') {
-      if (DOM.authErrorBanner) {
-        DOM.authErrorBanner.textContent = `Incorrect password. Note: password for ${matchedUser.role} is "${matchedUser.password}".`;
-        DOM.authErrorBanner.style.display = 'block';
-      }
-      return;
-    }
+    // Authenticated successfully
+    const safeUser = Object.assign({}, matchedUser);
+    delete safeUser.password; // Never store plain-text password
 
     state.auth = {
       isAuthenticated: true,
-      currentUser: Object.assign({}, matchedUser)
+      currentUser: safeUser
     };
+
+    const remember = DOM.authRememberMe ? DOM.authRememberMe.checked : true;
+    try {
+      if (remember) {
+        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(safeUser));
+      } else {
+        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(safeUser));
+      }
+    } catch (e) {
+      console.warn('Storage error on login', e);
+    }
 
     saveState();
     renderUserProfileBadge();
     hideLoginOverlay();
     if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
-    showToast(`Signed in successfully as ${matchedUser.name} (${matchedUser.roleLabel})`, 'success');
+    if (DOM.authPassword) DOM.authPassword.value = '';
+    showToast(`Welcome, ${safeUser.name}! Signed in as ${safeUser.roleLabel}.`, 'success');
   }
 
   function handleLogout() {
     if (!state.auth) state.auth = {};
     state.auth.isAuthenticated = false;
+    state.auth.currentUser = null;
+
+    try {
+      localStorage.removeItem(AUTH_SESSION_KEY);
+      sessionStorage.removeItem(AUTH_SESSION_KEY);
+    } catch (e) {
+      console.warn('Storage error on logout', e);
+    }
+
     saveState();
     renderUserProfileBadge();
+    if (DOM.authPassword) DOM.authPassword.value = '';
+    if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
     showLoginOverlay();
-    showToast('Signed out successfully. Choose a role or sign in.', 'info');
+    showToast('You have been signed out.', 'info');
   }
 
   function showLoginOverlay() {
-    if (DOM.authLoginOverlay) DOM.authLoginOverlay.classList.add('active');
+    if (DOM.authLoginOverlay) {
+      DOM.authLoginOverlay.classList.add('active');
+    }
+    if (DOM.appShell) {
+      DOM.appShell.style.display = 'none';
+    }
+    document.body.classList.add('unauthenticated-screen');
+    if (DOM.authEmail) DOM.authEmail.focus();
   }
 
   function hideLoginOverlay() {
-    if (DOM.authLoginOverlay) DOM.authLoginOverlay.classList.remove('active');
+    if (DOM.authLoginOverlay) {
+      DOM.authLoginOverlay.classList.remove('active');
+    }
+    if (DOM.appShell) {
+      DOM.appShell.style.display = '';
+    }
+    document.body.classList.remove('unauthenticated-screen');
   }
 
   // ==========================================================================
