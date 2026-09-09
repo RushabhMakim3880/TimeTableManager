@@ -1,5 +1,5 @@
 // Default presets for School Timetable Management System
-// Auto-synchronized from local edits on 2026-09-09T21:52:07.425Z
+// Auto-synchronized from local edits on 2026-09-09T21:58:54.628Z
 
 const DEFAULT_DATA = {
   "schoolProfile": {
@@ -236,6 +236,12 @@ const DEFAULT_DATA = {
       "maxPeriods": 5,
       "primarySubject": "Environment",
       "workSchedule": "full_day"
+    },
+    "Kavita Ma'am": {
+      "assignedShift": "afternoon",
+      "workSchedule": "full_day",
+      "halfDayAvailability": "all",
+      "maxPeriods": 5
     }
   },
   "subjects": [

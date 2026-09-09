@@ -587,6 +587,9 @@
     essWeeklyModal: document.getElementById('ess-weekly-modal'),
     btnCloseEssWeeklyModal: document.getElementById('btn-close-ess-weekly-modal'),
     btnCloseEssWeeklyFooter: document.getElementById('btn-close-ess-weekly-footer'),
+    btnPrintEssWeekly: document.getElementById('btn-print-ess-weekly'),
+    essWeeklyShiftBadge: document.getElementById('ess-weekly-shift-badge'),
+    essWeeklyModalSub: document.getElementById('ess-weekly-modal-sub'),
     essWeeklyGridContainer: document.getElementById('ess-weekly-grid-container'),
 
     // ESS Default Password Warning Banner & Change Password Modal
@@ -7267,6 +7270,17 @@
       };
     }
 
+    // Print Weekly Schedule Grid Matrix
+    if (DOM.btnPrintEssWeekly) {
+      DOM.btnPrintEssWeekly.onclick = () => {
+        document.body.classList.add('printing-ess-modal');
+        window.print();
+        setTimeout(() => {
+          document.body.classList.remove('printing-ess-modal');
+        }, 500);
+      };
+    }
+
     // Print Daily Briefing
     if (DOM.btnPrintEssPortal) {
       DOM.btnPrintEssPortal.onclick = () => window.print();
@@ -7567,35 +7581,131 @@
     DOM.essSyllabusChecklist.innerHTML = html;
   }
 
+  function getSubjectPillClass(subject) {
+    const s = (subject || '').toLowerCase();
+    if (s.includes('guj')) return 'gujarati';
+    if (s.includes('hin')) return 'hindi';
+    if (s.includes('math')) return 'maths';
+    if (s.includes('eng')) return 'english';
+    if (s.includes('sci') || s.includes('evs')) return 'science';
+    if (s.includes('soc') || s.includes('hist') || s.includes('geo')) return 'social';
+    if (s.includes('comp') || s.includes('it') || s.includes('cs')) return 'computer';
+    if (s.includes('pt') || s.includes('draw') || s.includes('art') || s.includes('music')) return 'pt';
+    return 'default-sub';
+  }
+
   function renderESSWeeklyTimetable(teacher) {
     if (!DOM.essWeeklyGridContainer) return;
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     const periods = state.periods || [];
+    const curDay = state.currentDay || 'Monday';
+
+    // Calculate Weekly Stats for summary strip
+    let totalLectures = 0;
+    let todayLectures = 0;
+    const dayCounts = {};
+
+    days.forEach(d => {
+      dayCounts[d] = 0;
+      const dSched = (state.schedules || {})[d] || {};
+      periods.forEach(p => {
+        const pSlots = dSched[p.id] || {};
+        Object.keys(pSlots).forEach(stdId => {
+          if (pSlots[stdId] && pSlots[stdId].teacher === teacher) {
+            totalLectures++;
+            dayCounts[d]++;
+            if (d === curDay) todayLectures++;
+          }
+        });
+      });
+    });
+
+    const totalPossibleSlots = days.length * periods.length;
+    const freeSlots = Math.max(0, totalPossibleSlots - totalLectures);
+    const avgPerDay = (totalLectures / (days.length || 1)).toFixed(1);
+
+    // Update modal header subtitle and shift badge if available
+    if (DOM.essWeeklyShiftBadge) {
+      DOM.essWeeklyShiftBadge.textContent = state.currentShift === 'morning' ? 'Morning Shift (7:30 AM – 12:15 PM)' : 'Afternoon Shift (1:00 PM – 5:50 PM)';
+    }
+    if (DOM.essWeeklyModalSub) {
+      DOM.essWeeklyModalSub.textContent = `Official 5-Day Academic Schedule & Classroom Allocations for ${teacher}`;
+    }
 
     let html = `
-      <table class="enterprise-table" style="font-size: 12px; width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr style="background: #f8fafc;">
-            <th style="width: 110px; padding: 10px;">Day</th>
-            ${periods.map(p => `
-              <th style="text-align: center; padding: 10px 8px;">
-                <div style="font-weight: 800; color: #0f172a;">${escapeHtml(p.label)}</div>
-                <div style="font-size: 10.5px; font-weight: normal; color: var(--text-muted);">${escapeHtml(p.time)}</div>
-              </th>
-            `).join('')}
-          </tr>
-        </thead>
-        <tbody>
+      <!-- Executive Weekly KPI Strip -->
+      <div class="ess-weekly-summary-strip">
+        <div class="ess-weekly-kpi-chip">
+          <div class="ess-weekly-kpi-icon" style="background: #eff6ff; color: #2563eb;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <div>
+            <div class="ess-weekly-kpi-val" style="font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${escapeHtml(teacher)}</div>
+            <div class="ess-weekly-kpi-lbl">Assigned Faculty</div>
+          </div>
+        </div>
+
+        <div class="ess-weekly-kpi-chip">
+          <div class="ess-weekly-kpi-icon" style="background: #f0fdf4; color: #16a34a;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          </div>
+          <div>
+            <div class="ess-weekly-kpi-val">${totalLectures} Lectures</div>
+            <div class="ess-weekly-kpi-lbl">Total Weekly Load</div>
+          </div>
+        </div>
+
+        <div class="ess-weekly-kpi-chip">
+          <div class="ess-weekly-kpi-icon" style="background: #fffbeb; color: #d97706;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+          </div>
+          <div>
+            <div class="ess-weekly-kpi-val">${freeSlots} Periods</div>
+            <div class="ess-weekly-kpi-lbl">Free / Prep Slots</div>
+          </div>
+        </div>
+
+        <div class="ess-weekly-kpi-chip">
+          <div class="ess-weekly-kpi-icon" style="background: #f5f3ff; color: #7c3aed;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+          </div>
+          <div>
+            <div class="ess-weekly-kpi-val">${avgPerDay} / Day</div>
+            <div class="ess-weekly-kpi-lbl">Daily Average</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Matrix Grid Wrapper -->
+      <div class="ess-matrix-table-wrap">
+        <table class="ess-matrix-table">
+          <thead>
+            <tr>
+              <th class="ess-matrix-th-day">Day / Shift</th>
+              ${periods.map(p => `
+                <th class="ess-matrix-th-period">
+                  <div class="ess-matrix-th-label">${escapeHtml(p.label)}</div>
+                  <div class="ess-matrix-th-time">${escapeHtml(p.time)}</div>
+                </th>
+              `).join('')}
+            </tr>
+          </thead>
+          <tbody>
     `;
 
     days.forEach(d => {
       const dSched = (state.schedules || {})[d] || {};
-      const isToday = (d === (state.currentDay || 'Monday'));
+      const isToday = (d === curDay);
+      const count = dayCounts[d] || 0;
+
       html += `
-        <tr style="${isToday ? 'background: #f0fdf4;' : ''}">
-          <td style="font-weight: 800; color: ${isToday ? '#15803d' : '#0f172a'}; padding: 12px 10px;">
-            ${escapeHtml(d)}
-            ${isToday ? '<span class="badge" style="background: #bbf7d0; color: #166534; font-size: 9.5px; margin-left: 4px; padding: 1px 6px;">Today</span>' : ''}
+        <tr class="ess-matrix-row ${isToday ? 'is-today' : ''}">
+          <td class="ess-matrix-day-cell">
+            <div class="ess-matrix-day-title">
+              ${escapeHtml(d)}
+              ${isToday ? '<span class="ess-matrix-today-pill">TODAY</span>' : ''}
+            </div>
+            <div class="ess-matrix-day-meta">${count} ${count === 1 ? 'Lecture' : 'Lectures'}</div>
           </td>`;
 
       periods.forEach(p => {
@@ -7611,17 +7721,33 @@
         });
 
         if (assignedStd) {
-          const colorClass = getSubjectColorClass(assignedSubj);
+          const pillClass = getSubjectPillClass(assignedSubj);
           html += `
-            <td style="text-align: center; padding: 10px 6px; border: 1px solid #e2e8f0;">
-              <div class="class-tt-subject-badge ${colorClass}" style="display: inline-block; font-size: 11px; padding: 2px 8px; margin-bottom: 3px;">${escapeHtml(assignedSubj)}</div>
-              <div style="font-weight: 800; font-size: 12px; color: #0f172a;">${escapeHtml(assignedStd.name)}</div>
-              <div style="font-size: 10.5px; color: #64748b;">${escapeHtml(assignedStd.room || 'Room 101')}</div>
+            <td class="ess-matrix-slot-cell">
+              <div class="ess-slot-card">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                  <span class="ess-sub-pill ${pillClass}">${escapeHtml(assignedSubj || 'General')}</span>
+                </div>
+                <div class="ess-slot-std" title="${escapeHtml(assignedStd.name)}">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color: #64748b; flex-shrink: 0;"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
+                  ${escapeHtml(assignedStd.name)}
+                </div>
+                <div class="ess-room-tag">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="color: #94a3b8;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                  ${escapeHtml(assignedStd.room || 'Room 101')}
+                </div>
+              </div>
             </td>`;
         } else {
           html += `
-            <td style="text-align: center; padding: 10px 6px; color: #94a3b8; font-style: italic; font-size: 11px; border: 1px solid #f1f5f9; background: #fafafa;">
-              Free Slot
+            <td class="ess-matrix-slot-cell">
+              <div class="ess-free-card">
+                <span class="ess-free-pill">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="color: #94a3b8;"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+                  Free Period
+                </span>
+                <span class="ess-free-sub">Prep &amp; Review</span>
+              </div>
             </td>`;
         }
       });
@@ -7629,7 +7755,7 @@
       html += `</tr>`;
     });
 
-    html += `</tbody></table>`;
+    html += `</tbody></table></div>`;
     DOM.essWeeklyGridContainer.innerHTML = html;
   }
 
@@ -7884,7 +8010,7 @@
     }
 
     // Close Modals on background click
-    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal, DOM.cloudDbModal, DOM.classCellModal, DOM.attendanceDutyModal, DOM.classTeacherModal, DOM.syllabusModal, DOM.authLoginOverlay, DOM.autoSchedulerModal, DOM.addSectionModal, DOM.addExamSlotModal].forEach(m => {
+    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal, DOM.cloudDbModal, DOM.classCellModal, DOM.attendanceDutyModal, DOM.classTeacherModal, DOM.syllabusModal, DOM.authLoginOverlay, DOM.autoSchedulerModal, DOM.addSectionModal, DOM.addExamSlotModal, DOM.essWeeklyModal, DOM.essLeaveModal, DOM.essChangePasswordModal].forEach(m => {
       if (m) m.onclick = (e) => { 
         if (e.target === m) {
           m.classList.remove('active'); 
@@ -7911,6 +8037,9 @@
         if (DOM.autoSchedulerModal) DOM.autoSchedulerModal.style.display = 'none';
         if (DOM.addSectionModal) DOM.addSectionModal.style.display = 'none';
         if (DOM.addExamSlotModal) DOM.addExamSlotModal.style.display = 'none';
+        if (DOM.essWeeklyModal) DOM.essWeeklyModal.style.display = 'none';
+        if (DOM.essLeaveModal) DOM.essLeaveModal.style.display = 'none';
+        if (DOM.essChangePasswordModal) DOM.essChangePasswordModal.style.display = 'none';
       }
     };
   }
