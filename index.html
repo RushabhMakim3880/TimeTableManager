@@ -7,99 +7,468 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231E3A8A'%3E%3Cpath d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z'/%3E%3C/svg%3E">
   <link rel="alternate icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=6">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=25">
 </head>
 <body>
 
-  <!-- Executive Header with Institutional Identity -->
-  <header class="app-header">
-    <div class="header-inner">
-      <div class="brand-wrapper">
-        <div id="school-logo-container" style="display: flex; align-items: center;">
-          <!-- Displayed if logo uploaded, else default academic icon -->
-          <div class="brand-icon-box" id="default-brand-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"/>
-            </svg>
-          </div>
-          <img id="header-school-logo" class="brand-logo-img" style="display: none;" alt="School Crest">
-        </div>
-        <div class="brand-info">
-          <h1>
-            <span id="header-school-name">FUNLAND ENGLISH MEDIUM SCHOOL</span>
-            <span class="status-pill" id="save-status-badge">
-              <span class="dot"></span> Auto-Saved
-            </span>
-          </h1>
-          <p id="header-school-meta">Academic Session: 2026–2027</p>
-        </div>
-      </div>
-
-      <div class="header-toolbar">
-        <button id="btn-open-school-profile" class="btn btn-secondary" title="Configure School Name, Logo & Signatories">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
-          School Profile & Logo
-        </button>
-        <button id="btn-open-settings" class="btn btn-secondary" title="Manage Staff and Subjects Roster">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-          Staff & Subject Roster
-        </button>
-        <button id="btn-open-cloud-db" class="btn btn-secondary" title="Configure Cloud Database (Firebase Firestore) for Multi-Device Sync">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/></svg>
-          Cloud Database
-        </button>
-        <button id="btn-export-json" class="btn btn-secondary" title="Export JSON backup file">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
-          Backup
-        </button>
-        <button id="btn-import-json" class="btn btn-secondary" title="Restore timetable data from backup">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
-          Restore
-        </button>
-        <input type="file" id="import-file-input" accept=".json" style="display: none;">
-      </div>
-    </div>
-  </header>
-
-  <!-- Multi-Perspective View Switcher Bar -->
-  <nav class="view-switcher-bar">
-    <div class="view-switcher-inner">
-      <button class="view-tab-btn active" data-view="class-view">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-        Class Timetable View
-      </button>
-      <button class="view-tab-btn" data-view="teacher-view">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        Teacher-Wise Timetable
-      </button>
-      <button class="view-tab-btn" data-view="duty-view">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-        Faculty Extra Duties
-      </button>
-      <button class="view-tab-btn" data-view="general-duty-view">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-        School &amp; Assembly Duties
-      </button>
-      <button class="view-tab-btn" data-view="substitution-view">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
-        Daily Substitution &amp; Proxy
-      </button>
-      <button class="view-tab-btn" data-view="workload-view">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-        Faculty Workload Analytics
-      </button>
-    </div>
-  </nav>
-
-  <!-- Main Container -->
-  <main class="main-wrapper">
+  <!-- Full-Width Enterprise SaaS Application Shell -->
+  <div class="app-shell" id="app-shell">
 
     <!-- ====================================================================
-         SECTION 1: CLASS-WISE TIMETABLE VIEW
+         SLEEK COLLAPSIBLE SIDEBAR
          ==================================================================== -->
-    <section class="view-section active" id="section-class-view">
+    <aside class="app-sidebar" id="app-sidebar">
+      <!-- Sidebar Brand / School Crest Header -->
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-crest-box" id="school-logo-container">
+            <div class="brand-icon-box" id="default-brand-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.73L12 15l5-2.74v3.73z"/>
+              </svg>
+            </div>
+            <img id="header-school-logo" class="brand-logo-img" style="display: none;" alt="School Crest">
+          </div>
+          <div class="brand-text-block">
+            <h2 class="sidebar-school-title" id="header-school-name">FUNLAND HIGH SCHOOL</h2>
+            <span class="sidebar-school-sub" id="header-school-meta">Academic Session: 2026–2027</span>
+          </div>
+        </div>
+        <button type="button" class="sidebar-toggle-btn" id="btn-sidebar-collapse" title="Collapse / Expand Sidebar">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Navigation Links Scroller -->
+      <div class="sidebar-nav-scroller">
+        <!-- Main Core -->
+        <div class="nav-group">
+          <div class="nav-group-title">MAIN</div>
+          <button class="nav-item view-tab-btn active" data-view="dashboard-view" id="nav-tab-dashboard" title="Dashboard">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></span>
+            <span class="nav-label">Dashboard</span>
+          </button>
+          <button class="nav-item view-tab-btn" data-view="settings-view" id="nav-tab-settings" title="Master System Settings">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></span>
+            <span class="nav-label">Master Settings</span>
+            <span class="nav-pill-badge" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;">Config</span>
+          </button>
+        </div>
+
+        <!-- Academic Timetables -->
+        <div class="nav-group">
+          <div class="nav-group-title">ACADEMIC TIMETABLES</div>
+          <button class="nav-item view-tab-btn" data-view="class-timetable-view" id="nav-tab-class-timetable" title="Class Timetable">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg></span>
+            <span class="nav-label">Class Timetable</span>
+            <span class="nav-pill-badge">Std 3–8</span>
+          </button>
+          <button class="nav-item view-tab-btn" data-view="class-view" id="nav-tab-class-grid" title="Daily Schedule Grid">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></span>
+            <span class="nav-label">Daily Schedule Grid</span>
+          </button>
+          <button class="nav-item view-tab-btn" data-view="teacher-view" id="nav-tab-teacher" title="Teacher Schedules">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>
+            <span class="nav-label">Teacher Schedules</span>
+          </button>
+        </div>
+
+        <!-- School Operations -->
+        <div class="nav-group">
+          <div class="nav-group-title">SCHOOL OPERATIONS</div>
+          <button class="nav-item view-tab-btn" data-view="attendance-duty-view" id="nav-tab-attendance-duty" title="Attendance Duty">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg></span>
+            <span class="nav-label">Attendance Duty</span>
+          </button>
+          <button class="nav-item view-tab-btn" data-view="class-teacher-duty-view" id="nav-tab-class-teacher" title="Class Teachers">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg></span>
+            <span class="nav-label">Class Teachers</span>
+          </button>
+          <button class="nav-item view-tab-btn" data-view="syllabus-view" id="nav-tab-syllabus" title="Syllabus Progress">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg></span>
+            <span class="nav-label">Syllabus Scope</span>
+          </button>
+          <button class="nav-item view-tab-btn" data-view="substitution-view" id="nav-tab-substitution" title="Substitutions">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg></span>
+            <span class="nav-label">Substitutions</span>
+          </button>
+          <button class="nav-item view-tab-btn" data-view="workload-view" id="nav-tab-workload" title="Workload Analytics">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></span>
+            <span class="nav-label">Workload Balance</span>
+          </button>
+        </div>
+
+        <!-- Faculty & Events -->
+        <div class="nav-group">
+          <div class="nav-group-title">FACULTY &amp; EVENTS</div>
+          <button class="nav-item view-tab-btn" data-view="duty-view" id="nav-tab-extra-duties" title="Faculty Duties">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></span>
+            <span class="nav-label">Special Duties</span>
+          </button>
+          <button class="nav-item view-tab-btn" data-view="general-duty-view" id="nav-tab-general-duty" title="Assembly Duties">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span>
+            <span class="nav-label">Assembly Duties</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer User Profile -->
+      <div class="sidebar-footer">
+        <!-- User Profile Card -->
+        <div class="sidebar-user-card" id="header-user-badge">
+          <div class="user-avatar" id="header-user-avatar">👑</div>
+          <div class="user-info-text">
+            <span class="user-name" id="header-user-name">Admin User</span>
+            <span class="user-role-tag role-admin" id="header-user-role">Administrator</span>
+          </div>
+          <button id="btn-logout" class="btn-logout-icon" title="Switch Role / Sign Out">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         MAIN APP WORKSPACE (FULL WIDTH)
+         ==================================================================== -->
+    <div class="app-main-layout" id="app-main-layout">
+      <!-- Executive Top Bar -->
+      <header class="app-topbar" id="app-topbar">
+        <div class="topbar-left">
+          <button type="button" class="topbar-mobile-btn" id="btn-mobile-sidebar-toggle" title="Toggle Navigation Menu">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="topbar-breadcrumb">
+            <span class="breadcrumb-root">School ERP</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current" id="topbar-view-title">Executive Dashboard</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Academic Shift Switcher (Morning vs Afternoon) -->
+          <div class="shift-segmented-control" id="header-shift-selector" title="Switch Academic Shift (Morning or Afternoon)">
+            <button type="button" class="shift-segment-btn" data-shift="morning" id="btn-shift-morning">
+              <span class="shift-icon">☀️</span> Morning (7:30–12:15)
+            </button>
+            <button type="button" class="shift-segment-btn active" data-shift="afternoon" id="btn-shift-afternoon">
+              <span class="shift-icon">🌙</span> Afternoon (1:00–5:50)
+            </button>
+          </div>
+
+          <!-- Firebase Cloud Status Badge -->
+          <div class="status-pill cloud-synced" id="save-status-badge" title="Firebase Cloud Database Live Sync">
+            <span class="dot"></span> <span class="badge-text">Cloud Synced</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Scrollable Main Content Workspace (Full Width) -->
+      <main class="main-wrapper" id="main-content-scroll">
+
+    <!-- =================================================    <!-- ====================================================================
+         SECTION 0: SCHOOL MANAGEMENT EXECUTIVE DASHBOARD
+         ==================================================================== -->
+    <!-- ====================================================================
+         SECTION 0: SCHOOL MANAGEMENT EXECUTIVE DASHBOARD (REBUILT FROM SCRATCH)
+         ==================================================================== -->
+    <section class="view-section active" id="section-dashboard-view">
+
+      <!-- Executive Welcome Hero -->
+      <div class="dash-hero-card">
+        <div class="dash-hero-left">
+          <div class="dash-hero-badge-row">
+            <span class="dash-hero-badge">
+              <span class="dash-pulse-dot"></span>
+              Academic Session 2026–2027 • Term 1
+            </span>
+            <span class="dash-date-badge" id="dash-live-date-str">Tuesday, 10 September 2026</span>
+          </div>
+          <h1 class="dash-hero-title">FUNLAND ENGLISH MEDIUM SCHOOL</h1>
+          <p class="dash-hero-subtitle">Executive Command Center • Centralized Academic Timetables, Room Allocation &amp; Supervision Roster</p>
+        </div>
+
+        <div class="dash-hero-right">
+          <!-- Active Shift Switcher in Hero -->
+          <div class="dash-shift-box">
+            <div class="dash-shift-label">ACTIVE ACADEMIC SHIFT</div>
+            <div class="shift-segmented-control" id="dash-shift-selector">
+              <button type="button" class="shift-segment-btn" data-shift="morning" id="dash-btn-shift-morning">
+                <span class="shift-icon">☀️</span> Morning (7:30–12:15)
+              </button>
+              <button type="button" class="shift-segment-btn active" data-shift="afternoon" id="dash-btn-shift-afternoon">
+                <span class="shift-icon">🌙</span> Afternoon (1:00–5:50)
+              </button>
+            </div>
+          </div>
+          
+          <div class="dash-hero-actions">
+            <button class="btn btn-secondary btn-sm" id="dash-btn-master-settings" title="Open Master System Settings">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+              Master Settings
+            </button>
+            <button class="btn btn-primary btn-sm" id="dash-btn-quick-export" title="Export All Timetables as Word Document">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Export Word (.docx)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 High-Impact KPI Metric Cards -->
+      <div class="dash-kpi-row">
+        <!-- KPI 1: Active Shift -->
+        <div class="dash-kpi-card card-blue">
+          <div class="dash-kpi-header">
+            <span class="dash-kpi-tag" id="dash-kpi-shift-tag">🌙 ACTIVE SHIFT</span>
+            <div class="dash-kpi-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            </div>
+          </div>
+          <div class="dash-kpi-val" id="dash-kpi-shift-name">Afternoon Shift</div>
+          <div class="dash-kpi-desc" id="dash-kpi-shift-time">1:00 PM – 5:50 PM • 6 Lectures</div>
+          <div class="dash-kpi-status status-good" id="dash-kpi-shift-status">● Operating on Schedule</div>
+        </div>
+
+        <!-- KPI 2: Classes & Rooms -->
+        <div class="dash-kpi-card card-cyan">
+          <div class="dash-kpi-header">
+            <span class="dash-kpi-tag">🏫 ACTIVE CLASSES</span>
+            <div class="dash-kpi-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            </div>
+          </div>
+          <div class="dash-kpi-val" id="dash-kpi-classes-count">6 Standards</div>
+          <div class="dash-kpi-desc" id="dash-kpi-classes-sub">Std 3rd to 8th • Rooms 101–203</div>
+          <div class="dash-kpi-status status-good" id="dash-kpi-classes-status">● 100% Classrooms Assigned</div>
+        </div>
+
+        <!-- KPI 3: Faculty Roster -->
+        <div class="dash-kpi-card card-purple">
+          <div class="dash-kpi-header">
+            <span class="dash-kpi-tag">👥 FACULTY ROSTER</span>
+            <div class="dash-kpi-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+          </div>
+          <div class="dash-kpi-val" id="dash-kpi-faculty-count">10 Teachers</div>
+          <div class="dash-kpi-desc" id="dash-kpi-faculty-sub">10 Active on Duty • 0 on Leave</div>
+          <div class="dash-kpi-status status-good" id="dash-kpi-faculty-status">● Full Faculty Attendance</div>
+        </div>
+
+        <!-- KPI 4: Academic Audit -->
+        <div class="dash-kpi-card card-emerald">
+          <div class="dash-kpi-header">
+            <span class="dash-kpi-tag">📚 SYLLABUS AUDIT</span>
+            <div class="dash-kpi-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+            </div>
+          </div>
+          <div class="dash-kpi-val" id="dash-kpi-syllabus-val">76% Complete</div>
+          <div class="dash-progress-track">
+            <div class="dash-progress-fill" id="dash-kpi-syl-fill" style="width: 76%;"></div>
+          </div>
+          <div class="dash-kpi-desc" style="margin-top: 6px;" id="dash-kpi-syl-sub">Term 1 Curriculum on Track</div>
+        </div>
+      </div>
+
+      <!-- Centerpiece: Today's Live Class Timetable Quick-View -->
+      <div class="dash-section-card">
+        <div class="dash-section-header">
+          <div class="dash-section-title-wrap">
+            <div class="dash-section-icon" style="background: #eff6ff; color: #1e40af;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+            </div>
+            <div>
+              <h3 class="dash-section-title">Today's Class Schedule (<span id="dash-schedule-day-name">Tuesday</span>)</h3>
+              <p class="dash-section-subtitle">Real-time timetable matrix across all standards in active shift</p>
+            </div>
+          </div>
+          <div class="dash-section-actions">
+            <button class="btn btn-secondary btn-sm" onclick="window.switchView && window.switchView('class-view')">
+              Open Master Grid &rarr;
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="window.switchView && window.switchView('class-timetable-view')">
+              Class Timetables &rarr;
+            </button>
+          </div>
+        </div>
+
+        <div class="dash-timetable-container" style="overflow-x: auto;">
+          <table class="dash-matrix-table" id="dash-today-matrix-table">
+            <thead id="dash-today-matrix-thead">
+              <!-- Dynamically rendered -->
+            </thead>
+            <tbody id="dash-today-matrix-tbody">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Dual Operational Row: Supervision Duty & Free Teachers -->
+      <div class="dash-two-col-grid">
+        <!-- Col 1: Supervision & Gate Duty for Today -->
+        <div class="dash-section-card">
+          <div class="dash-section-header">
+            <div class="dash-section-title-wrap">
+              <div class="dash-section-icon" style="background: #e0f2fe; color: #0284c7;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+              </div>
+              <div>
+                <h3 class="dash-section-title">Today's Campus Supervision &amp; Gate Roster</h3>
+                <p class="dash-section-subtitle">Designated staff for arrival, prayers, recess &amp; dispersal</p>
+              </div>
+            </div>
+            <span class="panel-badge status-good">4 Posts Active</span>
+          </div>
+
+          <div class="dash-duty-roster" id="dash-today-duty-roster">
+            <!-- Dynamically populated with guaranteed 4 posts -->
+          </div>
+
+          <div style="padding-top: 12px; border-top: 1px solid var(--border-color); text-align: right;">
+            <button class="btn btn-secondary btn-sm" onclick="window.switchView && window.switchView('attendance-duty-view')">
+              Manage Campus Duties &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- Col 2: Free Teachers & Substitution Availability -->
+        <div class="dash-section-card">
+          <div class="dash-section-header">
+            <div class="dash-section-title-wrap">
+              <div class="dash-section-icon" style="background: #fef3c7; color: #d97706;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
+              </div>
+              <div>
+                <h3 class="dash-section-title">Period-wise Free Faculty &amp; Substitutions</h3>
+                <p class="dash-section-subtitle">Staff available for substitution in each lecture today</p>
+              </div>
+            </div>
+            <span class="panel-badge status-good" id="dash-free-faculty-badge">Full Availability</span>
+          </div>
+
+          <div class="dash-free-roster" id="dash-period-free-roster">
+            <!-- Dynamically populated for all 6 periods -->
+          </div>
+
+          <div style="padding-top: 12px; border-top: 1px solid var(--border-color); text-align: right;">
+            <button class="btn btn-secondary btn-sm" onclick="window.switchView && window.switchView('substitutions-view')">
+              Manage Substitution System &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Launchpad (Quick Shortcut Cards) -->
+      <div class="dash-launchpad-grid">
+        <div class="dash-launchpad-card" onclick="window.switchView && window.switchView('class-view')">
+          <div class="launchpad-icon" style="background: #eff6ff; color: #1e40af;">📅</div>
+          <div class="launchpad-content">
+            <h4>Master Daily Timetable</h4>
+            <p>View complete 6-period day grid, room occupancy &amp; free staff</p>
+          </div>
+          <span class="launchpad-arrow">&rarr;</span>
+        </div>
+
+        <div class="dash-launchpad-card" onclick="window.switchView && window.switchView('class-timetable-view')">
+          <div class="launchpad-icon" style="background: #ecfdf5; color: #059669;">🎓</div>
+          <div class="launchpad-content">
+            <h4>Class-wise Timetables</h4>
+            <p>Single standard weekly view (Mon–Fri) ready for Word export</p>
+          </div>
+          <span class="launchpad-arrow">&rarr;</span>
+        </div>
+
+        <div class="dash-launchpad-card" onclick="window.switchView && window.switchView('teacher-view')">
+          <div class="launchpad-icon" style="background: #fdf4ff; color: #9333ea;">👩‍🏫</div>
+          <div class="launchpad-content">
+            <h4>Teacher Schedule &amp; Load</h4>
+            <p>Individual teacher weekly periods, balance &amp; assigned subjects</p>
+          </div>
+          <span class="launchpad-arrow">&rarr;</span>
+        </div>
+
+        <div class="dash-launchpad-card" onclick="window.switchView && window.switchView('settings-view')">
+          <div class="launchpad-icon" style="background: #fff7ed; color: #ea580c;">⚙️</div>
+          <div class="launchpad-content">
+            <h4>Shift &amp; Standards Settings</h4>
+            <p>Configure morning vs afternoon standards, timings &amp; subjects</p>
+          </div>
+          <span class="launchpad-arrow">&rarr;</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         SECTION 1B: DEDICATED CLASS-WISE TIMETABLE VIEW
+         ==================================================================== -->
+    <section class="view-section" id="section-class-timetable-view">
+      <!-- Standard Selector Bar & Meta Card -->
+      <div class="class-tt-header-bar">
+        <div class="class-tt-selector-group">
+          <label class="class-tt-label">SELECT STANDARD / CLASS:</label>
+          <div class="class-std-pill-group" id="class-tt-std-pills">
+            <!-- Rendered in app.js -->
+          </div>
+        </div>
+
+        <div class="class-tt-actions">
+          <button id="btn-download-selected-class-docx" class="btn btn-primary btn-sm" title="Export this class timetable to Word (.docx)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Export Class Timetable (.docx)
+          </button>
+          <button id="btn-print-class-timetable" class="btn btn-secondary btn-sm" title="Print Class Timetable">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-4 11H9v-5h6v5zm4-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-3-9H8v3h8V3z"/></svg>
+            Print
+          </button>
+        </div>
+      </div>
+
+      <!-- Class Standard Metadata Card -->
+      <div class="class-meta-card" id="class-meta-banner">
+        <div class="class-meta-col">
+          <span class="meta-small-label">CURRENT CLASS</span>
+          <h3 id="class-meta-title">Standard: 3rd</h3>
+        </div>
+        <div class="class-meta-col">
+          <span class="meta-small-label">CLASS TEACHER</span>
+          <div class="class-meta-val" id="class-meta-teacher">Priya Ma'am</div>
+        </div>
+        <div class="class-meta-col">
+          <span class="meta-small-label">ROOM / SECTION</span>
+          <div class="class-meta-val" id="class-meta-room">Room 101 • Primary Wing</div>
+        </div>
+        <div class="class-meta-col">
+          <span class="meta-small-label">ACADEMIC SHIFT</span>
+          <div class="class-meta-val" id="class-meta-shift">Afternoon Shift (1:00 PM – 5:50 PM)</div>
+        </div>
+      </div>
+
+      <!-- Weekly Matrix Grid for Selected Standard -->
+      <div class="table-container class-tt-table-container">
+        <table class="enterprise-table" id="class-tt-matrix-table">
+          <thead id="class-tt-thead">
+            <!-- Days & Periods Rendered in app.js -->
+          </thead>
+          <tbody id="class-tt-tbody">
+            <!-- Period slots Rendered in app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECTION 1: DAILY SCHEDULE GRID VIEW
+         ==================================================================== -->
+    <section class="view-section" id="section-class-view">
 
       <!-- Day Navigation Toolbar -->
       <div class="day-nav-bar">
@@ -108,6 +477,10 @@
         </div>
 
         <div class="day-nav-actions">
+          <button id="btn-quick-new-class-view" class="btn btn-secondary btn-sm" title="Quick Add New Class / Standard">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ New Class</span>
+          </button>
           <button id="btn-open-copy-modal" class="btn btn-secondary btn-sm" title="Duplicate schedule to other days">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
             Duplicate Schedule...
@@ -169,6 +542,10 @@
           <select id="select-teacher-filter" class="popover-input" style="width: auto; min-width: 220px; font-weight: 600;">
             <!-- Rendered in app.js -->
           </select>
+          <button id="btn-quick-new-teacher-view" class="btn btn-secondary btn-sm" title="Quick Add New Teacher">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ New Teacher</span>
+          </button>
         </div>
 
         <div class="teacher-stats-badge" id="teacher-stats-badge">
@@ -554,39 +931,780 @@
 
     </section>
 
+    <!-- ====================================================================
+         SECTION 7: ATTENDANCE DUTY MANAGEMENT MODULE
+         ==================================================================== -->
+    <section class="view-section" id="section-attendance-duty-view">
+      <div class="duty-header-toolbar">
+        <div>
+          <h2>Attendance Duty Management</h2>
+          <p class="section-subtitle">Assign, schedule, and monitor faculty members responsible for student attendance, gate entry, and morning assembly verification.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button id="btn-add-attendance-duty" class="btn btn-primary btn-sm">
+            + Assign Attendance Duty
+          </button>
+          <button id="btn-print-attendance-duties" class="btn btn-secondary btn-sm">Print Roster</button>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="module-filter-bar">
+        <div class="filter-group">
+          <label>FILTER BY DAY:</label>
+          <div class="day-segmented-control" id="att-duty-day-tabs">
+            <button type="button" class="day-tab-btn active" data-day="all">All Days</button>
+            <button type="button" class="day-tab-btn" data-day="Monday">Monday</button>
+            <button type="button" class="day-tab-btn" data-day="Tuesday">Tuesday</button>
+            <button type="button" class="day-tab-btn" data-day="Wednesday">Wednesday</button>
+            <button type="button" class="day-tab-btn" data-day="Thursday">Thursday</button>
+            <button type="button" class="day-tab-btn" data-day="Friday">Friday</button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label>FILTER BY SHIFT:</label>
+          <select id="att-duty-filter-shift" class="popover-input" style="width: 160px;">
+            <option value="all">All Shifts</option>
+            <option value="Morning">Morning Shift</option>
+            <option value="Afternoon">Afternoon Shift</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Attendance Duty Table -->
+      <div class="table-container">
+        <table class="enterprise-table" id="attendance-duty-table">
+          <thead>
+            <tr>
+              <th style="width: 110px;">DAY</th>
+              <th style="width: 120px;">SHIFT</th>
+              <th style="width: 240px;">DUTY ASSIGNMENT</th>
+              <th style="width: 190px;">FACULTY IN-CHARGE</th>
+              <th style="width: 190px;">LOCATION</th>
+              <th style="width: 160px;">TIMING</th>
+              <th style="width: 120px;">STATUS</th>
+              <th style="width: 100px; text-align: center;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="attendance-duty-tbody">
+            <!-- Rendered in app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECTION 8: CLASS TEACHER DUTY MODULE (WITH CONFLICT GUARDS)
+         ==================================================================== -->
+    <section class="view-section" id="section-class-teacher-duty-view">
+      <div class="duty-header-toolbar">
+        <div>
+          <h2>Class Teacher Duty Allocation</h2>
+          <p class="section-subtitle">Designate primary Class Teachers for each standard with intelligent conflict-prevention guards against double-booking.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button id="btn-open-add-class-teacher" class="btn btn-primary btn-sm">
+            + Assign / Reassign Class Teacher
+          </button>
+        </div>
+      </div>
+
+      <!-- Standard Cards Grid -->
+      <div class="class-teacher-cards-grid" id="class-teacher-cards-container">
+        <!-- Rendered in app.js -->
+      </div>
+
+      <!-- Comprehensive Allocation Table -->
+      <div class="table-card-wrapper" style="margin-top: 24px;">
+        <div class="table-card-header">
+          <h3>Class Teacher Allocation Master Roster</h3>
+          <span class="status-pill cloud-synced" id="class-teacher-coverage-badge">6 of 6 Standards Assigned</span>
+        </div>
+        <div class="table-container">
+          <table class="enterprise-table" id="class-teacher-master-table">
+            <thead>
+              <tr>
+                <th style="width: 140px;">STANDARD</th>
+                <th style="width: 190px;">CLASS TEACHER</th>
+                <th style="width: 150px;">PRIMARY SUBJECT</th>
+                <th style="width: 140px;">ROOM NO.</th>
+                <th style="width: 130px;">SHIFT</th>
+                <th style="width: 160px;">CONTACT</th>
+                <th style="width: 140px;">ACADEMIC YEAR</th>
+                <th style="width: 100px; text-align: center;">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="class-teacher-table-tbody">
+              <!-- Rendered in app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECTION 9: STANDARD-WISE SYLLABUS MANAGEMENT MODULE
+         ==================================================================== -->
+    <section class="view-section" id="section-syllabus-view">
+      <div class="duty-header-toolbar">
+        <div>
+          <h2>Standard-Wise Syllabus Management</h2>
+          <p class="section-subtitle">Track Semester 1 Exam scope, textbook and classwork notebook checking progress across all academic standards.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button id="btn-add-syllabus-record" class="btn btn-primary btn-sm">
+            + Add / Update Subject Syllabus
+          </button>
+          <button id="btn-print-syllabus-report" class="btn btn-secondary btn-sm">
+            Print Syllabus Audit
+          </button>
+        </div>
+      </div>
+
+      <!-- Standard Selection Tabs for Syllabus -->
+      <div class="module-filter-bar">
+        <div class="filter-group">
+          <label>SELECT STANDARD:</label>
+          <div class="day-segmented-control" id="syllabus-std-tabs">
+            <button type="button" class="day-tab-btn active" data-std="all">All Standards</button>
+            <button type="button" class="day-tab-btn" data-std="std_3">Std 3rd</button>
+            <button type="button" class="day-tab-btn" data-std="std_4">Std 4th</button>
+            <button type="button" class="day-tab-btn" data-std="std_5">Std 5th</button>
+            <button type="button" class="day-tab-btn" data-std="std_6">Std 6th</button>
+            <button type="button" class="day-tab-btn" data-std="std_7">Std 7th</button>
+            <button type="button" class="day-tab-btn" data-std="std_8">Std 8th</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Syllabus Progress Table -->
+      <div class="table-container">
+        <table class="enterprise-table" id="syllabus-tracking-table">
+          <thead>
+            <tr>
+              <th style="width: 110px;">STANDARD</th>
+              <th style="width: 120px;">SUBJECT</th>
+              <th style="width: 150px;">TEACHER</th>
+              <th style="width: 180px; text-align: center;">SEM 1 EXAM SCOPE<br><small style="font-weight: normal;">(Chapters / Poems / Grammar)</small></th>
+              <th style="width: 200px;">COMPLETED COURSE</th>
+              <th style="width: 180px;">PENDING COURSE</th>
+              <th style="width: 170px; text-align: center; background: rgba(16, 185, 129, 0.08);">SYLLABUS CHECKED<br><small style="font-weight: normal;">Textbooks &bull; ClassWork</small></th>
+              <th style="width: 170px; text-align: center; background: rgba(245, 158, 11, 0.08);">CHECKING PENDING<br><small style="font-weight: normal;">Textbooks &bull; ClassWork</small></th>
+              <th style="width: 130px; text-align: center;">PROGRESS</th>
+              <th style="width: 80px; text-align: center;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="syllabus-table-tbody">
+            <!-- Rendered in app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECTION 12: ALL-IN-ONE MASTER SYSTEM SETTINGS VIEW
+         ==================================================================== -->
+    <section class="view-section" id="section-settings-view">
+      <div class="settings-container">
+        
+        <!-- Executive Settings Header Card -->
+        <div class="settings-header-card">
+          <div class="settings-header-text">
+            <h2>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#1e40af"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+              Master System Settings &amp; Institutional Configuration
+            </h2>
+            <p>Every single timetable parameter—school shift timings, teacher shift allocations, half-day availability, standards, subjects, and cloud sync—configured right here.</p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span class="settings-badge-saved" id="settings-auto-status">
+              <span class="dot" style="width: 7px; height: 7px; border-radius: 50%; background: #059669; display: inline-block;"></span>
+              Auto-Synchronized
+            </span>
+          </div>
+        </div>
+
+        <!-- Settings Nav Tabs Bar -->
+        <div class="settings-tabs-nav">
+          <button class="settings-tab-btn active" data-settings-tab="tab-shifts" id="stab-btn-shifts">
+            <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            Shift Timings &amp; Periods
+          </button>
+          <button class="settings-tab-btn" data-settings-tab="tab-faculty" id="stab-btn-faculty">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            Faculty Shifts &amp; Work Hours
+          </button>
+          <button class="settings-tab-btn" data-settings-tab="tab-profile" id="stab-btn-profile">
+            <svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+            School Institutional Profile
+          </button>
+          <button class="settings-tab-btn" data-settings-tab="tab-standards" id="stab-btn-standards">
+            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            Classes &amp; Standards
+          </button>
+          <button class="settings-tab-btn" data-settings-tab="tab-subjects" id="stab-btn-subjects">
+            <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+            Academic Subjects Catalog
+          </button>
+          <button class="settings-tab-btn" data-settings-tab="tab-cloud-db" id="stab-btn-cloud-db">
+            <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/></svg>
+            Cloud DB &amp; System Backup
+          </button>
+        </div>
+
+        <!-- ================================================================
+             PANEL 1: SHIFT TIMINGS & PERIOD SLOTS CONFIGURATION
+             ================================================================ -->
+        <div class="settings-panel active" id="settings-panel-shifts">
+          <!-- Two Shift Timing Parameter Cards -->
+          <div class="settings-form-grid-2">
+            <!-- Morning Shift Config Card -->
+            <div class="settings-card">
+              <div class="settings-card-title">
+                <span>☀️ Morning Shift Timing Configuration</span>
+                <span class="faculty-shift-badge shift-morning-badge">Morning</span>
+              </div>
+              <div class="settings-card-subtitle">Standard operating shift timing and break intervals for primary grades.</div>
+              <div class="settings-form-grid-2">
+                <div class="settings-form-group">
+                  <label class="settings-label">SHIFT LABEL</label>
+                  <input type="text" id="cfg-shift-morning-label" class="settings-input" value="Morning Shift">
+                </div>
+                <div class="settings-form-group">
+                  <label class="settings-label">RECESS / BREAK INTERVAL</label>
+                  <input type="text" id="cfg-shift-morning-recess" class="settings-input" value="9:45 AM – 10:05 AM">
+                </div>
+                <div class="settings-form-group">
+                  <label class="settings-label">START TIME</label>
+                  <input type="text" id="cfg-shift-morning-start" class="settings-input" value="07:30 AM">
+                </div>
+                <div class="settings-form-group">
+                  <label class="settings-label">END TIME</label>
+                  <input type="text" id="cfg-shift-morning-end" class="settings-input" value="12:15 PM">
+                </div>
+              </div>
+            </div>
+
+            <!-- Afternoon Shift Config Card -->
+            <div class="settings-card">
+              <div class="settings-card-title">
+                <span>🌙 Afternoon Shift Timing Configuration</span>
+                <span class="faculty-shift-badge shift-afternoon-badge">Afternoon</span>
+              </div>
+              <div class="settings-card-subtitle">Standard operating shift timing and lunch intervals for secondary grades.</div>
+              <div class="settings-form-grid-2">
+                <div class="settings-form-group">
+                  <label class="settings-label">SHIFT LABEL</label>
+                  <input type="text" id="cfg-shift-afternoon-label" class="settings-input" value="Afternoon Shift">
+                </div>
+                <div class="settings-form-group">
+                  <label class="settings-label">RECESS / LUNCH INTERVAL</label>
+                  <input type="text" id="cfg-shift-afternoon-recess" class="settings-input" value="3:15 PM – 3:45 PM">
+                </div>
+                <div class="settings-form-group">
+                  <label class="settings-label">START TIME</label>
+                  <input type="text" id="cfg-shift-afternoon-start" class="settings-input" value="01:00 PM">
+                </div>
+                <div class="settings-form-group">
+                  <label class="settings-label">END TIME</label>
+                  <input type="text" id="cfg-shift-afternoon-end" class="settings-input" value="05:50 PM">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Period Slots Configuration Table -->
+          <div class="settings-card">
+            <div class="settings-card-title">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span>Period Slots Manager</span>
+                <div class="shift-segmented-control" style="background: #f1f5f9;">
+                  <button type="button" class="shift-segment-btn" id="cfg-periods-btn-morning" style="padding: 3px 10px; font-size: 11px;">☀️ Morning Slots</button>
+                  <button type="button" class="shift-segment-btn active" id="cfg-periods-btn-afternoon" style="padding: 3px 10px; font-size: 11px;">🌙 Afternoon Slots</button>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-save-shift-timings">Save Shift Timings</button>
+            </div>
+            <div class="settings-card-subtitle">Manage individual period slot timing ranges, labels, and recess intervals for the selected shift.</div>
+            
+            <div style="overflow-x: auto;">
+              <table class="period-slots-table">
+                <thead>
+                  <tr>
+                    <th style="width: 70px;">SLOT #</th>
+                    <th style="width: 140px;">PERIOD LABEL</th>
+                    <th style="width: 180px;">TIMING RANGE</th>
+                    <th style="width: 130px;">RECESS / BREAK?</th>
+                    <th style="width: 100px; text-align: center;">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody id="cfg-periods-tbody">
+                  <!-- Rendered dynamically in app.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Quick Add Period Slot Bar -->
+            <div style="background: #f8fafc; border: 1px dashed var(--border-color); border-radius: 6px; padding: 12px; margin-top: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <span style="font-size: 12px; font-weight: 700; color: #334155;">+ Add New Period Slot:</span>
+              <input type="number" id="new-slot-num" class="settings-input" placeholder="Slot #" style="width: 75px;" min="1" max="12">
+              <input type="text" id="new-slot-label" class="settings-input" placeholder="e.g. Lecture 7" style="width: 140px;">
+              <input type="text" id="new-slot-time" class="settings-input" placeholder="e.g. 5:50 to 6:25" style="width: 160px;">
+              <label style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: #475569; font-weight: 600; cursor: pointer;">
+                <input type="checkbox" id="new-slot-isbreak"> Recess/Break?
+              </label>
+              <button class="btn btn-secondary btn-sm" id="btn-add-period-slot">+ Add Slot</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             PANEL 2: FACULTY SHIFTS & WORKING HOURS (HALF-DAY CONFIGURATION)
+             ================================================================ -->
+        <div class="settings-panel" id="settings-panel-faculty">
+          <!-- Summary Stat Strip -->
+          <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px;">
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #64748b; text-transform: uppercase;">Total Teachers</span>
+              <div style="font-size: 18px; font-weight: 800; color: #0f172a;" id="cfg-stat-total-teachers">10</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #b45309; text-transform: uppercase;">☀️ Morning Shift</span>
+              <div style="font-size: 18px; font-weight: 800; color: #92400e;" id="cfg-stat-morning-teachers">0</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #1e40af; text-transform: uppercase;">🌙 Afternoon Shift</span>
+              <div style="font-size: 18px; font-weight: 800; color: #1e40af;" id="cfg-stat-afternoon-teachers">10</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #047857; text-transform: uppercase;">🔄 Both Shifts</span>
+              <div style="font-size: 18px; font-weight: 800; color: #065f46;" id="cfg-stat-both-teachers">0</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #be123c; text-transform: uppercase;">⏳ Half Day Faculty</span>
+              <div style="font-size: 18px; font-weight: 800; color: #9f1239;" id="cfg-stat-halfday-teachers">0</div>
+            </div>
+          </div>
+
+          <!-- Add New Teacher Form -->
+          <div class="settings-card" style="padding: 16px 20px;">
+            <div class="settings-card-title">
+              <span>+ Add New Faculty Member</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1.5fr 1.2fr auto; gap: 10px; align-items: flex-end; margin-top: 8px;">
+              <div class="settings-form-group" style="margin-bottom: 0;">
+                <label class="settings-label">TEACHER NAME</label>
+                <input type="text" id="new-faculty-name" class="settings-input" placeholder="e.g. Meera Ma'am">
+              </div>
+              <div class="settings-form-group" style="margin-bottom: 0;">
+                <label class="settings-label">ASSIGNED SHIFT</label>
+                <select id="new-faculty-shift" class="settings-select">
+                  <option value="afternoon">Afternoon Shift</option>
+                  <option value="morning">Morning Shift</option>
+                  <option value="both">Both Shifts</option>
+                </select>
+              </div>
+              <div class="settings-form-group" style="margin-bottom: 0;">
+                <label class="settings-label">WORK SCHEDULE</label>
+                <select id="new-faculty-worktype" class="settings-select">
+                  <option value="full_day">Full Day</option>
+                  <option value="half_day">Half Day</option>
+                </select>
+              </div>
+              <div class="settings-form-group" style="margin-bottom: 0;">
+                <label class="settings-label">HALF-DAY AVAILABILITY</label>
+                <select id="new-faculty-halfday-slot" class="settings-select">
+                  <option value="all">Full Day (All Periods)</option>
+                  <option value="first_half">First Half (Periods 1–3)</option>
+                  <option value="second_half">Second Half (Periods 4–6)</option>
+                </select>
+              </div>
+              <div class="settings-form-group" style="margin-bottom: 0;">
+                <label class="settings-label" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>PRIMARY SUBJECT</span>
+                  <button type="button" class="quick-add-link-btn" id="btn-quick-new-subject-faculty" title="Add New Subject Quickly">+ New</button>
+                </label>
+                <select id="new-faculty-subject" class="settings-select">
+                  <!-- Populated from state.subjects -->
+                </select>
+              </div>
+              <button class="btn btn-primary btn-md" id="btn-create-faculty">+ Add Teacher</button>
+            </div>
+          </div>
+
+          <!-- Faculty Allocation Management Table -->
+          <div class="settings-card">
+            <div class="settings-card-title">
+              <span>Faculty Roster, Shift Allocation &amp; Half-Day Schedule</span>
+              <button class="btn btn-primary btn-sm" id="btn-save-faculty-allocations">Save Faculty Changes</button>
+            </div>
+            <div class="settings-card-subtitle">Configure which teacher will be on which shift, and designate who is available for Half Day only (with specific period coverage).</div>
+            
+            <div style="overflow-x: auto;">
+              <table class="faculty-settings-table">
+                <thead>
+                  <tr>
+                    <th style="width: 170px;">TEACHER NAME</th>
+                    <th style="width: 150px;">ASSIGNED SHIFT</th>
+                    <th style="width: 130px;">WORK SCHEDULE</th>
+                    <th style="width: 190px;">HALF-DAY PERIOD COVERAGE</th>
+                    <th style="width: 150px;">PRIMARY SUBJECT</th>
+                    <th style="width: 100px; text-align: center;">MAX LECTURES/DAY</th>
+                    <th style="width: 70px; text-align: center;">REMOVE</th>
+                  </tr>
+                </thead>
+                <tbody id="cfg-faculty-tbody">
+                  <!-- Dynamically rendered in app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             PANEL 3: SCHOOL INSTITUTIONAL PROFILE & BRANDING
+             ================================================================ -->
+        <div class="settings-panel" id="settings-panel-profile">
+          <div class="settings-card">
+            <div class="settings-card-title">
+              <span>School Institutional Profile &amp; Signatories</span>
+              <button class="btn btn-primary btn-sm" id="btn-save-profile-settings">Save Institutional Profile</button>
+            </div>
+            <div class="settings-card-subtitle">Official school identity, affiliation metadata, letterhead crest, and document signatory titles.</div>
+
+            <div class="settings-form-grid-2">
+              <div class="settings-form-group">
+                <label class="settings-label">OFFICIAL SCHOOL NAME</label>
+                <input type="text" id="cfg-school-name" class="settings-input" placeholder="e.g. FUNLAND ENGLISH MEDIUM SCHOOL">
+              </div>
+              <div class="settings-form-group">
+                <label class="settings-label">AFFILIATION &amp; BOARD CODE</label>
+                <input type="text" id="cfg-school-affiliation" class="settings-input" placeholder="e.g. Affiliation No: 1130452 • School Code: 40381">
+              </div>
+              <div class="settings-form-group">
+                <label class="settings-label">ACADEMIC SESSION</label>
+                <input type="text" id="cfg-school-session" class="settings-input" placeholder="e.g. Academic Session: 2026–2027">
+              </div>
+              <div class="settings-form-group">
+                <label class="settings-label">TERM / SEMESTER</label>
+                <input type="text" id="cfg-school-term" class="settings-input" placeholder="e.g. Term 1 (April – September)">
+              </div>
+            </div>
+
+            <!-- Logo Crest Upload -->
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 14px; margin-top: 8px; margin-bottom: 14px;">
+              <label class="settings-label" style="margin-bottom: 6px; display: block;">SCHOOL CREST / LOGO (PNG OR JPG)</label>
+              <div style="display: flex; gap: 14px; align-items: center;">
+                <div id="cfg-logo-preview-box" style="width: 50px; height: 50px; border: 1px solid var(--border-color); border-radius: 8px; background: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                  <img id="cfg-logo-preview-img" style="width: 100%; height: 100%; object-fit: contain; display: none;" alt="Logo Preview">
+                  <span id="cfg-logo-placeholder" style="font-size: 22px;">🏫</span>
+                </div>
+                <div style="flex: 1;">
+                  <input type="file" id="cfg-input-logo" accept="image/*" class="settings-input" style="padding: 4px;">
+                  <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Logo appears on the web topbar, printable timetable matrix, and generated Word (.docx) letterheads.</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btn-cfg-remove-logo" style="color: #dc2626;">Remove Logo</button>
+              </div>
+            </div>
+
+            <!-- Signatories -->
+            <div class="settings-form-grid-3">
+              <div class="settings-form-group">
+                <label class="settings-label">PREPARED BY (SIGNATURE TITLE)</label>
+                <input type="text" id="cfg-sign-prep" class="settings-input" placeholder="TimeTable In-Charge">
+              </div>
+              <div class="settings-form-group">
+                <label class="settings-label">VERIFIED BY (SIGNATURE TITLE)</label>
+                <input type="text" id="cfg-sign-ver" class="settings-input" placeholder="Academic Coordinator">
+              </div>
+              <div class="settings-form-group">
+                <label class="settings-label">APPROVED BY (SIGNATURE TITLE)</label>
+                <input type="text" id="cfg-sign-app" class="settings-input" placeholder="Principal">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             PANEL 4: CLASSES & STANDARDS CONFIGURATION (SHIFT-CONFIGURABLE)
+             ================================================================ -->
+        <div class="settings-panel" id="settings-panel-standards">
+          <div class="settings-card">
+            <div class="settings-card-title">
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span>Classes &amp; Standards Directory</span>
+                <span class="settings-badge-pill" id="cfg-std-count-badge">6 Afternoon Classes</span>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-save-standards-settings">Save Standards</button>
+            </div>
+            <div class="settings-card-subtitle">Configure distinct classes and standards for Morning Shift vs Afternoon Shift. Add, edit classrooms, and manage student capacity according to your school structure.</div>
+
+            <!-- Shift Filter Segmented Control -->
+            <div class="settings-shift-toggle-bar">
+              <div class="shift-segmented-control" id="cfg-standards-shift-selector" style="margin: 10px 0 12px 0;">
+                <button type="button" class="shift-segment-btn" data-shift="morning" id="cfg-btn-shift-morning">
+                  <span class="shift-icon">☀️</span> Morning Shift Classes
+                </button>
+                <button type="button" class="shift-segment-btn active" data-shift="afternoon" id="cfg-btn-shift-afternoon">
+                  <span class="shift-icon">🌙</span> Afternoon Shift Classes
+                </button>
+              </div>
+              <div style="font-size: 12px; color: #64748b; margin-bottom: 12px;" id="cfg-std-shift-desc">
+                Currently configuring classes for <strong>Afternoon Shift</strong> (Std 3rd to 8th).
+              </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="period-slots-table">
+                <thead>
+                  <tr>
+                    <th style="width: 90px;">STANDARD ID</th>
+                    <th style="width: 190px;">CLASS / GRADE NAME</th>
+                    <th style="width: 150px;">ASSIGNED SHIFT</th>
+                    <th style="width: 160px;">DESIGNATED ROOM</th>
+                    <th style="width: 110px; text-align: center;">STUDENT CAPACITY</th>
+                    <th style="width: 80px; text-align: center;">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody id="cfg-standards-tbody">
+                  <!-- Rendered dynamically in app.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Quick Add Standard Bar -->
+            <div class="quick-add-standard-box" style="background: #f8fafc; border: 1px dashed var(--border-color); border-radius: 8px; padding: 14px; margin-top: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <div style="font-size: 12px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+                <span>➕ Add Class to:</span>
+                <select id="new-std-shift" class="settings-input" style="width: 150px; font-weight: 600; padding: 4px 8px; font-size: 12px;">
+                  <option value="morning">☀️ Morning Shift</option>
+                  <option value="afternoon" selected>🌙 Afternoon Shift</option>
+                </select>
+              </div>
+              <input type="text" id="new-std-name" class="settings-input" placeholder="e.g. Standard: 9th or Nursery" style="width: 190px;">
+              <input type="text" id="new-std-room" class="settings-input" placeholder="e.g. Room 302" style="width: 130px;">
+              <input type="number" id="new-std-students" class="settings-input" placeholder="Capacity" style="width: 90px;" value="35">
+              <button class="btn btn-secondary btn-sm" id="btn-add-standard" style="background: #1e40af; color: #ffffff; font-weight: 600;">+ Add Class</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             PANEL 5: ACADEMIC SUBJECTS MASTER CATALOG
+             ================================================================ -->
+        <div class="settings-panel" id="settings-panel-subjects">
+          <!-- Summary Stat Strip -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;">
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #64748b; text-transform: uppercase;">Total Subjects</span>
+              <div style="font-size: 18px; font-weight: 800; color: #0f172a;" id="cfg-stat-total-subjects">11</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #7c3aed; text-transform: uppercase;">Core Academics</span>
+              <div style="font-size: 18px; font-weight: 800; color: #6d28d9;" id="cfg-stat-core-subjects">3</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #2563eb; text-transform: uppercase;">Languages</span>
+              <div style="font-size: 18px; font-weight: 800; color: #1d4ed8;" id="cfg-stat-lang-subjects">4</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #059669; text-transform: uppercase;">Science &amp; Activities</span>
+              <div style="font-size: 18px; font-weight: 800; color: #047857;" id="cfg-stat-activity-subjects">4</div>
+            </div>
+          </div>
+
+          <!-- Add New Subject Form Card -->
+          <div class="settings-card" style="padding: 16px 20px; margin-bottom: 14px;">
+            <div class="settings-card-title">
+              <span>+ Add New Curriculum Subject</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1.5fr 1.2fr 1fr auto; gap: 10px; align-items: flex-end; margin-top: 8px;">
+              <div class="settings-form-group" style="margin-bottom: 0;">
+                <label class="settings-label">SUBJECT NAME</label>
+                <input type="text" id="new-subject-name" class="settings-input" placeholder="e.g. Value Education / French">
+              </div>
+              <div class="settings-form-group" style="margin-bottom: 0;">
+                <label class="settings-label">CODE</label>
+                <input type="text" id="new-subject-code" class="settings-input" placeholder="e.g. VED" style="text-transform: uppercase; font-weight: 700;">
+              </div>
+              <div class="settings-form-group" style="margin-bottom: 0;">
+                <label class="settings-label">CATEGORY</label>
+                <select id="new-subject-category" class="settings-select">
+                  <option value="Core Academic">Core Academic</option>
+                  <option value="Language">Language</option>
+                  <option value="Science & Technology">Science & Technology</option>
+                  <option value="Physical & Arts">Physical & Arts</option>
+                  <option value="Physical & Sports">Physical & Sports</option>
+                  <option value="Elective / Other">Elective / Other</option>
+                </select>
+              </div>
+              <div class="settings-form-group" style="margin-bottom: 0;">
+                <label class="settings-label">BADGE COLOR</label>
+                <select id="new-subject-color" class="settings-select">
+                  <option value="#2563eb">🔵 Blue</option>
+                  <option value="#7c3aed">🟣 Purple</option>
+                  <option value="#059669">🟢 Emerald</option>
+                  <option value="#d97706">🟠 Amber</option>
+                  <option value="#ea580c">🟧 Orange</option>
+                  <option value="#0284c7">🔷 Sky</option>
+                  <option value="#16a34a">🌲 Green</option>
+                  <option value="#dc2626">🔴 Red</option>
+                  <option value="#9333ea">🔮 Violet</option>
+                  <option value="#ec4899">🌸 Pink</option>
+                  <option value="#0d9488">🌊 Teal</option>
+                  <option value="#475569">🔘 Slate</option>
+                </select>
+              </div>
+              <div class="settings-form-group" style="margin-bottom: 0;">
+                <label class="settings-label">TARGET SESSIONS</label>
+                <input type="number" id="new-subject-periods" class="settings-input" value="5" min="1" max="15" style="text-align: center;">
+              </div>
+              <button class="btn btn-primary btn-md" id="btn-add-new-subject">+ Add Subject</button>
+            </div>
+          </div>
+
+          <!-- Academic Subjects Master Table -->
+          <div class="settings-card">
+            <div class="settings-card-title">
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span>Academic Subjects Master Directory</span>
+                <span class="settings-badge-pill" id="cfg-subject-count">11 Subjects</span>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-save-subjects-settings">Save Subjects Catalog</button>
+            </div>
+            <div class="settings-card-subtitle">Manage official academic curriculum subjects, short codes, subject categories, assigned teachers, and live timetable metrics.</div>
+
+            <div style="overflow-x: auto;">
+              <table class="faculty-settings-table">
+                <thead>
+                  <tr>
+                    <th style="width: 100px;">CODE &amp; BADGE</th>
+                    <th style="width: 180px;">SUBJECT NAME</th>
+                    <th style="width: 160px;">CATEGORY</th>
+                    <th style="width: 120px; text-align: center;">TARGET SESSIONS</th>
+                    <th style="width: 200px;">SPECIALIST FACULTY</th>
+                    <th style="width: 120px; text-align: center;">ACTIVE SLOTS</th>
+                    <th style="width: 80px; text-align: center;">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody id="cfg-subjects-tbody">
+                  <!-- Rendered dynamically in app.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Quick Chips Preview container for backward compat -->
+            <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border-color);">
+              <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px; display: block;">Quick Chips Catalog View:</span>
+              <div id="cfg-subjects-chips-container" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <!-- Chips rendered dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             PANEL 6: CLOUD DATABASE & BACKUP OPERATIONS
+             ================================================================ -->
+        <div class="settings-panel" id="settings-panel-cloud-db">
+          <div class="settings-card">
+            <div class="settings-card-title">
+              <span>Firebase Firestore Cloud Database Synchronization</span>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" id="btn-cfg-sync-cloud">☁️ Push to Cloud</button>
+                <button class="btn btn-secondary btn-sm" id="btn-cfg-fetch-cloud">🔄 Pull from Cloud</button>
+              </div>
+            </div>
+            <div class="settings-card-subtitle">Connect your school's Google Firebase account to sync timetables across all coordinators and devices.</div>
+
+            <div class="settings-form-grid-2">
+              <div class="settings-form-group">
+                <label class="settings-label">FIREBASE API KEY</label>
+                <input type="text" id="cfg-fb-apiKey" class="settings-input" placeholder="AIzaSy...">
+              </div>
+              <div class="settings-form-group">
+                <label class="settings-label">PROJECT ID</label>
+                <input type="text" id="cfg-fb-projectId" class="settings-input" placeholder="timetabalemanager">
+              </div>
+              <div class="settings-form-group">
+                <label class="settings-label">AUTH DOMAIN</label>
+                <input type="text" id="cfg-fb-authDomain" class="settings-input" placeholder="timetabalemanager.firebaseapp.com">
+              </div>
+              <div class="settings-form-group">
+                <label class="settings-label">APP ID</label>
+                <input type="text" id="cfg-fb-appId" class="settings-input" placeholder="1:303254714470:web:...">
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+              <button class="btn btn-primary btn-sm" id="btn-save-cloud-credentials">Save &amp; Connect Firebase</button>
+            </div>
+          </div>
+
+          <!-- JSON Database Backup & Restore -->
+          <div class="settings-card">
+            <div class="settings-card-title">
+              <span>Local Offline Database Backup &amp; Disaster Recovery</span>
+            </div>
+            <div class="settings-card-subtitle">Safeguard your entire school schedule with 1-click JSON backup snapshots.</div>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+              <button class="btn btn-secondary btn-md" id="btn-cfg-export-json">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Export Timetable Database (.json)
+              </button>
+              <button class="btn btn-secondary btn-md" id="btn-cfg-import-json">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                Restore from JSON Backup
+              </button>
+              <input type="file" id="settings-import-file-input" accept=".json" style="display: none;">
+              <button class="btn btn-secondary btn-sm" id="btn-cfg-factory-reset" style="color: #dc2626; margin-left: auto;">
+                Reset to Default Data
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
-  <!-- Sticky Bottom Action Bar -->
-  <footer class="sticky-export-bar">
-    <div class="sticky-export-container">
-      <div class="export-desc-group">
-        <div class="export-word-badge">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-          </svg>
+    <!-- DOCKED STICKY BOTTOM ACTION BAR (Clean & Unobtrusive) -->
+    <footer class="sticky-export-bar" id="sticky-export-bar">
+      <div class="sticky-export-container">
+        <div class="export-desc-group">
+          <div class="export-word-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+            </svg>
+          </div>
+          <div class="export-desc-text">
+            <h4 id="export-bar-title">Export Official School Documents</h4>
+            <p id="export-bar-desc">Outputs formatted Microsoft Word (.docx) with school letterhead and principal sign-off.</p>
+          </div>
         </div>
-        <div class="export-desc-text">
-          <h4 id="export-bar-title">Export Official School Documents</h4>
-          <p id="export-bar-desc">Outputs formatted Microsoft Word (.docx) with school letterhead and principal sign-off.</p>
-        </div>
-      </div>
 
-      <div class="export-action-buttons">
-        <button id="btn-download-single-day" class="btn btn-word btn-lg">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-          Download <span id="btn-download-day-name">Monday</span>.docx
-        </button>
-        <button id="btn-download-all-days" class="btn btn-primary btn-lg" title="All days in one master Word document with clean page breaks">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-          Download Full Week (.docx)
-        </button>
-        <button id="btn-print-view" class="btn btn-secondary btn-lg" title="Print document or save as PDF">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
-          Print / PDF
-        </button>
+        <div class="export-action-buttons">
+          <button id="btn-download-single-day" class="btn btn-word btn-md">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Download <span id="btn-download-day-name">Monday</span>.docx
+          </button>
+          <button id="btn-download-all-days" class="btn btn-primary btn-md" title="All days in one master Word document with clean page breaks">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            Download Full Week (.docx)
+          </button>
+          <button id="btn-print-view" class="btn btn-secondary btn-md" title="Print document or save as PDF">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+            Print / PDF
+          </button>
+        </div>
       </div>
-    </div>
-  </footer>
+    </footer>
+
+    </div><!-- /#app-main-layout -->
+  </div><!-- /#app-shell -->
 
   <!-- Fast In-Place Popover for Period Editing -->
   <div class="period-popover-overlay" id="period-modal">
@@ -608,7 +1726,10 @@
         <div>
           <div class="popover-section-label" style="display: flex; justify-content: space-between; align-items: center;">
             <span>Select Subject</span>
-            <span id="modal-subject-hint" style="font-size: 11px; font-weight: 600; color: var(--primary-navy); text-transform: none;"></span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span id="modal-subject-hint" style="font-size: 11px; font-weight: 600; color: var(--primary-navy); text-transform: none;"></span>
+              <button type="button" class="quick-add-link-btn" id="btn-quick-new-subject-period-modal" title="Add New Subject">+ New</button>
+            </div>
           </div>
           <div class="quick-select-pills" id="modal-subject-chips"></div>
           <div style="margin-top: 6px;">
@@ -619,7 +1740,10 @@
         <div>
           <div class="popover-section-label" style="display: flex; justify-content: space-between; align-items: center;">
             <span>Select Teacher</span>
-            <span id="modal-teacher-hint" style="font-size: 11px; font-weight: 600; color: var(--primary-navy); text-transform: none;"></span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span id="modal-teacher-hint" style="font-size: 11px; font-weight: 600; color: var(--primary-navy); text-transform: none;"></span>
+              <button type="button" class="quick-add-link-btn" id="btn-quick-new-teacher-period-modal" title="Add New Teacher">+ New</button>
+            </div>
           </div>
           <div class="quick-select-pills" id="modal-teacher-chips"></div>
           <div style="margin-top: 6px;">
@@ -996,6 +2120,516 @@
       </div>
     </div>
   </div>
+  <!-- ====================================================================
+       SAAS ENTERPRISE MODALS & OVERLAYS
+       ==================================================================== -->
+
+  <!-- 1. SaaS Enterprise Authentication & Login Overlay Modal -->
+  <div class="auth-overlay" id="auth-login-overlay" style="display: none;">
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <div class="auth-logo-badge">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="var(--primary-color)"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+        </div>
+        <h2>Funland School ERP Portal</h2>
+        <p class="auth-subtitle">Academic Timetable &amp; School Management System • Multi-Role SaaS</p>
+      </div>
+
+      <!-- Quick 1-Click Role Demo Switcher -->
+      <div class="auth-role-quick-panel">
+        <div class="auth-quick-label">⚡ 1-Click Quick Login (Select Role):</div>
+        <div class="auth-role-chips">
+          <button type="button" class="auth-role-chip active" data-role="Admin" id="btn-demo-admin">
+            👑 Administrator
+          </button>
+          <button type="button" class="auth-role-chip" data-role="Principal" id="btn-demo-principal">
+            🎓 Principal
+          </button>
+          <button type="button" class="auth-role-chip" data-role="Teacher" id="btn-demo-teacher">
+            👩‍🏫 Teacher
+          </button>
+          <button type="button" class="auth-role-chip" data-role="Staff" id="btn-demo-staff">
+            📋 Staff
+          </button>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <form id="auth-login-form" onsubmit="return false;" class="auth-form">
+        <div class="auth-input-group">
+          <label for="auth-email">Official Institutional Email</label>
+          <div class="auth-input-wrap">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <input type="email" id="auth-email" value="admin@funland.edu" required autocomplete="username" class="auth-input" placeholder="name@school.edu">
+          </div>
+        </div>
+
+        <div class="auth-input-group">
+          <label for="auth-password">Password / Access PIN</label>
+          <div class="auth-input-wrap">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            <input type="password" id="auth-password" value="admin123" required autocomplete="current-password" class="auth-input" placeholder="••••••••">
+          </div>
+        </div>
+
+        <div class="auth-extra-row">
+          <label class="auth-remember">
+            <input type="checkbox" id="auth-remember-me" checked>
+            <span>Keep me signed in</span>
+          </label>
+          <span class="auth-secured-note">🔒 Role-Secured ERP Access</span>
+        </div>
+
+        <div id="auth-error-banner" class="auth-error-msg" style="display: none;"></div>
+
+        <button type="button" id="btn-auth-submit" class="btn btn-primary auth-submit-btn">
+          Sign In to School Portal &rarr;
+        </button>
+      </form>
+
+      <div class="auth-footer-note">
+        Session 2026–2027 • Standard Institutional Academic Access
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Enterprise Modal: Assign Attendance Duty -->
+  <div class="enterprise-modal-overlay" id="attendance-duty-modal">
+    <div class="enterprise-modal-card" style="max-width: 580px;">
+      <div class="modal-title-bar">
+        <h3 id="att-modal-title">Assign Attendance Duty</h3>
+        <button class="popover-close-btn" id="btn-close-att-modal">&times;</button>
+      </div>
+      <div class="modal-content-area">
+        <input type="hidden" id="att-input-edit-id">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div>
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">DAY OF WEEK</label>
+            <select id="att-input-day" class="popover-input">
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">ACADEMIC SHIFT</label>
+            <select id="att-input-shift" class="popover-input">
+              <option value="Afternoon">Afternoon Shift</option>
+              <option value="Morning">Morning Shift</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">DUTY ASSIGNMENT / TYPE</label>
+          <input type="text" id="att-input-duty" class="popover-input" placeholder="e.g. Main Gate &amp; Assembly Attendance">
+        </div>
+
+        <div>
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">FACULTY IN-CHARGE (TEACHER)</label>
+          <select id="att-input-teacher" class="popover-input">
+            <!-- Teachers options rendered in app.js -->
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div>
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">REPORTING LOCATION</label>
+            <input type="text" id="att-input-location" class="popover-input" placeholder="e.g. School Main Gate">
+          </div>
+          <div>
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">REPORTING TIMING</label>
+            <input type="text" id="att-input-timing" class="popover-input" placeholder="e.g. 12:30 PM - 1:00 PM">
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">STATUS</label>
+          <select id="att-input-status" class="popover-input">
+            <option value="Assigned">Assigned / Scheduled</option>
+            <option value="On-Duty">Currently On Duty</option>
+            <option value="Completed">Completed</option>
+            <option value="Substituted">Substituted</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions-bar" style="justify-content: space-between;">
+        <button id="btn-delete-att-duty" class="btn btn-secondary btn-sm" style="color: #dc2626; display: none;">Remove Duty</button>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-cancel-att-modal" class="btn btn-secondary btn-sm">Cancel</button>
+          <button id="btn-save-att-duty" class="btn btn-primary btn-sm">Save Assignment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Enterprise Modal: Assign Class Teacher (with Conflict Guard) -->
+  <div class="enterprise-modal-overlay" id="class-teacher-modal">
+    <div class="enterprise-modal-card" style="max-width: 580px;">
+      <div class="modal-title-bar">
+        <h3 id="ct-modal-title">Assign Class Teacher</h3>
+        <button class="popover-close-btn" id="btn-close-ct-modal">&times;</button>
+      </div>
+      <div class="modal-content-area">
+        <!-- Conflict Alert Banner -->
+        <div id="ct-conflict-warning-banner" class="ct-conflict-banner" style="display: none;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="#d97706"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          <div>
+            <strong id="ct-conflict-teacher-name">Teacher Name</strong> is already assigned as Class Teacher for <span id="ct-conflict-std-name">Standard: 4th</span>!
+            <div style="font-size: 11px; margin-top: 2px;">Assigning them here will reallocate their class responsibility.</div>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">TARGET STANDARD / CLASS</label>
+          <select id="ct-input-standard" class="popover-input">
+            <!-- Standards options rendered in app.js -->
+          </select>
+        </div>
+
+        <div>
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">DESIGNATED CLASS TEACHER</label>
+          <select id="ct-input-teacher" class="popover-input">
+            <!-- Teachers options rendered in app.js -->
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div>
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">ROOM / CLASSROOM NUMBER</label>
+            <input type="text" id="ct-input-room" class="popover-input" placeholder="e.g. Room 201">
+          </div>
+          <div>
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">ACADEMIC SHIFT</label>
+            <select id="ct-input-shift" class="popover-input">
+              <option value="afternoon">Afternoon Shift</option>
+              <option value="morning">Morning Shift</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">FACULTY CONTACT / PHONE</label>
+          <input type="text" id="ct-input-contact" class="popover-input" placeholder="e.g. +91 98250 11223">
+        </div>
+      </div>
+      <div class="modal-actions-bar" style="justify-content: space-between;">
+        <button id="btn-remove-class-teacher" class="btn btn-secondary btn-sm" style="color: #dc2626; display: none;">Clear Assignment</button>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-cancel-ct-modal" class="btn btn-secondary btn-sm">Cancel</button>
+          <button id="btn-save-class-teacher" class="btn btn-primary btn-sm">Confirm Assignment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Enterprise Modal: Add / Edit Syllabus Progress Record -->
+  <div class="enterprise-modal-overlay" id="syllabus-modal">
+    <div class="enterprise-modal-card" style="max-width: 650px;">
+      <div class="modal-title-bar">
+        <h3 id="syl-modal-title">Subject Syllabus &amp; Verification Entry</h3>
+        <button class="popover-close-btn" id="btn-close-syl-modal">&times;</button>
+      </div>
+      <div class="modal-content-area">
+        <input type="hidden" id="syl-input-id">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div>
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">STANDARD / CLASS</label>
+            <select id="syl-input-standard" class="popover-input">
+              <!-- Standard options -->
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">SUBJECT</label>
+            <select id="syl-input-subject" class="popover-input">
+              <!-- Subjects options -->
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">TEACHER IN-CHARGE</label>
+          <select id="syl-input-teacher" class="popover-input">
+            <!-- Teacher options -->
+          </select>
+        </div>
+
+        <!-- Semester 1 Exam Scope Sub-Grid -->
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+            📝 SEMESTER 1 EXAM SYLLABUS SCOPE:
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 2px;">NO. OF CHAPTERS</label>
+              <input type="number" id="syl-input-chapters" class="popover-input" min="0" value="8">
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 2px;">NO. OF POEMS</label>
+              <input type="number" id="syl-input-poems" class="popover-input" min="0" value="4">
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 2px;">GRAMMAR TOPICS</label>
+              <input type="number" id="syl-input-grammar" class="popover-input" min="0" value="6">
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Details -->
+        <div>
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">COMPLETED COURSE SUMMARY</label>
+          <input type="text" id="syl-input-completed-course" class="popover-input" placeholder="e.g. Ch 1 to 5, Poems 1 to 3, Grammar 1 to 4">
+        </div>
+
+        <div>
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">PENDING COURSE SUMMARY</label>
+          <input type="text" id="syl-input-pending-course" class="popover-input" placeholder="e.g. Ch 6 to 8, Poem 4, Grammar 5 to 6">
+        </div>
+
+        <!-- Checking Status Sub-Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <!-- Syllabus Checked -->
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 10px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: #065f46; margin-bottom: 6px;">✓ SYLLABUS CHECKED:</div>
+            <div style="margin-bottom: 6px;">
+              <label style="font-size: 10.5px; font-weight: 600; color: #047857;">TEXTBOOKS</label>
+              <input type="text" id="syl-input-checked-textbooks" class="popover-input" placeholder="e.g. 28 Books Checked">
+            </div>
+            <div>
+              <label style="font-size: 10.5px; font-weight: 600; color: #047857;">CLASSWORK</label>
+              <input type="text" id="syl-input-checked-classwork" class="popover-input" placeholder="e.g. 27 Notebooks Checked">
+            </div>
+          </div>
+
+          <!-- Checking Pending -->
+          <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 10px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: #92400e; margin-bottom: 6px;">⏳ CHECKING PENDING:</div>
+            <div style="margin-bottom: 6px;">
+              <label style="font-size: 10.5px; font-weight: 600; color: #b45309;">TEXTBOOKS</label>
+              <input type="text" id="syl-input-pending-textbooks" class="popover-input" placeholder="e.g. 2 Books Pending">
+            </div>
+            <div>
+              <label style="font-size: 10.5px; font-weight: 600; color: #b45309;">CLASSWORK</label>
+              <input type="text" id="syl-input-pending-classwork" class="popover-input" placeholder="e.g. 3 Books Pending">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">ESTIMATED COURSE PROGRESS (%): <span id="syl-progress-percent-val" style="font-weight: 700; color: var(--primary-color);">75%</span></label>
+          <input type="range" id="syl-input-progress" min="0" max="100" value="75" class="popover-input" style="padding: 0;">
+        </div>
+      </div>
+      <div class="modal-actions-bar" style="justify-content: space-between;">
+        <button id="btn-delete-syllabus-record" class="btn btn-secondary btn-sm" style="color: #dc2626; display: none;">Delete Entry</button>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-cancel-syl-modal" class="btn btn-secondary btn-sm">Cancel</button>
+          <button id="btn-save-syllabus-record" class="btn btn-primary btn-sm">Save Syllabus Record</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Enterprise Modal: Edit Period in Dedicated Class Timetable -->
+  <div class="enterprise-modal-overlay" id="class-cell-modal">
+    <div class="enterprise-modal-card" style="max-width: 480px;">
+      <div class="modal-title-bar">
+        <h3 id="class-cell-modal-title">Edit Class Period Slot</h3>
+        <button class="popover-close-btn" id="btn-close-class-cell-modal">&times;</button>
+      </div>
+      <div class="modal-content-area">
+        <input type="hidden" id="class-cell-day">
+        <input type="hidden" id="class-cell-period-id">
+        <input type="hidden" id="class-cell-std-id">
+
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 0;">SUBJECT</label>
+            <button type="button" class="quick-add-link-btn" id="btn-quick-new-subject-slot" title="Quick Add Subject">+ New</button>
+          </div>
+          <select id="class-cell-subject" class="popover-input">
+            <!-- Subjects options -->
+          </select>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 0;">ASSIGNED FACULTY (TEACHER)</label>
+            <button type="button" class="quick-add-link-btn" id="btn-quick-new-teacher-slot" title="Quick Add Teacher">+ New</button>
+          </div>
+          <select id="class-cell-teacher" class="popover-input">
+            <!-- Teachers options -->
+          </select>
+        </div>
+
+        <div id="class-cell-conflict-alert" class="ct-conflict-banner" style="display: none; margin-top: 10px;">
+          <span id="class-cell-conflict-msg">Teacher is already assigned in another class at this period.</span>
+        </div>
+      </div>
+      <div class="modal-actions-bar" style="justify-content: space-between;">
+        <button id="btn-clear-class-cell" class="btn btn-danger-outline btn-sm">Clear Slot</button>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-cancel-class-cell" class="btn btn-secondary btn-sm">Cancel</button>
+          <button id="btn-save-class-cell" class="btn btn-primary btn-sm">Save Slot</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       6. ENTERPRISE UNIVERSAL QUICK-ADD MODAL
+       Allows 1-Click creation of Subjects, Teachers, or Classes from ANY screen
+       ==================================================================== -->
+  <div class="enterprise-modal-overlay" id="universal-quick-add-modal">
+    <div class="enterprise-modal-card" style="max-width: 540px;">
+      <div class="modal-title-bar">
+        <h3 id="quick-add-modal-title">Quick Add Entity</h3>
+        <button class="popover-close-btn" id="btn-close-quick-add-modal" title="Close">&times;</button>
+      </div>
+
+      <!-- Segmented Mode Tabs -->
+      <div class="quick-add-tabs-strip">
+        <div class="quick-add-segmented-tabs">
+          <button type="button" class="quick-add-tab-btn active" data-type="subject" id="quick-tab-btn-subject">
+            New Subject
+          </button>
+          <button type="button" class="quick-add-tab-btn" data-type="teacher" id="quick-tab-btn-teacher">
+            New Teacher
+          </button>
+          <button type="button" class="quick-add-tab-btn" data-type="class" id="quick-tab-btn-class">
+            New Class
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-content-area" style="padding-top: 14px;">
+        <!-- Hidden input to track target select element if any -->
+        <input type="hidden" id="quick-add-target-select-id">
+
+        <!-- PANE 1: QUICK ADD SUBJECT -->
+        <div class="quick-add-pane active" id="quick-pane-subject">
+          <div class="settings-form-group">
+            <label class="settings-label">SUBJECT NAME <span style="color: #dc2626;">*</span></label>
+            <input type="text" id="quick-subject-name" class="settings-input" placeholder="e.g. Value Education / Computer Science">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px;">
+            <div class="settings-form-group">
+              <label class="settings-label">SHORT CODE</label>
+              <input type="text" id="quick-subject-code" class="settings-input" placeholder="e.g. VED" style="text-transform: uppercase; font-weight: 700;">
+            </div>
+            <div class="settings-form-group">
+              <label class="settings-label">CATEGORY</label>
+              <select id="quick-subject-category" class="settings-select">
+                <option value="Core Academic">Core Academic</option>
+                <option value="Language">Language</option>
+                <option value="Science & Technology">Science & Technology</option>
+                <option value="Physical & Arts">Physical & Arts</option>
+                <option value="Physical & Sports">Physical & Sports</option>
+                <option value="Elective / Other">Elective / Other</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="settings-form-group">
+              <label class="settings-label">COLOR BADGE</label>
+              <select id="quick-subject-color" class="settings-select">
+                <option value="#2563eb">🔵 Blue</option>
+                <option value="#7c3aed">🟣 Purple</option>
+                <option value="#059669">🟢 Emerald</option>
+                <option value="#d97706">🟠 Amber</option>
+                <option value="#ea580c">🟧 Orange</option>
+                <option value="#0284c7">🔷 Sky</option>
+                <option value="#16a34a">🌲 Green</option>
+                <option value="#dc2626">🔴 Red</option>
+                <option value="#9333ea">🔮 Violet</option>
+                <option value="#ec4899">🌸 Pink</option>
+                <option value="#0d9488">🌊 Teal</option>
+                <option value="#475569">🔘 Slate</option>
+              </select>
+            </div>
+            <div class="settings-form-group">
+              <label class="settings-label">TARGET SESSIONS</label>
+              <input type="number" id="quick-subject-periods" class="settings-input" value="5" min="1" max="15">
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 2: QUICK ADD TEACHER -->
+        <div class="quick-add-pane" id="quick-pane-teacher" style="display: none;">
+          <div class="settings-form-group">
+            <label class="settings-label">TEACHER NAME <span style="color: #dc2626;">*</span></label>
+            <input type="text" id="quick-teacher-name" class="settings-input" placeholder="e.g. Bhavna Ma'am">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="settings-form-group">
+              <label class="settings-label">ASSIGNED SHIFT</label>
+              <select id="quick-teacher-shift" class="settings-select">
+                <option value="afternoon">🌙 Afternoon Shift</option>
+                <option value="morning">☀️ Morning Shift</option>
+                <option value="both">🔄 Both Shifts</option>
+              </select>
+            </div>
+            <div class="settings-form-group">
+              <label class="settings-label">PRIMARY SUBJECT</label>
+              <select id="quick-teacher-subject" class="settings-select">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="settings-form-group">
+              <label class="settings-label">WORK SCHEDULE</label>
+              <select id="quick-teacher-work" class="settings-select">
+                <option value="full_day">Full Day</option>
+                <option value="half_day">Half Day</option>
+              </select>
+            </div>
+            <div class="settings-form-group">
+              <label class="settings-label">HALF-DAY AVAILABILITY</label>
+              <select id="quick-teacher-halfday" class="settings-select">
+                <option value="all">All Periods (Full Shift)</option>
+                <option value="first_half">First Half (Periods 1–3)</option>
+                <option value="second_half">Second Half (Periods 4–6)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 3: QUICK ADD CLASS / STANDARD -->
+        <div class="quick-add-pane" id="quick-pane-class" style="display: none;">
+          <div class="settings-form-group">
+            <label class="settings-label">CLASS / GRADE NAME <span style="color: #dc2626;">*</span></label>
+            <input type="text" id="quick-class-name" class="settings-input" placeholder="e.g. Standard: 9th or Prep-A">
+          </div>
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px;">
+            <div class="settings-form-group">
+              <label class="settings-label">ASSIGNED SHIFT</label>
+              <select id="quick-class-shift" class="settings-select">
+                <option value="afternoon" selected>🌙 Afternoon Shift</option>
+                <option value="morning">☀️ Morning Shift</option>
+              </select>
+            </div>
+            <div class="settings-form-group">
+              <label class="settings-label">DESIGNATED ROOM</label>
+              <input type="text" id="quick-class-room" class="settings-input" placeholder="e.g. Room 302">
+            </div>
+            <div class="settings-form-group">
+              <label class="settings-label">CAPACITY</label>
+              <input type="number" id="quick-class-capacity" class="settings-input" value="35" min="1">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-actions-bar" style="justify-content: flex-end; gap: 8px;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-quick-add">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-save-quick-add">Save &amp; Apply</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Toast Container -->
   <div class="toast-area" id="toast-container"></div>
@@ -1005,12 +2639,12 @@
   <!-- Firebase SDK Compat via CDN -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=6"></script>
-  <script src="js/firebase-sync.js?v=6"></script>
-  <script src="js/template-assets.js?v=6"></script>
-  <script src="js/default-data.js?v=6"></script>
-  <script src="js/docx-generator.js?v=6"></script>
-  <script src="js/app.js?v=6"></script>
+  <script src="js/firebase-config.js?v=25"></script>
+  <script src="js/firebase-sync.js?v=25"></script>
+  <script src="js/template-assets.js?v=25"></script>
+  <script src="js/default-data.js?v=25"></script>
+  <script src="js/docx-generator.js?v=25"></script>
+  <script src="js/app.js?v=25"></script>
 
 </body>
 </html>
