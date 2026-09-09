@@ -313,6 +313,76 @@
     btnTogglePassword: document.getElementById('btn-toggle-password'),
     pwEyeIcon: document.getElementById('pw-eye-icon'),
 
+    // Phase 1: Workspace Switcher Elements
+    workspaceSelectorControl: document.getElementById('workspace-selector-control'),
+    btnWsPrincipal: document.getElementById('btn-ws-principal'),
+    btnWsAcademic: document.getElementById('btn-ws-academic'),
+    btnWsAdmin: document.getElementById('btn-ws-admin'),
+
+    // Phase 1: Administration & Audit DOM
+    adminUsersTbody: document.getElementById('admin-users-tbody'),
+    auditLogsTbody: document.getElementById('audit-logs-tbody'),
+    btnOpenCreateUserModal: document.getElementById('btn-open-create-user-modal'),
+    adminCreateUserModal: document.getElementById('admin-create-user-modal'),
+    btnCloseCreateUserModal: document.getElementById('btn-close-create-user-modal'),
+    btnCancelCreateUser: document.getElementById('btn-cancel-create-user'),
+    btnSubmitCreateUser: document.getElementById('btn-submit-create-user'),
+    btnRefreshAuditLogs: document.getElementById('btn-refresh-audit-logs'),
+
+    // Phase 2: Student Admissions & GR DOM
+    adminStudentsTbody: document.getElementById('admin-students-tbody'),
+    studentStatTotal: document.getElementById('student-stat-total'),
+    studentStatBoys: document.getElementById('student-stat-boys'),
+    studentStatGirls: document.getElementById('student-stat-girls'),
+    studentStatClasses: document.getElementById('student-stat-classes'),
+    studentSearchInput: document.getElementById('student-search-input'),
+    studentFilterStandard: document.getElementById('student-filter-standard'),
+    studentFilterStatus: document.getElementById('student-filter-status'),
+    btnRefreshStudentsTable: document.getElementById('btn-refresh-students-table'),
+    btnOpenAdmitStudentModal: document.getElementById('btn-open-admit-student-modal'),
+    adminAdmitStudentModal: document.getElementById('admin-admit-student-modal'),
+    btnCloseAdmitStudentModal: document.getElementById('btn-close-admit-student-modal'),
+    btnCancelAdmitStudent: document.getElementById('btn-cancel-admit-student'),
+    btnSubmitAdmitStudent: document.getElementById('btn-submit-admit-student'),
+
+    // Phase 2: Student Detail Modal DOM
+    adminStudentDetailModal: document.getElementById('admin-student-detail-modal'),
+    btnCloseStudentDetailModal: document.getElementById('btn-close-student-detail-modal'),
+
+    // Phase 2: Student Edit Modal DOM
+    adminEditStudentModal: document.getElementById('admin-edit-student-modal'),
+    btnCloseEditStudentModal: document.getElementById('btn-close-edit-student-modal'),
+    btnCancelEditStudent: document.getElementById('btn-cancel-edit-student'),
+    btnSubmitEditStudent: document.getElementById('btn-submit-edit-student'),
+
+    // Phase 2: Hierarchical Approvals DOM
+    academicApprovalsList: document.getElementById('academic-approvals-list'),
+    adminApprovalsList: document.getElementById('admin-approvals-list'),
+    academicApprovalsTbody: document.getElementById('academic-approvals-tbody'),
+    adminApprovalsTbody: document.getElementById('admin-approvals-tbody'),
+    principalUrgentApprovalsList: document.getElementById('principal-urgent-approvals-list'),
+    academicPendingBadge: document.getElementById('academic-pending-badge'),
+    adminPendingBadge: document.getElementById('admin-pending-badge'),
+    principalUrgentCountBadge: document.getElementById('principal-urgent-count-badge'),
+    badgeAcademicPending: document.getElementById('badge-academic-pending'),
+    badgeAdminPending: document.getElementById('badge-admin-pending'),
+    btnRefreshAcademicApprovals: document.getElementById('btn-refresh-academic-approvals'),
+    btnRefreshAdminApprovals: document.getElementById('btn-refresh-admin-approvals'),
+
+    // Phase 2: Staff HR DOM
+    adminStaffCardGrid: document.getElementById('admin-staff-card-grid'),
+    btnOpenCreateStaffModal: document.getElementById('btn-open-create-staff-modal'),
+    adminCreateStaffModal: document.getElementById('admin-create-staff-modal'),
+    btnCloseCreateStaffModal: document.getElementById('btn-close-create-staff-modal'),
+    btnCancelCreateStaff: document.getElementById('btn-cancel-create-staff'),
+    btnSubmitCreateStaff: document.getElementById('btn-submit-create-staff'),
+
+    // Phase 2: Academic Master DOM
+    masterStandardsContainer: document.getElementById('master-standards-container'),
+    masterSubjectsContainer: document.getElementById('master-subjects-container'),
+    masterStandardsCountBadge: document.getElementById('master-standards-count-badge'),
+    masterSubjectsCountBadge: document.getElementById('master-subjects-count-badge'),
+
     // Dashboard View Elements
     dashLiveDateStr: document.getElementById('dash-live-date-str'),
     dashBtnShiftMorning: document.getElementById('dash-btn-shift-morning'),
@@ -626,15 +696,48 @@
     initAutoScheduler();
     initExamScheduleView();
     initTeacherESSView();
+    initAdminStudentsView();
+    initAdminStaffView();
+    initAcademicMasterView();
     setupEventListeners();
     renderSchoolProfile();
     window.switchView = switchView;
+    window.switchWorkspace = switchWorkspace;
+    window.hasPermission = hasPermission;
+    window.loadAdminUsersTable = loadAdminUsersTable;
+    window.loadAuditLogsTable = loadAuditLogsTable;
+    window.loadAdminStudentsView = loadAdminStudentsView;
+    window.loadAdminStaffView = loadAdminStaffView;
+    window.loadAcademicMasterView = loadAcademicMasterView;
+    window.viewStudentProfile = viewStudentProfile;
+    window.openEditStudentModal = openEditStudentModal;
+    window.deleteStudentRecord = deleteStudentRecord;
+    window.loadAcademicApprovals = loadAcademicApprovals;
+    window.loadAdminApprovals = loadAdminApprovals;
+    window.loadPrincipalUrgentApprovals = loadPrincipalUrgentApprovals;
+    window.decideApprovalRecord = decideApprovalRecord;
+    window.promptEscalateRecord = promptEscalateRecord;
     window.state = state;
     window.registerTeacherCredentials = registerTeacherCredentials;
     window.getDefaultTeacherPassword = getDefaultTeacherPassword;
     window.showChangePasswordModal = showChangePasswordModal;
 
-    const validViews = ['dashboard-view', 'settings-view', 'class-timetable-view', 'attendance-duty-view', 'class-teacher-duty-view', 'syllabus-view', 'class-view', 'teacher-view', 'duty-view', 'general-duty-view', 'substitution-view', 'workload-view', 'exam-schedule-view', 'teacher-ess-view'];
+    if (DOM.btnRefreshAcademicApprovals) {
+      DOM.btnRefreshAcademicApprovals.addEventListener('click', loadAcademicApprovals);
+    }
+    if (DOM.btnRefreshAdminApprovals) {
+      DOM.btnRefreshAdminApprovals.addEventListener('click', loadAdminApprovals);
+    }
+
+    const validViews = [
+      'dashboard-view', 'settings-view', 'class-timetable-view', 'attendance-duty-view',
+      'class-teacher-duty-view', 'syllabus-view', 'class-view', 'teacher-view',
+      'duty-view', 'general-duty-view', 'substitution-view', 'workload-view',
+      'exam-schedule-view', 'teacher-ess-view',
+      'principal-cockpit-view', 'admin-users-view', 'admin-overview-view',
+      'admin-students-view', 'admin-staff-view', 'academic-master-view',
+      'academic-approvals-view', 'admin-approvals-view'
+    ];
     if (window.location.hash) {
       const hashView = window.location.hash.replace('#', '');
       if (validViews.includes(hashView)) {
@@ -1606,44 +1709,175 @@
 
   const DEMO_USERS = {
     Admin: {
+      username: "admin",
       email: "admin@funland.edu",
       password: "admin123",
       role: "Admin",
-      name: "Admin User",
+      roles: ["ADMIN_HEAD"],
+      workspaces: ["ADMINISTRATION"],
+      permissions: ["admin.students.view", "admin.students.create", "admin.students.edit", "admin.students.delete", "admin.staff.view", "admin.users.view", "approvals.view", "approvals.action"],
+      name: "System Administrator",
       avatar: "👑",
-      roleLabel: "Administrator"
+      roleLabel: "Administration Head"
     },
     Principal: {
+      username: "principal",
       email: "principal@funland.edu",
       password: "principal123",
       role: "Principal",
-      name: "Principal Sharma",
-      avatar: "🎓",
-      roleLabel: "Principal"
+      roles: ["PRINCIPAL"],
+      workspaces: ["PRINCIPAL"],
+      permissions: ["SUPERVISORY_OVERSIGHT", "EXECUTIVE_APPROVALS", "VIEW_AUDIT_LOGS", "MANAGE_ACADEMICS", "MANAGE_ADMINISTRATION"],
+      name: "Principal / Trustee",
+      avatar: "🏛️",
+      roleLabel: "School Principal / Director"
+    },
+    Academics: {
+      username: "academics",
+      email: "academics@funland.edu",
+      password: "academic123",
+      role: "Academic Head",
+      roles: ["ACADEMIC_HEAD"],
+      workspaces: ["ACADEMIC"],
+      permissions: ["academic.standards.view", "academic.subjects.view", "academic.leaves.view", "academic.leaves.approve", "academic.timetable.manage"],
+      name: "Academic Head",
+      avatar: "📚",
+      roleLabel: "Academic Head & Timetable Coordinator"
+    },
+    Payal: {
+      username: "payal",
+      email: "payal@funland.edu",
+      password: "payal123",
+      role: "Teacher",
+      roles: ["TEACHER"],
+      workspaces: ["ACADEMIC"],
+      permissions: ["faculty.schedule.view", "faculty.leave.apply", "faculty.password.change"],
+      name: "Payal Ma'am",
+      avatar: "👩‍🏫",
+      roleLabel: "Class Teacher (Std 3rd)",
+      teacherCode: "PAYAL"
     },
     Teacher: {
+      username: "priya",
       email: "priya@funland.edu",
       password: "priya123",
       role: "Teacher",
+      roles: ["TEACHER"],
+      workspaces: ["ACADEMIC"],
+      permissions: ["faculty.schedule.view", "faculty.leave.apply", "faculty.password.change"],
       name: "Priya Ma'am",
       avatar: "👩‍🏫",
-      roleLabel: "Faculty Member"
+      roleLabel: "Faculty Member",
+      teacherCode: "PRIYA"
     },
     Staff: {
+      username: "supervision",
       email: "supervision@funland.edu",
       password: "staff123",
       role: "Staff",
+      roles: ["STAFF"],
+      workspaces: ["ADMINISTRATION"],
+      permissions: ["supervision.duties.view"],
       name: "Office Staff",
       avatar: "📋",
       roleLabel: "Supervision Staff"
     }
   };
 
+  function hasPermission(permissionCode) {
+    const cur = (state.auth && state.auth.currentUser) || null;
+    if (!cur) return false;
+    if (cur.roles && cur.roles.includes('PRINCIPAL')) return true;
+    return Array.isArray(cur.permissions) && cur.permissions.includes(permissionCode);
+  }
+
+  function switchWorkspace(wsName) {
+    const cur = (state.auth && state.auth.currentUser) || null;
+    if (!cur) return;
+
+    // Security Gate: Check if user has permission for requested workspace
+    const userWorkspaces = cur.workspaces || [];
+    const isPrincipal = cur.roles && cur.roles.includes('PRINCIPAL');
+
+    if (!isPrincipal && !userWorkspaces.includes(wsName)) {
+      showToast(`Access Denied: Your account does not have access to the ${wsName} workspace.`, 'warning');
+      return;
+    }
+
+    state.activeWorkspace = wsName;
+    applyRolePermissions();
+
+    if (wsName === 'PRINCIPAL') {
+      switchView('principal-cockpit-view');
+      loadAuditLogsTable();
+      showToast('Switched to Principal Executive Supervisory Cockpit', 'info');
+    } else if (wsName === 'ADMINISTRATION') {
+      switchView('admin-overview-view');
+      loadAdminUsersTable();
+      showToast('Switched to Administration & Operations Workspace', 'info');
+    } else {
+      const isTeacher = cur && (cur.role === 'Teacher' || (cur.roles && cur.roles.includes('TEACHER')));
+      switchView(isTeacher ? 'teacher-ess-view' : 'dashboard-view');
+      showToast('Switched to Academic Operations Workspace', 'info');
+    }
+  }
+
+  async function verifyServerSession() {
+    const token = localStorage.getItem('school_erp_token');
+    if (!token) return;
+
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.user) {
+          const u = data.user;
+          const safeUser = {
+            id: u.id,
+            name: u.fullName,
+            username: u.username,
+            email: u.email,
+            role: u.roles[0] || u.userType,
+            roles: u.roles,
+            workspaces: u.workspaces,
+            permissions: u.permissions,
+            avatar: u.avatar || '👤',
+            roleLabel: u.roles[0] || u.userType,
+            teacherCode: u.teacherCode,
+            mustChangePassword: u.mustChangePassword
+          };
+
+          state.auth = {
+            isAuthenticated: true,
+            currentUser: safeUser,
+            token
+          };
+
+          // Set default workspace if not set
+          if (!state.activeWorkspace) {
+            if (safeUser.roles.includes('PRINCIPAL')) state.activeWorkspace = 'PRINCIPAL';
+            else if (safeUser.roles.includes('ADMIN_HEAD') || safeUser.roles.includes('ACCOUNTANT')) state.activeWorkspace = 'ADMINISTRATION';
+            else state.activeWorkspace = 'ACADEMIC';
+          }
+
+          renderUserProfileBadge();
+          applyRolePermissions();
+          hideLoginOverlay();
+        }
+      }
+    } catch (e) {
+      console.warn('Server session check unavailable:', e.message);
+    }
+  }
+
   function initAuth() {
     syncAllTeacherCredentials();
     renderUserProfileBadge();
     applyRolePermissions();
     initChangePasswordModal();
+    verifyServerSession();
 
     // Check auth status: show full-page sign-in screen immediately if not logged in
     if (!state.auth || !state.auth.isAuthenticated) {
@@ -1703,12 +1937,48 @@
         showLoginOverlay();
       });
     }
+
+    // Workspace segmented control buttons
+    if (DOM.btnWsPrincipal) {
+      DOM.btnWsPrincipal.addEventListener('click', () => switchWorkspace('PRINCIPAL'));
+    }
+    if (DOM.btnWsAcademic) {
+      DOM.btnWsAcademic.addEventListener('click', () => switchWorkspace('ACADEMIC'));
+    }
+    if (DOM.btnWsAdmin) {
+      DOM.btnWsAdmin.addEventListener('click', () => switchWorkspace('ADMINISTRATION'));
+    }
+
+    // Audit logs refresh button
+    if (DOM.btnRefreshAuditLogs) {
+      DOM.btnRefreshAuditLogs.addEventListener('click', loadAuditLogsTable);
+    }
+
+    // Admin User Modal buttons
+    if (DOM.btnOpenCreateUserModal) {
+      DOM.btnOpenCreateUserModal.addEventListener('click', () => {
+        if (DOM.adminCreateUserModal) DOM.adminCreateUserModal.style.display = 'flex';
+      });
+    }
+    if (DOM.btnCloseCreateUserModal) {
+      DOM.btnCloseCreateUserModal.addEventListener('click', () => {
+        if (DOM.adminCreateUserModal) DOM.adminCreateUserModal.style.display = 'none';
+      });
+    }
+    if (DOM.btnCancelCreateUser) {
+      DOM.btnCancelCreateUser.addEventListener('click', () => {
+        if (DOM.adminCreateUserModal) DOM.adminCreateUserModal.style.display = 'none';
+      });
+    }
+    if (DOM.btnSubmitCreateUser) {
+      DOM.btnSubmitCreateUser.addEventListener('click', handleCreateUserSubmit);
+    }
   }
 
   function renderUserProfileBadge() {
     const cur = (state.auth && state.auth.currentUser) || DEMO_USERS.Admin;
     if (DOM.headerUserAvatar) DOM.headerUserAvatar.textContent = cur.avatar || "👑";
-    if (DOM.headerUserName) DOM.headerUserName.textContent = cur.name || "Admin User";
+    if (DOM.headerUserName) DOM.headerUserName.textContent = cur.name || cur.fullName || "Admin User";
     if (DOM.headerUserRole) {
       DOM.headerUserRole.textContent = cur.roleLabel || cur.role || "Administrator";
       DOM.headerUserRole.className = `user-role-tag role-${(cur.role || 'Admin').toLowerCase()}`;
@@ -1717,193 +1987,335 @@
 
   function applyRolePermissions() {
     const cur = (state.auth && state.auth.currentUser) || null;
-    const isTeacher = cur && (cur.role === 'Teacher');
+    const isTeacher = cur && (cur.role === 'Teacher' || (cur.roles && cur.roles.includes('TEACHER')));
+    const isPrincipal = cur && ((cur.roles && cur.roles.includes('PRINCIPAL')) || cur.role === 'Principal');
+    const isAdmin = cur && ((cur.roles && (cur.roles.includes('ADMIN_HEAD') || cur.roles.includes('ACCOUNTANT'))) || cur.role === 'Admin');
 
+    // 1. Establish Active Workspace Strictly by Role
+    if (isPrincipal) {
+      state.activeWorkspace = 'PRINCIPAL';
+    } else if (isAdmin) {
+      state.activeWorkspace = 'ADMINISTRATION';
+    } else if (isTeacher) {
+      state.activeWorkspace = 'TEACHER';
+    } else {
+      state.activeWorkspace = 'ACADEMIC';
+    }
+
+    // 2. Hide Topbar Workspace Control permanently (no cross-hopping)
+    if (DOM.workspaceSelectorControl) {
+      DOM.workspaceSelectorControl.style.display = 'none';
+    }
+
+    // 3. Workspace-Based Sidebar Navigation Filtering
+    const principalNavGroup = document.getElementById('nav-group-principal');
+    const adminNavGroup = document.getElementById('nav-group-admin');
     const navEssBtn = document.getElementById('nav-tab-teacher-ess');
     const navEssGroup = navEssBtn ? navEssBtn.closest('.nav-group') : null;
+    const allNavGroups = Array.from(document.querySelectorAll('.nav-group'));
 
-    if (isTeacher) {
-      // TEACHER PORTAL MODE:
+    if (state.activeWorkspace === 'PRINCIPAL') {
+      // ==========================================
+      // PRINCIPAL EXECUTIVE SUPERVISORY PORTAL
+      // ==========================================
+      document.body.classList.remove('role-teacher');
+      document.body.classList.remove('role-admin');
+      document.body.classList.add('role-principal');
+
+      // Strictly show ONLY principal cockpit nav group
+      allNavGroups.forEach(grp => {
+        if (grp === principalNavGroup) {
+          grp.style.display = 'block';
+        } else {
+          grp.style.display = 'none';
+        }
+      });
+
+      // Quick management buttons hidden for principal executive view
+      if (DOM.btnTopbarQuickCreate) DOM.btnTopbarQuickCreate.style.display = 'none';
+      const headerShift = document.getElementById('header-shift-selector');
+      if (headerShift) headerShift.style.display = 'none';
+      const headerBell = document.getElementById('header-bell-selector');
+      if (headerBell) headerBell.style.display = 'none';
+
+      if (state.activeView !== 'principal-cockpit-view') {
+        switchView('principal-cockpit-view');
+      }
+
+    } else if (state.activeWorkspace === 'ADMINISTRATION') {
+      // ==========================================
+      // ADMINISTRATION ERP PORTAL
+      // ==========================================
+      document.body.classList.remove('role-teacher');
+      document.body.classList.remove('role-principal');
+      document.body.classList.add('role-admin');
+
+      // Strictly show ONLY Administration ERP nav group
+      allNavGroups.forEach(grp => {
+        if (grp === adminNavGroup) {
+          grp.style.display = 'block';
+        } else {
+          grp.style.display = 'none';
+        }
+      });
+
+      // Show all admin buttons inside admin group
+      if (adminNavGroup) {
+        adminNavGroup.querySelectorAll('.nav-item.view-tab-btn').forEach(b => {
+          b.style.display = 'flex';
+        });
+      }
+
+      if (DOM.btnTopbarQuickCreate) DOM.btnTopbarQuickCreate.style.display = 'none';
+      const headerShift = document.getElementById('header-shift-selector');
+      if (headerShift) headerShift.style.display = 'none';
+      const headerBell = document.getElementById('header-bell-selector');
+      if (headerBell) headerBell.style.display = 'none';
+
+      const adminAllowedViews = ['admin-overview-view', 'admin-students-view', 'admin-staff-view', 'admin-users-view', 'admin-approvals-view'];
+      if (!adminAllowedViews.includes(state.activeView)) {
+        switchView('admin-overview-view');
+      }
+
+    } else if (isTeacher || state.activeWorkspace === 'TEACHER') {
+      // ==========================================
+      // FACULTY SELF-SERVICE (ESS) PORTAL
+      // ==========================================
       document.body.classList.add('role-teacher');
       document.body.classList.remove('role-admin');
+      document.body.classList.remove('role-principal');
 
-      // 1. Show Teacher ESS tab and group
+      // Strictly show ONLY teacher ESS group
+      allNavGroups.forEach(grp => {
+        if (grp === navEssGroup) {
+          grp.style.display = 'block';
+        } else {
+          grp.style.display = 'none';
+        }
+      });
+
       if (navEssBtn) navEssBtn.style.display = 'flex';
-      if (navEssGroup) navEssGroup.style.display = 'block';
+      state.selectedESSTeacher = cur ? cur.name : '';
 
-      // 2. Hide administrative/management-only tabs to keep the teacher portal uncluttered
-      const adminOnlyTabs = [
-        'nav-tab-dashboard',
-        'nav-tab-settings',
-        'nav-tab-exam-schedule',
-        'nav-tab-class-grid',
-        'nav-tab-attendance-duty',
-        'nav-tab-class-teacher',
-        'nav-tab-substitution',
-        'nav-tab-workload',
-        'nav-tab-general-duty'
-      ];
-      adminOnlyTabs.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-      });
-
-      // 3. Keep teacher-relevant navigation tabs visible
-      const teacherTabs = [
-        'nav-tab-teacher-ess',
-        'nav-tab-class-timetable',
-        'nav-tab-teacher',
-        'nav-tab-syllabus',
-        'nav-tab-extra-duties'
-      ];
-      teacherTabs.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'flex';
-      });
-
-      // 4. Lock ESS profile to current authenticated teacher
-      state.selectedESSTeacher = cur.name;
-
-      // 5. Hide the admin switcher dropdown in the ESS view
       const switcherWrap = document.getElementById('select-ess-teacher-wrapper');
       if (switcherWrap) switcherWrap.style.display = 'none';
 
-      // 6. Strictly hide administrative management buttons across all views
       if (DOM.btnTopbarQuickCreate) DOM.btnTopbarQuickCreate.style.display = 'none';
       if (DOM.btnQuickNewTeacherView) DOM.btnQuickNewTeacherView.style.display = 'none';
       if (DOM.btnDownloadAllTeachersDocx) DOM.btnDownloadAllTeachersDocx.style.display = 'none';
       if (DOM.btnClearAllWeeklyDuties) DOM.btnClearAllWeeklyDuties.style.display = 'none';
       if (DOM.btnOpenAutoScheduler) DOM.btnOpenAutoScheduler.style.display = 'none';
       if (DOM.btnOpenAddSectionModal) DOM.btnOpenAddSectionModal.style.display = 'none';
+
       const headerShift = document.getElementById('header-shift-selector');
       if (headerShift) headerShift.style.display = 'none';
       const headerBell = document.getElementById('header-bell-selector');
       if (headerBell) headerBell.style.display = 'none';
 
-      // 7. If active view is admin-only, redirect to teacher-ess-view
-      const isAllowed = teacherTabs.some(t => {
-        const el = document.getElementById(t);
-        return el && el.getAttribute('data-view') === state.activeView;
-      });
-      if (!isAllowed) {
-        state.activeView = 'teacher-ess-view';
+      if (state.activeView !== 'teacher-ess-view') {
+        switchView('teacher-ess-view');
       }
 
     } else {
-      // NON-TEACHER / MANAGEMENT MODE (Admin, Principal, Supervision Staff, Guest)
+      // ==========================================
+      // ACADEMIC HEAD & TIMETABLE COORDINATOR PORTAL
+      // ==========================================
       document.body.classList.remove('role-teacher');
+      document.body.classList.remove('role-principal');
       document.body.classList.add('role-admin');
 
-      // STRICTLY HIDE TEACHER ESS COCKPIT
-      if (navEssBtn) navEssBtn.style.display = 'none';
-      if (navEssGroup) navEssGroup.style.display = 'none';
-
-      // Show all standard management and ERP tabs
-      const allNavBtns = document.querySelectorAll('.nav-item.view-tab-btn');
-      allNavBtns.forEach(btn => {
-        if (btn.id !== 'nav-tab-teacher-ess') {
-          btn.style.display = 'flex';
-        }
-      });
-      const allGroups = document.querySelectorAll('.nav-group');
-      allGroups.forEach(grp => {
-        if (grp !== navEssGroup) {
+      // Strictly show Academic groups; hide Principal, Admin, and ESS
+      allNavGroups.forEach(grp => {
+        if (grp === principalNavGroup || grp === adminNavGroup || grp === navEssGroup) {
+          grp.style.display = 'none';
+        } else {
           grp.style.display = 'block';
         }
       });
 
-      // Restore administrative management buttons
-      if (DOM.btnTopbarQuickCreate && state.activeView !== 'teacher-ess-view') {
-        DOM.btnTopbarQuickCreate.style.display = 'inline-flex';
-      }
-      if (DOM.btnQuickNewTeacherView) DOM.btnQuickNewTeacherView.style.display = 'inline-flex';
-      if (DOM.btnDownloadAllTeachersDocx) DOM.btnDownloadAllTeachersDocx.style.display = 'inline-flex';
-      if (DOM.btnClearAllWeeklyDuties) DOM.btnClearAllWeeklyDuties.style.display = 'inline-flex';
-      if (DOM.btnOpenAutoScheduler) DOM.btnOpenAutoScheduler.style.display = 'inline-flex';
-      if (DOM.btnOpenAddSectionModal) DOM.btnOpenAddSectionModal.style.display = 'inline-flex';
-      const headerShift = document.getElementById('header-shift-selector');
-      if (headerShift) headerShift.style.display = (state.activeView === 'teacher-ess-view') ? 'none' : '';
-      const headerBell = document.getElementById('header-bell-selector');
-      if (headerBell) headerBell.style.display = (state.activeView === 'teacher-ess-view') ? 'none' : '';
+      // Show all academic buttons
+      const allNavBtns = document.querySelectorAll('.nav-item.view-tab-btn');
+      allNavBtns.forEach(btn => {
+        const v = btn.getAttribute('data-view');
+        if (v === 'teacher-ess-view' || v === 'principal-cockpit-view' || (v && v.startsWith('admin-'))) {
+          btn.style.display = 'none';
+        } else {
+          btn.style.display = 'flex';
+        }
+      });
 
-      // If currently on teacher-ess-view, redirect away to dashboard
-      if (state.activeView === 'teacher-ess-view') {
-        state.activeView = 'dashboard-view';
+      if (DOM.btnTopbarQuickCreate && state.activeView !== 'teacher-ess-view') {
+        DOM.btnTopbarQuickCreate.style.display = hasPermission('academic.classes.manage') ? 'inline-flex' : 'none';
+      }
+      if (DOM.btnQuickNewTeacherView) DOM.btnQuickNewTeacherView.style.display = hasPermission('academic.subjects.manage') ? 'inline-flex' : 'none';
+      if (DOM.btnDownloadAllTeachersDocx) DOM.btnDownloadAllTeachersDocx.style.display = hasPermission('academic.timetable.export') ? 'inline-flex' : 'none';
+      if (DOM.btnClearAllWeeklyDuties) DOM.btnClearAllWeeklyDuties.style.display = hasPermission('academic.duties.manage') ? 'inline-flex' : 'none';
+      if (DOM.btnOpenAutoScheduler) DOM.btnOpenAutoScheduler.style.display = hasPermission('academic.timetable.edit') ? 'inline-flex' : 'none';
+      if (DOM.btnOpenAddSectionModal) DOM.btnOpenAddSectionModal.style.display = hasPermission('academic.classes.manage') ? 'inline-flex' : 'none';
+
+      const headerShift = document.getElementById('header-shift-selector');
+      if (headerShift) headerShift.style.display = '';
+      const headerBell = document.getElementById('header-bell-selector');
+      if (headerBell) headerBell.style.display = '';
+
+      const blockedAcademicViews = ['principal-cockpit-view', 'admin-overview-view', 'admin-students-view', 'admin-staff-view', 'admin-users-view', 'admin-approvals-view', 'teacher-ess-view'];
+      if (blockedAcademicViews.includes(state.activeView)) {
+        switchView('dashboard-view');
       }
     }
   }
 
-  function handleLogin() {
-    const emailInput = DOM.authEmail ? DOM.authEmail.value.trim().toLowerCase() : '';
+  async function handleLogin() {
+    const emailInput = DOM.authEmail ? DOM.authEmail.value.trim() : '';
     const password = DOM.authPassword ? DOM.authPassword.value.trim() : '';
-    let matchedUser = null;
+    const remember = DOM.authRememberMe ? DOM.authRememberMe.checked : true;
 
     if (!emailInput || !password) {
       if (DOM.authErrorBanner) {
         const txt = DOM.authErrorBanner.querySelector('#auth-error-text');
-        if (txt) txt.textContent = 'Please enter both institutional email/ID and password.';
+        if (txt) txt.textContent = 'Please enter both institutional username/email and password.';
         DOM.authErrorBanner.style.display = 'flex';
       }
       return;
     }
 
-    // Match by full email, role name, or username key in DEMO_USERS
+    if (DOM.btnAuthSubmit) {
+      DOM.btnAuthSubmit.disabled = true;
+      DOM.btnAuthSubmit.innerHTML = '<span>Verifying credentials...</span>';
+    }
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usernameOrEmail: emailInput,
+          password,
+          rememberMe: remember
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success && data.user) {
+        localStorage.setItem('school_erp_token', data.token);
+
+        const safeUser = {
+          id: data.user.id,
+          name: data.user.fullName,
+          username: data.user.username,
+          email: data.user.email,
+          role: data.user.roles[0] || data.user.userType,
+          roles: data.user.roles,
+          workspaces: data.user.workspaces,
+          permissions: data.user.permissions,
+          avatar: data.user.avatar || '👤',
+          roleLabel: data.user.roles[0] || data.user.userType,
+          teacherCode: data.user.teacherCode,
+          mustChangePassword: data.user.mustChangePassword
+        };
+
+        state.auth = {
+          isAuthenticated: true,
+          currentUser: safeUser,
+          token: data.token
+        };
+
+        if (remember) {
+          localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(safeUser));
+        } else {
+          sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(safeUser));
+        }
+
+        // Set default workspace
+        if (safeUser.roles.includes('PRINCIPAL')) {
+          state.activeWorkspace = 'PRINCIPAL';
+        } else if (safeUser.roles.includes('ADMIN_HEAD') || safeUser.roles.includes('ACCOUNTANT')) {
+          state.activeWorkspace = 'ADMINISTRATION';
+        } else {
+          state.activeWorkspace = 'ACADEMIC';
+        }
+
+        renderUserProfileBadge();
+        applyRolePermissions();
+        hideLoginOverlay();
+        if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
+        showToast(`Welcome, ${safeUser.name}! Signed in as ${safeUser.roleLabel}.`, 'success');
+
+        if (safeUser.role === 'TEACHER' || safeUser.role === 'Teacher') {
+          state.selectedESSTeacher = safeUser.name;
+          switchView('teacher-ess-view');
+          if (safeUser.mustChangePassword) {
+            setTimeout(() => {
+              showChangePasswordModal(safeUser.name, true);
+            }, 500);
+          }
+        } else if (state.activeWorkspace === 'PRINCIPAL') {
+          switchView('principal-cockpit-view');
+          loadAuditLogsTable();
+        } else if (state.activeWorkspace === 'ADMINISTRATION') {
+          switchView('admin-overview-view');
+          loadAdminUsersTable();
+        } else {
+          switchView('dashboard-view');
+        }
+
+        return;
+      } else {
+        if (DOM.authErrorBanner) {
+          const txt = DOM.authErrorBanner.querySelector('#auth-error-text');
+          if (txt) txt.textContent = data.message || 'Invalid institutional credentials.';
+          DOM.authErrorBanner.style.display = 'flex';
+        }
+      }
+    } catch (netErr) {
+      console.warn('Backend unavailable, falling back to offline demo login...', netErr);
+      handleOfflineDemoLogin(emailInput, password, remember);
+    } finally {
+      if (DOM.btnAuthSubmit) {
+        DOM.btnAuthSubmit.disabled = false;
+        DOM.btnAuthSubmit.innerHTML = '<span>Sign In</span>';
+      }
+    }
+  }
+
+  function handleOfflineDemoLogin(emailInput, password, remember) {
+    const cleanEmail = emailInput.toLowerCase();
+    let matchedUser = null;
+
     for (const key of Object.keys(DEMO_USERS)) {
       const u = DEMO_USERS[key];
-      if (u.email.toLowerCase() === emailInput || u.role.toLowerCase() === emailInput || key.toLowerCase() === emailInput) {
+      if (
+        (u.username && u.username.toLowerCase() === cleanEmail) ||
+        u.email.toLowerCase() === cleanEmail ||
+        u.role.toLowerCase() === cleanEmail ||
+        key.toLowerCase() === cleanEmail
+      ) {
         let isMatch = (password === u.password);
-        if (u.role === 'Teacher') {
-          const cred = registerTeacherCredentials(u.name);
-          const defaultPw = getDefaultTeacherPassword(u.name);
-          const activePw = cred ? cred.password : defaultPw;
-          if (cred && !cred.isDefaultPassword) {
-            isMatch = (password === activePw);
-          } else {
-            isMatch = (password === activePw) || (password.toLowerCase() === defaultPw.toLowerCase()) || (password === 'teacher123') || (password === 'admin123');
-          }
-        }
-        if (isMatch) {
-          matchedUser = u;
-        }
+        if (isMatch) matchedUser = u;
         break;
       }
     }
 
-    // Dynamic match for all faculty members in teacher roster
     if (!matchedUser) {
-      const allTeachers = state.teachers || (typeof DEFAULT_DATA !== 'undefined' ? DEFAULT_DATA.teachers : []);
+      const allTeachers = state.teachers || [];
       for (const tName of allTeachers) {
         const cleanName = tName.toLowerCase().replace(/[^a-z0-9]/g, '');
         const firstName = tName.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
-        const teacherEmail = `${firstName}@funland.edu`;
-        const fullTeacherEmail = `${cleanName}@funland.edu`;
-
-        if (emailInput === teacherEmail || emailInput === fullTeacherEmail || emailInput === cleanName || emailInput === firstName || emailInput === tName.toLowerCase()) {
-          const cred = registerTeacherCredentials(tName);
-          const defaultPw = getDefaultTeacherPassword(tName);
-          const activePw = cred ? cred.password : defaultPw;
-
-          let isPwMatch = false;
-          if (cred && !cred.isDefaultPassword) {
-            isPwMatch = (password === activePw);
-          } else {
-            isPwMatch = (password === activePw) ||
-                        (password.toLowerCase() === defaultPw.toLowerCase()) ||
-                        (password.toLowerCase() === `${cleanName}123`.toLowerCase()) ||
-                        (password === 'teacher123') ||
-                        (password === 'admin123');
-          }
-
-          if (isPwMatch) {
-            matchedUser = {
-              email: teacherEmail,
-              role: "Teacher",
-              name: tName,
-              avatar: "👩‍🏫",
-              roleLabel: "Faculty Member"
-            };
-            break;
-          }
+        if (cleanEmail === `${firstName}@funland.edu` || cleanEmail === cleanName || cleanEmail === firstName) {
+          matchedUser = {
+            username: firstName,
+            email: `${firstName}@funland.edu`,
+            role: "Teacher",
+            roles: ["TEACHER"],
+            workspaces: ["ACADEMIC"],
+            permissions: ["faculty.schedule.view", "faculty.leave.apply", "faculty.password.change"],
+            name: tName,
+            avatar: "👩‍🏫",
+            roleLabel: "Faculty Member",
+            teacherCode: firstName.toUpperCase()
+          };
+          break;
         }
       }
     }
@@ -1911,78 +2323,1388 @@
     if (!matchedUser) {
       if (DOM.authErrorBanner) {
         const txt = DOM.authErrorBanner.querySelector('#auth-error-text');
-        if (txt) txt.textContent = 'Invalid institutional email or password. Please verify your credentials.';
+        if (txt) txt.textContent = 'Invalid institutional credentials.';
         DOM.authErrorBanner.style.display = 'flex';
       }
       return;
     }
 
-    // Authenticated successfully
     const safeUser = Object.assign({}, matchedUser);
-    delete safeUser.password; // Never store plain-text password
+    delete safeUser.password;
+    if (!safeUser.roles) safeUser.roles = [safeUser.role || 'TEACHER'];
+    if (!safeUser.workspaces) safeUser.workspaces = ['ACADEMIC'];
+    if (!safeUser.permissions) safeUser.permissions = [];
 
-    state.auth = {
-      isAuthenticated: true,
-      currentUser: safeUser
-    };
+    state.auth = { isAuthenticated: true, currentUser: safeUser };
 
-    const remember = DOM.authRememberMe ? DOM.authRememberMe.checked : true;
-    try {
-      if (remember) {
-        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(safeUser));
-      } else {
-        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(safeUser));
-      }
-    } catch (e) {
-      console.warn('Storage error on login', e);
-    }
+    if (safeUser.roles.includes('PRINCIPAL')) state.activeWorkspace = 'PRINCIPAL';
+    else if (safeUser.roles.includes('ADMIN_HEAD') || safeUser.roles.includes('ACCOUNTANT')) state.activeWorkspace = 'ADMINISTRATION';
+    else state.activeWorkspace = 'ACADEMIC';
 
-    saveState();
     renderUserProfileBadge();
     applyRolePermissions();
     hideLoginOverlay();
     if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
-    showToast(`Welcome, ${safeUser.name}! Signed in as ${safeUser.roleLabel}.`, 'success');
-    if (safeUser.role === 'Teacher') {
+    showToast(`Welcome, ${safeUser.name}! (Institutional Offline Mode)`, 'info');
+
+    if (safeUser.role === 'Teacher' || safeUser.roles.includes('TEACHER')) {
       state.selectedESSTeacher = safeUser.name;
-      const cred = registerTeacherCredentials(safeUser.name);
-      const isFirstLogin = !cred.hasLoggedIn;
-      cred.hasLoggedIn = true;
-      cred.loginCount = (cred.loginCount || 0) + 1;
-      saveState();
-
       switchView('teacher-ess-view');
-
-      // Prompt to update default password on first login or if still using default
-      if (cred.mustChangePassword) {
-        setTimeout(() => {
-          showChangePasswordModal(safeUser.name, isFirstLogin);
-        }, 500);
-      }
+    } else if (state.activeWorkspace === 'PRINCIPAL') {
+      switchView('principal-cockpit-view');
+    } else if (state.activeWorkspace === 'ADMINISTRATION') {
+      switchView('admin-overview-view');
     } else {
-      switchView(state.activeView && state.activeView !== 'teacher-ess-view' ? state.activeView : 'dashboard-view');
+      switchView('dashboard-view');
     }
   }
 
-  function handleLogout() {
-    if (!state.auth) state.auth = {};
-    state.auth.isAuthenticated = false;
-    state.auth.currentUser = null;
-
+  async function handleLogout() {
+    const token = localStorage.getItem('school_erp_token');
     try {
-      localStorage.removeItem(AUTH_SESSION_KEY);
-      sessionStorage.removeItem(AUTH_SESSION_KEY);
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
     } catch (e) {
-      console.warn('Storage error on logout', e);
+      // ignore
     }
 
-    saveState();
+    localStorage.removeItem('school_erp_token');
+    localStorage.removeItem(AUTH_SESSION_KEY);
+    sessionStorage.removeItem(AUTH_SESSION_KEY);
+
+    state.auth = { isAuthenticated: false, currentUser: null };
     renderUserProfileBadge();
     applyRolePermissions();
+
     if (DOM.authPassword) DOM.authPassword.value = '';
     if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
     showLoginOverlay();
     showToast('You have been signed out.', 'info');
+  }
+
+  function renderAdminUsersRows(users) {
+    if (!DOM.adminUsersTbody) return;
+    DOM.adminUsersTbody.innerHTML = users.map(u => {
+      const roleObj = Array.isArray(u.roles) ? u.roles[0] : null;
+      const roleCode = roleObj ? (typeof roleObj === 'object' ? roleObj.code : roleObj) : (u.roles || u.user_type || 'STAFF');
+      const roleName = roleObj && typeof roleObj === 'object' ? roleObj.name : (u.user_type || roleCode);
+      const roleWorkspace = roleObj && typeof roleObj === 'object' ? roleObj.workspace : (roleCode === 'PRINCIPAL' ? 'PRINCIPAL' : (roleCode === 'ADMIN_HEAD' ? 'ADMINISTRATION' : 'ACADEMIC'));
+      const badgeClass = `role-badge-${String(roleCode).toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+      const isActive = u.isActive !== undefined ? u.isActive : (u.is_active === 1 || u.is_active === true);
+      const createdDate = u.created_at || u.updated_at || new Date().toISOString();
+
+      return `
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">${u.avatar || '👤'}</span>
+              <strong style="color: #0f172a;">${u.full_name || u.fullName || u.username}</strong>
+            </div>
+          </td>
+          <td><code>${u.username}</code></td>
+          <td>${u.email || '—'}</td>
+          <td><span class="role-badge-pill ${badgeClass}">${roleName}</span></td>
+          <td><span style="font-weight: 600; font-size: 11px; color: #475569;">${roleWorkspace}</span></td>
+          <td>
+            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 11.5px; color: ${isActive ? '#059669' : '#dc2626'};">
+              ${isActive ? '● Active' : '○ Inactive'}
+            </span>
+          </td>
+          <td style="color: #64748b; font-size: 11.5px;">${new Date(createdDate).toLocaleDateString()}</td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="window.toggleUserStatus && window.toggleUserStatus(${u.id}, ${!isActive})">
+              ${isActive ? 'Deactivate' : 'Activate'}
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function loadAdminUsersTable() {
+    if (!DOM.adminUsersTbody) return;
+    DOM.adminUsersTbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#64748b;">Loading user accounts...</td></tr>';
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const res = await fetch('/api/users', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+
+      if (data.success && data.users) {
+        renderAdminUsersRows(data.users);
+      } else if (window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.users)) {
+        renderAdminUsersRows(window.ERP_FALLBACK_DATA.users);
+      } else {
+        DOM.adminUsersTbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px; color:#dc2626;">${data.message || 'Access restricted.'}</td></tr>`;
+      }
+    } catch (e) {
+      if (window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.users)) {
+        renderAdminUsersRows(window.ERP_FALLBACK_DATA.users);
+      } else {
+        DOM.adminUsersTbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#dc2626; padding:20px;">Failed to load user accounts.</td></tr>';
+      }
+    }
+  }
+
+  async function handleCreateUserSubmit() {
+    const fullName = document.getElementById('new-user-fullname')?.value.trim();
+    const username = document.getElementById('new-user-username')?.value.trim();
+    const email = document.getElementById('new-user-email')?.value.trim();
+    const roleCode = document.getElementById('new-user-role')?.value;
+    const password = document.getElementById('new-user-password')?.value.trim();
+
+    if (!fullName || !username || !password || !roleCode) {
+      showToast('Please complete all required fields.', 'warning');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ fullName, username, email, roleCode, password, userType: roleCode })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(data.message, 'success');
+        if (DOM.adminCreateUserModal) DOM.adminCreateUserModal.style.display = 'none';
+        loadAdminUsersTable();
+      } else {
+        showToast(data.message || 'Failed to create user account.', 'error');
+      }
+    } catch (err) {
+      showToast('Error creating user account: ' + err.message, 'error');
+    }
+  }
+
+  window.toggleUserStatus = async function (userId, newStatus) {
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const res = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ isActive: newStatus })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(data.message, 'success');
+        loadAdminUsersTable();
+      } else {
+        showToast(data.message || 'Failed to update user.', 'error');
+      }
+    } catch (e) {
+      showToast('Failed to update status.', 'error');
+    }
+  };
+
+  function renderAuditLogsRows(logs) {
+    if (!DOM.auditLogsTbody) return;
+    if (!logs || logs.length === 0) {
+      DOM.auditLogsTbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#64748b;">No audit records found.</td></tr>';
+      return;
+    }
+    DOM.auditLogsTbody.innerHTML = logs.map(l => {
+      const createdDate = l.createdAt || l.created_at || new Date().toISOString();
+      const userRole = l.role || l.user_type || 'User';
+      const ip = l.ipAddress || l.ip_address || '127.0.0.1';
+      return `
+        <tr>
+          <td style="font-family: monospace; font-size: 11px; color: #64748b;">#${l.id}</td>
+          <td style="font-size: 11.5px; color: #334155; white-space: nowrap;">${new Date(createdDate).toLocaleString()}</td>
+          <td><strong>${l.username || 'system'}</strong></td>
+          <td><span class="role-badge-pill role-badge-${String(userRole).toLowerCase()}">${userRole}</span></td>
+          <td><span class="audit-action-tag">${l.action}</span></td>
+          <td><code>${l.resource}</code></td>
+          <td style="font-size: 11px; color: #475569; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title='${typeof l.details === 'string' ? l.details : JSON.stringify(l.details || {})}'>
+            ${typeof l.details === 'string' ? l.details : (l.details ? JSON.stringify(l.details) : '—')}
+          </td>
+          <td style="font-family: monospace; font-size: 11px; color: #64748b;">${ip}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function loadAuditLogsTable() {
+    if (!DOM.auditLogsTbody) return;
+    DOM.auditLogsTbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#64748b;">Loading live institutional audit trails...</td></tr>';
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const res = await fetch('/api/audit-logs', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+
+      if (data.success && data.logs) {
+        renderAuditLogsRows(data.logs);
+      } else if (window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.auditLogs)) {
+        renderAuditLogsRows(window.ERP_FALLBACK_DATA.auditLogs);
+      } else {
+        DOM.auditLogsTbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#dc2626; padding:20px;">${data.message || 'Access restricted.'}</td></tr>`;
+      }
+    } catch (e) {
+      if (window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.auditLogs)) {
+        renderAuditLogsRows(window.ERP_FALLBACK_DATA.auditLogs);
+      } else {
+        DOM.auditLogsTbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#dc2626; padding:20px;">Audit logs accessible only by Principal or Administrator.</td></tr>';
+      }
+    }
+  }
+
+  // ==========================================================================
+  // HIERARCHICAL APPROVALS & URGENT ESCALATIONS
+  // ==========================================================================
+
+  async function loadAcademicApprovals() {
+    const tbody = document.getElementById('academic-approvals-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:#64748b;">Loading faculty leave applications...</td></tr>';
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      let approvals = [];
+      try {
+        const res = await fetch('/api/approvals/academic', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.approvals)) approvals = data.approvals;
+        }
+      } catch (fetchErr) {
+        console.warn('Academic approvals API unreachable, using local fallback...', fetchErr);
+      }
+
+      // Netlify / Offline fallback
+      if (approvals.length === 0 && (!token || window.location.hostname.includes('netlify'))) {
+        approvals = [
+          { id: 1, category: 'ACADEMIC_LEAVE', department: 'Primary Wing', requester_name: "Payal Ma'am", requester_role: 'Class Teacher - Std 3rd', title: 'Casual Leave (2 Days)', details: 'Medical appointment & fever recovery. Proxy relief allocated to Manali Ma\'am for Periods 2 & 4.', urgency: 'NORMAL', status: 'PENDING' },
+          { id: 2, category: 'ACADEMIC_LEAVE', department: 'Secondary Wing', requester_name: "Kavita Ma'am", requester_role: 'Senior Maths Teacher', title: 'Medical Leave (Emergency)', details: 'Orthopedic procedure and post-op rest. Grade 8 Maths substitution assigned to Sakina Ma\'am.', urgency: 'URGENT', status: 'PENDING' },
+          { id: 5, category: 'ACADEMIC_LEAVE', department: 'Secondary Wing', requester_name: "Manali Ma'am", requester_role: 'Senior Hindi Teacher', title: 'Duty Leave (District Workshop)', details: 'Attending GSEB Curriculum Alignment Workshop at DIET center.', urgency: 'NORMAL', status: 'APPROVED', decision_by: 'Academic Head' }
+        ];
+      }
+
+      const total = approvals.length;
+      const pending = approvals.filter(a => a.status === 'PENDING').length;
+      const approved = approvals.filter(a => a.status === 'APPROVED').length;
+      const escalated = approvals.filter(a => a.status === 'ESCALATED').length;
+
+      // Update KPI Ribbon
+      const statTot = document.getElementById('academic-stat-total');
+      const statPen = document.getElementById('academic-stat-pending');
+      const statApp = document.getElementById('academic-stat-approved');
+      const statEsc = document.getElementById('academic-stat-escalated');
+      if (statTot) statTot.textContent = total;
+      if (statPen) statPen.textContent = pending;
+      if (statApp) statApp.textContent = approved;
+      if (statEsc) statEsc.textContent = escalated;
+
+      if (DOM.academicPendingBadge) DOM.academicPendingBadge.textContent = `${pending} Pending`;
+      if (DOM.badgeAcademicPending) DOM.badgeAcademicPending.textContent = `${pending} Leaves`;
+
+      if (tbody) {
+        if (approvals.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:32px; color:#64748b;">No faculty leave applications found. All teaching faculty present on duty.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = approvals.map(a => {
+          const isPending = a.status === 'PENDING';
+          const statusBadge = a.status === 'APPROVED'
+            ? '<span class="approval-status-pill status-approved">✓ APPROVED</span>'
+            : a.status === 'REJECTED'
+            ? '<span class="approval-status-pill status-rejected">✕ REJECTED</span>'
+            : a.status === 'ESCALATED'
+            ? '<span class="approval-status-pill status-escalated">🚨 ESCALATED TO PRINCIPAL</span>'
+            : '<span class="approval-status-pill status-pending">⏳ PENDING REVIEW</span>';
+
+          const urgencyBadge = a.urgency === 'URGENT'
+            ? '<span class="approval-urgency-pill urgency-high">URGENT</span>'
+            : '<span class="approval-urgency-pill urgency-normal">NORMAL</span>';
+
+          const actions = isPending ? `
+            <div class="approval-action-group">
+              <button class="btn-appr-approve" onclick="window.decideApprovalRecord(${a.id}, 'APPROVED', 'academic')">
+                ✓ Approve
+              </button>
+              <button class="btn-appr-reject" onclick="window.decideApprovalRecord(${a.id}, 'REJECTED', 'academic')">
+                ✕ Reject
+              </button>
+              <button class="btn-appr-escalate" onclick="window.promptEscalateRecord(${a.id}, 'academic')">
+                🚨 Escalate (Urgent)
+              </button>
+            </div>
+          ` : `
+            <div style="font-size: 12px; color: #64748b;">
+              Decided by: <strong>${a.decision_by || 'Academic Head'}</strong> ${a.decision_notes ? `• "${a.decision_notes}"` : ''}
+            </div>
+          `;
+
+          return `
+            <tr>
+              <td><span class="approval-id-pill">#LV-${String(a.id).padStart(3, '0')}</span></td>
+              <td>
+                <div style="font-weight: 700; color: #0f172a; font-size: 13.5px;">${a.requester_name}</div>
+                <div style="font-size: 11.5px; color: #64748b;">${a.requester_role}</div>
+              </td>
+              <td>
+                <span class="badge" style="background:#eff6ff; color:#1e40af; font-weight:700; font-size:11px; padding:3px 8px; border-radius:6px;">${a.department}</span>
+              </td>
+              <td>
+                <div style="font-weight: 700; color: #1e293b; margin-bottom: 2px;">${a.title}</div>
+                <div style="font-size: 12px; color: #475569; line-height: 1.4;">${a.details || 'Leave application'}</div>
+              </td>
+              <td>${urgencyBadge}</td>
+              <td>${statusBadge}</td>
+              <td>${actions}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    } catch (e) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:#dc2626;">Failed to load academic leaves.</td></tr>';
+    }
+  }
+
+  async function loadAdminApprovals() {
+    const tbody = document.getElementById('admin-approvals-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:#64748b;">Loading subordinate staff requisitions...</td></tr>';
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      let approvals = [];
+      try {
+        const res = await fetch('/api/approvals/admin', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.approvals)) approvals = data.approvals;
+        }
+      } catch (fetchErr) {
+        console.warn('Admin approvals API unreachable, using local fallback...', fetchErr);
+      }
+
+      // Netlify / Offline fallback
+      if (approvals.length === 0 && (!token || window.location.hostname.includes('netlify'))) {
+        approvals = [
+          { id: 3, category: 'ADMIN_SUBORDINATE', department: 'Campus Facilities', requester_name: 'Ramesh Kumar', requester_role: 'Campus Facilities Supervisor', title: 'Store Requisition: Examination Paper Bundles', details: 'Urgent replenishment of 20 rim paper bundles and printer cartridges for term test prep (₹6,800).', urgency: 'NORMAL', status: 'PENDING' },
+          { id: 4, category: 'ADMIN_SUBORDINATE', department: 'Security & Logistics', requester_name: 'Pravin Solanki', requester_role: 'Gate Security Head', title: 'CCTV Camera Replacement - North Gate', details: 'Repair of weather-damaged dome camera near bus entrance gate (₹3,200).', urgency: 'URGENT', status: 'PENDING' },
+          { id: 6, category: 'ADMIN_SUBORDINATE', department: 'Sanitation', requester_name: 'Suresh Patil', requester_role: 'Sanitation Lead', title: 'Water Tank Disinfection & Filter Cartridges', details: 'Semi-annual certified tank cleaning and replacement of RO filters across wings (₹4,500).', urgency: 'NORMAL', status: 'APPROVED', decision_by: 'Admin Head' }
+        ];
+      }
+
+      const total = approvals.length;
+      const pending = approvals.filter(a => a.status === 'PENDING').length;
+      const approved = approvals.filter(a => a.status === 'APPROVED').length;
+      const escalated = approvals.filter(a => a.status === 'ESCALATED').length;
+
+      // Update KPI Ribbon
+      const statTot = document.getElementById('admin-stat-total');
+      const statPen = document.getElementById('admin-stat-pending');
+      const statApp = document.getElementById('admin-stat-approved');
+      const statEsc = document.getElementById('admin-stat-escalated');
+      if (statTot) statTot.textContent = total;
+      if (statPen) statPen.textContent = pending;
+      if (statApp) statApp.textContent = approved;
+      if (statEsc) statEsc.textContent = escalated;
+
+      if (DOM.adminPendingBadge) DOM.adminPendingBadge.textContent = `${pending} Pending`;
+      if (DOM.badgeAdminPending) DOM.badgeAdminPending.textContent = `${pending} Requests`;
+
+      if (tbody) {
+        if (approvals.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:32px; color:#64748b;">No pending campus administrative requisitions.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = approvals.map(a => {
+          const isPending = a.status === 'PENDING';
+          const statusBadge = a.status === 'APPROVED'
+            ? '<span class="approval-status-pill status-approved">✓ APPROVED</span>'
+            : a.status === 'REJECTED'
+            ? '<span class="approval-status-pill status-rejected">✕ REJECTED</span>'
+            : a.status === 'ESCALATED'
+            ? '<span class="approval-status-pill status-escalated">🚨 ESCALATED TO PRINCIPAL</span>'
+            : '<span class="approval-status-pill status-pending">⏳ PENDING REVIEW</span>';
+
+          const urgencyBadge = a.urgency === 'URGENT'
+            ? '<span class="approval-urgency-pill urgency-high">URGENT</span>'
+            : '<span class="approval-urgency-pill urgency-normal">NORMAL</span>';
+
+          const actions = isPending ? `
+            <div class="approval-action-group">
+              <button class="btn-appr-approve" onclick="window.decideApprovalRecord(${a.id}, 'APPROVED', 'admin')">
+                ✓ Approve
+              </button>
+              <button class="btn-appr-reject" onclick="window.decideApprovalRecord(${a.id}, 'REJECTED', 'admin')">
+                ✕ Reject
+              </button>
+              <button class="btn-appr-escalate" onclick="window.promptEscalateRecord(${a.id}, 'admin')">
+                🚨 Escalate (Urgent)
+              </button>
+            </div>
+          ` : `
+            <div style="font-size: 12px; color: #64748b;">
+              Decided by: <strong>${a.decision_by || 'Admin Head'}</strong> ${a.decision_notes ? `• "${a.decision_notes}"` : ''}
+            </div>
+          `;
+
+          return `
+            <tr>
+              <td><span class="approval-id-pill">#REQ-${String(a.id).padStart(3, '0')}</span></td>
+              <td>
+                <div style="font-weight: 700; color: #0f172a; font-size: 13.5px;">${a.requester_name}</div>
+                <div style="font-size: 11.5px; color: #64748b;">${a.requester_role}</div>
+              </td>
+              <td>
+                <span class="badge" style="background:#ecfdf5; color:#047857; font-weight:700; font-size:11px; padding:3px 8px; border-radius:6px;">${a.department}</span>
+              </td>
+              <td>
+                <div style="font-weight: 700; color: #1e293b; margin-bottom: 2px;">${a.title}</div>
+                <div style="font-size: 12px; color: #475569; line-height: 1.4;">${a.details || 'Campus Requisition'}</div>
+              </td>
+              <td>${urgencyBadge}</td>
+              <td>${statusBadge}</td>
+              <td>${actions}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    } catch (e) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:#dc2626;">Failed to load admin requisitions.</td></tr>';
+    }
+  }
+
+  async function loadPrincipalUrgentApprovals() {
+    if (!DOM.principalUrgentApprovalsList) return;
+    DOM.principalUrgentApprovalsList.innerHTML = '<div style="text-align:center; padding:20px; color:#9a3412;">Loading urgent departmental escalations...</div>';
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      let approvals = [];
+      try {
+        const res = await fetch('/api/approvals/urgent', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.approvals)) approvals = data.approvals;
+        }
+      } catch (fetchErr) {
+        console.warn('Principal urgent approvals API unreachable, using local fallback...', fetchErr);
+      }
+
+      const actionable = approvals.filter(a => a.status === 'PENDING' || a.status === 'ESCALATED').length;
+      if (DOM.principalUrgentCountBadge) {
+        DOM.principalUrgentCountBadge.textContent = `${actionable} Urgent Request${actionable === 1 ? '' : 's'}`;
+      }
+      const kpiCount = document.getElementById('principal-kpi-pending-count');
+      if (kpiCount) kpiCount.textContent = actionable;
+
+      if (approvals.length === 0) {
+        DOM.principalUrgentApprovalsList.innerHTML = `
+          <div style="text-align:center; padding:32px 20px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px;">
+            <div style="font-size:28px; margin-bottom:8px;">✓</div>
+            <div style="font-weight:800; color:#15803d; font-size:15px; margin-bottom:4px;">Zero Urgent Departmental Escalations</div>
+            <div style="font-size:12.5px; color:#166534;">Both Academic Head &amp; Administration Head are resolving routine leaves and requisitions autonomously.</div>
+          </div>
+        `;
+        return;
+      }
+
+      DOM.principalUrgentApprovalsList.innerHTML = approvals.map(a => {
+        const isPending = (a.status === 'PENDING' || a.status === 'ESCALATED');
+        const statusBadge = a.status === 'APPROVED'
+          ? '<span class="approval-status-pill status-approved">✓ EXECUTIVE APPROVED</span>'
+          : a.status === 'REJECTED'
+          ? '<span class="approval-status-pill status-rejected">✕ DISMISSED</span>'
+          : '<span class="approval-status-pill" style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; font-weight:800;">🚨 URGENT EXECUTIVE SIGN-OFF REQUIRED</span>';
+
+        const escalationNotice = a.escalated_by ? `
+          <div class="principal-escalation-banner">
+            <span>🚨</span>
+            <div>
+              <strong>Escalated by ${a.escalated_by}:</strong> ${a.escalation_reason || 'High priority matter requiring executive approval.'}
+            </div>
+          </div>
+        ` : '';
+
+        const actions = isPending ? `
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;">
+            <button class="btn-appr-executive" onclick="window.decideApprovalRecord(${a.id}, 'APPROVED', 'principal')">
+              ✓ Executive Sign-off / Authorize
+            </button>
+            <button class="btn-appr-reject" onclick="window.decideApprovalRecord(${a.id}, 'REJECTED', 'principal')">
+              ✕ Dismiss / Reject
+            </button>
+          </div>
+        ` : `
+          <div style="margin-top: 10px; font-size: 12px; color: #64748b;">
+            Executive Decision: <strong>${a.decision_by || 'Principal'}</strong> ${a.decision_notes ? `• Note: "${a.decision_notes}"` : ''}
+          </div>
+        `;
+
+        return `
+          <div class="principal-urgent-item">
+            <div class="principal-urgent-header">
+              <div>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                  <span class="approval-id-pill">#ESC-${String(a.id).padStart(3, '0')}</span>
+                  <h4 class="principal-urgent-title">${a.title}</h4>
+                </div>
+                <div style="font-size: 12px; color: #64748b;">
+                  Originating Dept: <strong>${a.department}</strong> • Original Requester: <strong>${a.requester_name}</strong> (${a.requester_role})
+                </div>
+              </div>
+              <div>${statusBadge}</div>
+            </div>
+            ${escalationNotice}
+            <div style="font-size: 13px; color: #334155; line-height: 1.5; margin-top: 6px;">
+              ${a.details || ''}
+            </div>
+            ${actions}
+          </div>
+        `;
+      }).join('');
+    } catch (e) {
+      if (DOM.principalUrgentApprovalsList) DOM.principalUrgentApprovalsList.innerHTML = '<div style="text-align:center; padding:20px; color:#dc2626;">Failed to load urgent escalations.</div>';
+    }
+  }
+
+  window.decideApprovalRecord = async function(id, decision, context) {
+    const notes = prompt(`Optional instructions or notes for ${decision.toLowerCase()} record:`, '');
+    if (notes === null) return; // user cancelled prompt
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const res = await fetch(`/api/approvals/${id}/decide`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({ decision, notes })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || `Approval marked as ${decision}.`, 'success');
+        if (context === 'academic') loadAcademicApprovals();
+        else if (context === 'admin') loadAdminApprovals();
+        else if (context === 'principal') loadPrincipalUrgentApprovals();
+      } else {
+        showToast(data.message || 'Action failed.', 'error');
+      }
+    } catch (err) {
+      showToast('Error recording decision.', 'error');
+    }
+  };
+
+  window.promptEscalateRecord = async function(id, context) {
+    const reason = prompt('Enter urgent escalation reason for Principal executive review:', 'Requires urgent executive sign-off / budgetary approval.');
+    if (!reason) return;
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const res = await fetch(`/api/approvals/${id}/escalate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({ reason })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('🚨 Request escalated urgently to the Principal.', 'success');
+        if (context === 'academic') loadAcademicApprovals();
+        else if (context === 'admin') loadAdminApprovals();
+      } else {
+        showToast(data.message || 'Escalation failed.', 'error');
+      }
+    } catch (err) {
+      showToast('Error escalating request.', 'error');
+    }
+  };
+
+  // ==========================================================================
+  // PHASE 2: MASTER DATA, STUDENT ADMISSIONS & STAFF HR
+  // ==========================================================================
+
+  let cachedStandards = [];
+
+  async function loadAcademicMasterView() {
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const authHeader = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+      const [stdRes, subRes] = await Promise.all([
+        fetch('/api/academic/standards', { headers: authHeader }),
+        fetch('/api/academic/subjects', { headers: authHeader })
+      ]);
+
+      const stdData = await stdRes.json();
+      const subData = await subRes.json();
+
+      if (stdData.success && Array.isArray(stdData.standards)) {
+        cachedStandards = stdData.standards;
+        if (DOM.masterStandardsCountBadge) {
+          DOM.masterStandardsCountBadge.textContent = `${stdData.standards.length} Classes`;
+        }
+        if (DOM.masterStandardsContainer) {
+          DOM.masterStandardsContainer.innerHTML = stdData.standards.map(std => {
+            const shiftIcon = std.shift === 'morning' ? '☀️ Morning' : '🌙 Afternoon';
+            const teacherNames = (std.sections || [])
+              .map(sec => sec.classTeacher ? sec.classTeacher.name : 'Unassigned')
+              .filter(Boolean).join(', ');
+            return `
+              <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <strong style="font-size: 14.5px; color: #0f172a;">${std.name}</strong>
+                    <span class="badge" style="background: #f1f5f9; color: #475569; font-size: 11px;"><code>${std.code}</code></span>
+                    <span class="badge" style="background: ${std.shift === 'morning' ? '#fef3c7; color: #92400e;' : '#eff6ff; color: #1e40af;'} font-size: 11px;">
+                      ${shiftIcon}
+                    </span>
+                  </div>
+                  <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                    Room: <strong>${std.room_number || 'TBD'}</strong> • Capacity: <strong>${std.capacity || 35} students</strong> • Sections: <strong>${(std.sections || []).length} (${(std.sections || []).map(s => s.name).join(', ') || 'A'})</strong>
+                  </div>
+                  <div style="font-size: 12px; color: #059669; font-weight: 600; margin-top: 2px;">
+                    Class Teacher: ${teacherNames || 'Unassigned'}
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <span style="font-size: 11.5px; color: #059669; font-weight: 700; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 12px;">● Active</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      if (subData.success && Array.isArray(subData.subjects)) {
+        if (DOM.masterSubjectsCountBadge) {
+          DOM.masterSubjectsCountBadge.textContent = `${subData.subjects.length} Subjects`;
+        }
+        if (DOM.masterSubjectsContainer) {
+          DOM.masterSubjectsContainer.innerHTML = subData.subjects.map(sub => {
+            const catColors = {
+              'Core': { bg: '#eff6ff', color: '#1e40af', border: '#bfdbfe' },
+              'Language': { bg: '#f5f3ff', color: '#6d28d9', border: '#ddd6fe' },
+              'Science': { bg: '#ecfdf5', color: '#047857', border: '#a7f3d0' },
+              'Activity': { bg: '#fff7ed', color: '#c2410c', border: '#ffedd5' }
+            };
+            const c = catColors[sub.category] || { bg: '#f8fafc', color: '#475569', border: '#e2e8f0' };
+            return `
+              <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 38px; height: 38px; border-radius: 8px; background: ${sub.color || '#3b82f6'}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">
+                    ${sub.code}
+                  </div>
+                  <div>
+                    <strong style="font-size: 14px; color: #0f172a;">${sub.name}</strong>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                      Weekly Quota: <strong>${sub.weekly_quota || 6} periods</strong>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <span class="badge" style="background: ${c.bg}; color: ${c.color}; border: 1px solid ${c.border}; font-weight: 700; font-size: 11px;">
+                    ${sub.category || 'Curriculum'}
+                  </span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+    } catch (err) {
+      console.warn('Academic master load error:', err.message);
+    }
+  }
+
+  function initAcademicMasterView() {
+    // Academic master event hooks
+  }
+
+  function renderStaffCards(staffList) {
+    if (!DOM.adminStaffCardGrid) return;
+    if (!staffList || staffList.length === 0) {
+      DOM.adminStaffCardGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 30px; color: #64748b;">No staff profiles found.</div>';
+      return;
+    }
+    DOM.adminStaffCardGrid.innerHTML = staffList.map(s => {
+      const shiftBadge = s.assigned_shift === 'morning'
+        ? '<span class="badge" style="background: #fef3c7; color: #92400e; font-size: 11px;">☀️ Morning</span>'
+        : '<span class="badge" style="background: #eff6ff; color: #1e40af; font-size: 11px;">🌙 Afternoon</span>';
+
+      return `
+        <div class="staff-hr-card">
+          <div class="staff-card-top">
+            <div class="staff-avatar-box">${s.avatar || '👩‍🏫'}</div>
+            <div>
+              <h4 class="staff-name-title">${s.fullName || s.full_name}</h4>
+              <div class="staff-desig-sub">${s.designation} • ${s.department}</div>
+            </div>
+          </div>
+          <div class="staff-details-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; color: #334155; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #64748b;">Employee Code:</span>
+              <code>${s.employee_code}</code>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #64748b;">Assigned Shift:</span>
+              ${shiftBadge}
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #64748b;">Primary Subject:</span>
+              <strong>${s.primary_subject || 'All Subjects'}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #64748b;">Qualification:</span>
+              <span>${s.qualification || 'M.A., B.Ed.'}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #64748b;">Contact:</span>
+              <span>${s.phone || '—'}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+              <span style="font-size: 11.5px; color: #059669; font-weight: 700;">● Active Faculty</span>
+              <button class="btn btn-outline btn-sm" onclick="showToast('Employee ${s.employee_code} employment records verified.', 'info')">Records</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function loadAdminStaffView() {
+    if (!DOM.adminStaffCardGrid) return;
+    DOM.adminStaffCardGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 30px; color: #64748b;">Loading staff employment directory...</div>';
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const res = await fetch('/api/staff', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+
+      if (data.success && Array.isArray(data.staff)) {
+        renderStaffCards(data.staff);
+      } else if (window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.staff)) {
+        renderStaffCards(window.ERP_FALLBACK_DATA.staff);
+      } else {
+        DOM.adminStaffCardGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #dc2626; padding: 20px;">${data.message || 'Access restricted.'}</div>`;
+      }
+    } catch (err) {
+      if (window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.staff)) {
+        renderStaffCards(window.ERP_FALLBACK_DATA.staff);
+      } else {
+        DOM.adminStaffCardGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #dc2626; padding: 20px;">Failed to load staff profiles.</div>';
+      }
+    }
+  }
+
+  function initAdminStaffView() {
+    if (DOM.btnOpenCreateStaffModal) {
+      DOM.btnOpenCreateStaffModal.addEventListener('click', () => {
+        if (DOM.adminCreateStaffModal) {
+          DOM.adminCreateStaffModal.style.display = 'flex';
+          DOM.adminCreateStaffModal.classList.add('active');
+        }
+      });
+    }
+
+    const closeStaffModal = () => {
+      if (DOM.adminCreateStaffModal) {
+        DOM.adminCreateStaffModal.style.display = 'none';
+        DOM.adminCreateStaffModal.classList.remove('active');
+      }
+    };
+
+    if (DOM.btnCloseCreateStaffModal) DOM.btnCloseCreateStaffModal.addEventListener('click', closeStaffModal);
+    if (DOM.btnCancelCreateStaff) DOM.btnCancelCreateStaff.addEventListener('click', closeStaffModal);
+
+    if (DOM.btnSubmitCreateStaff) {
+      DOM.btnSubmitCreateStaff.addEventListener('click', async () => {
+        const firstName = document.getElementById('staff-first-name')?.value.trim();
+        const lastName = document.getElementById('staff-last-name')?.value.trim();
+        const designation = document.getElementById('staff-designation')?.value.trim();
+        const department = document.getElementById('staff-department')?.value;
+        const qualification = document.getElementById('staff-qualification')?.value.trim();
+        const phone = document.getElementById('staff-phone')?.value.trim();
+        const primarySubject = document.getElementById('staff-primary-subject')?.value.trim();
+        const assignedShift = document.getElementById('staff-shift')?.value || 'afternoon';
+
+        if (!firstName || !designation || !department) {
+          showToast('Please provide First Name, Designation, and Department.', 'warning');
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem('school_erp_token');
+          const res = await fetch('/api/staff', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            },
+            body: JSON.stringify({
+              firstName, lastName, designation, department,
+              qualification, phone, primarySubject, assignedShift
+            })
+          });
+
+          const data = await res.json();
+          if (res.ok && data.success) {
+            showToast(`Staff profile created! Code: ${data.employeeCode}`, 'success');
+            closeStaffModal();
+            loadAdminStaffView();
+          } else {
+            showToast(data.message || 'Failed to create staff profile.', 'error');
+          }
+        } catch (err) {
+          showToast('Error creating staff member: ' + err.message, 'error');
+        }
+      });
+    }
+  }
+
+  async function loadAdminStudentsView() {
+    const token = localStorage.getItem('school_erp_token');
+    const authHeader = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+    // 1. Fetch Stats
+    try {
+      const statsRes = await fetch('/api/students/stats', { headers: authHeader });
+      const statsData = await statsRes.json();
+      if (statsData.success) {
+        if (DOM.studentStatTotal) DOM.studentStatTotal.textContent = statsData.total;
+        if (DOM.studentStatBoys) DOM.studentStatBoys.textContent = statsData.boys;
+        if (DOM.studentStatGirls) DOM.studentStatGirls.textContent = statsData.girls;
+      }
+    } catch (e) {
+      console.warn('Student stats fetch error:', e.message);
+    }
+
+    // 2. Fetch Standards for Filter Dropdown
+    try {
+      if (cachedStandards.length === 0) {
+        const stdRes = await fetch('/api/academic/standards', { headers: authHeader });
+        if (stdRes.ok) {
+          const stdData = await stdRes.json();
+          if (stdData.success && Array.isArray(stdData.standards)) cachedStandards = stdData.standards;
+        }
+      }
+    } catch (e) {
+      if (Array.isArray(state.standards) && state.standards.length > 0) {
+        cachedStandards = state.standards.map((name, idx) => ({ id: idx + 1, name }));
+      }
+    }
+
+    if (DOM.studentFilterStandard && cachedStandards.length > 0 && DOM.studentFilterStandard.options.length <= 1) {
+      DOM.studentFilterStandard.innerHTML = '<option value="">All Standards</option>' +
+        cachedStandards.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+
+    // 3. Query Students List
+    if (!DOM.adminStudentsTbody) return;
+    DOM.adminStudentsTbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#64748b;">Loading institutional General Register...</td></tr>';
+
+    try {
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (standardId) params.append('standardId', standardId);
+      if (status) params.append('status', status);
+
+      const res = await fetch(`/api/students?${params.toString()}`, { headers: authHeader });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.students)) {
+          renderAdminStudentsRows(data.students);
+          return;
+        }
+      }
+      renderAdminStudentsRows(getFallbackStudents());
+    } catch (err) {
+      renderAdminStudentsRows(getFallbackStudents());
+    }
+  }
+
+  async function viewStudentProfile(studentId) {
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      let student = null;
+      try {
+        const res = await fetch(`/api/students/${studentId}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.student) student = data.student;
+        }
+      } catch (e) {
+        // fallback to local data
+      }
+
+      if (!student && window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.students)) {
+        const found = window.ERP_FALLBACK_DATA.students.find(s => String(s.id) === String(studentId));
+        if (found) {
+          student = Object.assign({}, found, {
+            parents: [{
+              father_name: found.father_name,
+              mother_name: found.mother_name,
+              primary_phone: found.primary_phone,
+              occupation: found.occupation,
+              address: found.address
+            }]
+          });
+        }
+      }
+
+      if (student) {
+        const s = student;
+        const p = (s.parents && s.parents[0]) || {};
+
+        const elName = document.getElementById('modal-student-name');
+        const elGr = document.getElementById('modal-student-gr');
+        const elClass = document.getElementById('modal-student-class');
+        const elRoll = document.getElementById('modal-student-roll');
+        const elBlood = document.getElementById('modal-student-blood');
+        const elGender = document.getElementById('modal-student-gender');
+        const elFather = document.getElementById('modal-student-father');
+        const elMother = document.getElementById('modal-student-mother');
+        const elPhone = document.getElementById('modal-student-phone');
+        const elOccupation = document.getElementById('modal-student-occupation');
+        const elAddress = document.getElementById('modal-student-address');
+        const elDocs = document.getElementById('modal-student-docs');
+
+        if (elName) elName.textContent = s.fullName || (s.first_name + ' ' + s.last_name);
+        if (elGr) elGr.textContent = s.gr_number || '—';
+        if (elClass) elClass.textContent = `${s.standard_name || 'Standard'} - ${s.section_name || 'A'}`;
+        if (elRoll) elRoll.textContent = s.roll_no || '—';
+        if (elBlood) elBlood.textContent = s.blood_group || 'O+';
+        if (elGender) elGender.textContent = s.gender || '—';
+        if (elFather) elFather.textContent = p.father_name || s.father_name || '—';
+        if (elMother) elMother.textContent = p.mother_name || s.mother_name || '—';
+        if (elPhone) elPhone.textContent = p.primary_phone || s.primary_phone || '—';
+        if (elOccupation) elOccupation.textContent = p.occupation || s.occupation || '—';
+        if (elAddress) elAddress.textContent = s.address || p.address || '—';
+
+        if (elDocs) {
+          if (docs.length === 0) {
+            elDocs.innerHTML = '<div style="font-size: 12px; color: #64748b;">No uploaded documents recorded.</div>';
+          } else {
+            elDocs.innerHTML = docs.map(d => `
+              <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <span style="font-weight: 600; font-size: 12px; color: #1e293b;">📄 ${d.document_type.replace(/_/g, ' ')}</span>
+                <span class="doc-chip doc-chip-verified" style="margin: 0;">✓ Verified</span>
+              </div>
+            `).join('');
+          }
+        }
+
+        if (DOM.adminStudentDetailModal) {
+          DOM.adminStudentDetailModal.style.display = 'flex';
+          DOM.adminStudentDetailModal.classList.add('active');
+        }
+      }
+    } catch (e) {
+      showToast('Error loading student profile details.', 'error');
+    }
+  }
+
+  // Student Edit Modal Handling
+  async function openEditStudentModal(studentId) {
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const res = await fetch(`/api/students/${studentId}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+
+      if (data.success && data.student) {
+        const s = data.student;
+        const p = (s.parents && s.parents[0]) || {};
+
+        document.getElementById('edit-student-id').value = s.id;
+        document.getElementById('edit-student-gr').value = s.gr_number;
+        document.getElementById('edit-student-status').value = s.status || 'ACTIVE';
+
+        // Populate standards dropdown
+        const stdSelect = document.getElementById('edit-student-standard');
+        if (stdSelect) {
+          if (cachedStandards.length === 0) {
+            const stdRes = await fetch('/api/academic/standards', {
+              headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
+            const stdData = await stdRes.json();
+            if (stdData.success && Array.isArray(stdData.standards)) {
+              cachedStandards = stdData.standards;
+            }
+          }
+          stdSelect.innerHTML = cachedStandards.map(st => `
+            <option value="${st.id}" ${st.id === s.standard_id ? 'selected' : ''}>${st.name}</option>
+          `).join('');
+        }
+
+        document.getElementById('edit-student-section').value = s.section_id || 1;
+        document.getElementById('edit-student-roll').value = s.roll_no || '';
+        document.getElementById('edit-student-first-name').value = s.first_name || '';
+        document.getElementById('edit-student-middle-name').value = s.middle_name || '';
+        document.getElementById('edit-student-last-name').value = s.last_name || '';
+        document.getElementById('edit-student-gender').value = s.gender || 'Male';
+        document.getElementById('edit-student-dob').value = s.dob || '';
+        document.getElementById('edit-student-blood-group').value = s.blood_group || 'O+';
+        document.getElementById('edit-student-category').value = s.category || 'General';
+        document.getElementById('edit-student-father-name').value = p.father_name || '';
+        document.getElementById('edit-student-mother-name').value = p.mother_name || '';
+        document.getElementById('edit-student-phone').value = p.primary_phone || s.emergency_phone || '';
+        document.getElementById('edit-student-occupation').value = p.occupation || '';
+        document.getElementById('edit-student-income').value = p.annual_income || '';
+        document.getElementById('edit-student-address').value = s.address || p.address || '';
+
+        if (DOM.adminEditStudentModal) {
+          DOM.adminEditStudentModal.style.display = 'flex';
+          DOM.adminEditStudentModal.classList.add('active');
+        }
+      } else if (window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.students)) {
+        const s = window.ERP_FALLBACK_DATA.students.find(item => String(item.id) === String(studentId));
+        if (s) {
+          document.getElementById('edit-student-id').value = s.id;
+          document.getElementById('edit-student-gr').value = s.gr_number;
+          document.getElementById('edit-student-status').value = s.status || 'ACTIVE';
+
+          const stdSelect = document.getElementById('edit-student-standard');
+          if (stdSelect && cachedStandards.length > 0) {
+            stdSelect.innerHTML = cachedStandards.map(st => `
+              <option value="${st.id}" ${st.id === s.standard_id ? 'selected' : ''}>${st.name}</option>
+            `).join('');
+          }
+
+          document.getElementById('edit-student-section').value = s.section_id || 1;
+          document.getElementById('edit-student-roll').value = s.roll_no || '';
+          document.getElementById('edit-student-first-name').value = s.firstName || s.first_name || '';
+          document.getElementById('edit-student-middle-name').value = s.middle_name || '';
+          document.getElementById('edit-student-last-name').value = s.lastName || s.last_name || '';
+          document.getElementById('edit-student-gender').value = s.gender || 'Male';
+          document.getElementById('edit-student-dob').value = s.dob || '';
+          document.getElementById('edit-student-blood-group').value = s.blood_group || 'O+';
+          document.getElementById('edit-student-category').value = s.category || 'General';
+          document.getElementById('edit-student-father-name').value = s.father_name || '';
+          document.getElementById('edit-student-mother-name').value = s.mother_name || '';
+          document.getElementById('edit-student-phone').value = s.primary_phone || s.emergency_phone || '';
+          document.getElementById('edit-student-occupation').value = s.occupation || '';
+          document.getElementById('edit-student-income').value = s.annual_income || '';
+          document.getElementById('edit-student-address').value = s.address || '';
+
+          if (DOM.adminEditStudentModal) {
+            DOM.adminEditStudentModal.style.display = 'flex';
+            DOM.adminEditStudentModal.classList.add('active');
+          }
+        }
+      }
+    } catch (e) {
+      if (window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.students)) {
+        const s = window.ERP_FALLBACK_DATA.students.find(item => String(item.id) === String(studentId));
+        if (s) {
+          document.getElementById('edit-student-id').value = s.id;
+          document.getElementById('edit-student-gr').value = s.gr_number;
+          document.getElementById('edit-student-status').value = s.status || 'ACTIVE';
+          document.getElementById('edit-student-roll').value = s.roll_no || '';
+          document.getElementById('edit-student-first-name').value = s.firstName || s.first_name || '';
+          document.getElementById('edit-student-last-name').value = s.lastName || s.last_name || '';
+          document.getElementById('edit-student-gender').value = s.gender || 'Male';
+          document.getElementById('edit-student-father-name').value = s.father_name || '';
+          document.getElementById('edit-student-phone').value = s.primary_phone || '';
+
+          if (DOM.adminEditStudentModal) {
+            DOM.adminEditStudentModal.style.display = 'flex';
+            DOM.adminEditStudentModal.classList.add('active');
+          }
+          return;
+        }
+      }
+      showToast('Failed to load student for editing.', 'error');
+    }
+  }
+
+  async function handleEditStudentSubmit() {
+    const studentId = document.getElementById('edit-student-id').value;
+    if (!studentId) return;
+
+    const firstName = document.getElementById('edit-student-first-name').value.trim();
+    const lastName = document.getElementById('edit-student-last-name').value.trim();
+    if (!firstName || !lastName) {
+      showToast('First Name and Last Name are required.', 'warning');
+      return;
+    }
+
+    const payload = {
+      firstName,
+      middleName: document.getElementById('edit-student-middle-name').value.trim(),
+      lastName,
+      standardId: document.getElementById('edit-student-standard').value,
+      sectionId: document.getElementById('edit-student-section').value,
+      rollNo: document.getElementById('edit-student-roll').value ? parseInt(document.getElementById('edit-student-roll').value, 10) : null,
+      gender: document.getElementById('edit-student-gender').value,
+      dob: document.getElementById('edit-student-dob').value || null,
+      bloodGroup: document.getElementById('edit-student-blood-group').value,
+      category: document.getElementById('edit-student-category').value,
+      status: document.getElementById('edit-student-status').value,
+      fatherName: document.getElementById('edit-student-father-name').value.trim(),
+      motherName: document.getElementById('edit-student-mother-name').value.trim(),
+      primaryPhone: document.getElementById('edit-student-phone').value.trim(),
+      occupation: document.getElementById('edit-student-occupation').value.trim(),
+      annualIncome: document.getElementById('edit-student-income').value.trim(),
+      address: document.getElementById('edit-student-address').value.trim()
+    };
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const res = await fetch(`/api/students/${studentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showToast('✓ Student record updated successfully in General Register.', 'success');
+        if (DOM.adminEditStudentModal) {
+          DOM.adminEditStudentModal.style.display = 'none';
+          DOM.adminEditStudentModal.classList.remove('active');
+        }
+        loadAdminStudentsView();
+      } else {
+        showToast(data.message || 'Failed to update student.', 'error');
+      }
+    } catch (e) {
+      if (window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.students)) {
+        const idx = window.ERP_FALLBACK_DATA.students.findIndex(s => String(s.id) === String(studentId));
+        if (idx !== -1) {
+          const s = window.ERP_FALLBACK_DATA.students[idx];
+          s.firstName = payload.firstName;
+          s.lastName = payload.lastName;
+          s.fullName = `${payload.firstName} ${payload.middleName || ''} ${payload.lastName}`.replace(/\s+/g, ' ').trim();
+          s.roll_no = payload.rollNo;
+          s.father_name = payload.fatherName;
+          s.primary_phone = payload.primaryPhone;
+          showToast('✓ Student record updated successfully in General Register (Offline).', 'success');
+          if (DOM.adminEditStudentModal) {
+            DOM.adminEditStudentModal.style.display = 'none';
+            DOM.adminEditStudentModal.classList.remove('active');
+          }
+          loadAdminStudentsView();
+          return;
+        }
+      }
+      showToast('Error updating student record.', 'error');
+    }
+  }
+
+  async function deleteStudentRecord(studentId, studentName, grNumber) {
+    const ok = confirm(`Are you sure you want to permanently delete student "${studentName}" (${grNumber}) from the General Register?\n\nThis will remove their enrollment records and parent mappings. This action cannot be undone.`);
+    if (!ok) return;
+
+    try {
+      const token = localStorage.getItem('school_erp_token');
+      const res = await fetch(`/api/students/${studentId}`, {
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showToast(`✓ Student ${studentName} (${grNumber}) deleted from General Register.`, 'success');
+        loadAdminStudentsView();
+      } else {
+        showToast(data.message || 'Delete restricted.', 'error');
+      }
+    } catch (e) {
+      if (window.ERP_FALLBACK_DATA && Array.isArray(window.ERP_FALLBACK_DATA.students)) {
+        window.ERP_FALLBACK_DATA.students = window.ERP_FALLBACK_DATA.students.filter(s => String(s.id) !== String(studentId));
+        showToast(`✓ Student ${studentName} (${grNumber}) deleted from General Register (Offline).`, 'success');
+        loadAdminStudentsView();
+        return;
+      }
+      showToast('Error deleting student record.', 'error');
+    }
+  }
+
+  window.openEditStudentModal = openEditStudentModal;
+  window.deleteStudentRecord = deleteStudentRecord;
+  window.viewStudentProfile = viewStudentProfile;
+
+  function initAdminStudentsView() {
+    if (DOM.studentSearchInput) {
+      DOM.studentSearchInput.addEventListener('input', () => {
+        clearTimeout(DOM.studentSearchInput._timer);
+        DOM.studentSearchInput._timer = setTimeout(loadAdminStudentsView, 300);
+      });
+    }
+
+    if (DOM.studentFilterStandard) {
+      DOM.studentFilterStandard.addEventListener('change', loadAdminStudentsView);
+    }
+    if (DOM.studentFilterStatus) {
+      DOM.studentFilterStatus.addEventListener('change', loadAdminStudentsView);
+    }
+    if (DOM.btnRefreshStudentsTable) {
+      DOM.btnRefreshStudentsTable.addEventListener('click', loadAdminStudentsView);
+    }
+
+    // Modal Close
+    const closeDetailModal = () => {
+      if (DOM.adminStudentDetailModal) {
+        DOM.adminStudentDetailModal.style.display = 'none';
+        DOM.adminStudentDetailModal.classList.remove('active');
+      }
+    };
+    if (DOM.btnCloseStudentDetailModal) {
+      DOM.btnCloseStudentDetailModal.addEventListener('click', closeDetailModal);
+    }
+
+    // New Admission Modal Opening
+    if (DOM.btnOpenAdmitStudentModal) {
+      DOM.btnOpenAdmitStudentModal.addEventListener('click', async () => {
+        try {
+          const token = localStorage.getItem('school_erp_token');
+          const res = await fetch('/api/students/next-gr', {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
+          const data = await res.json();
+          const elGr = document.getElementById('admit-gr-number');
+          if (elGr && data.nextGrNumber) {
+            elGr.value = data.nextGrNumber;
+          }
+
+          const elDate = document.getElementById('admit-date');
+          if (elDate) {
+            elDate.value = new Date().toISOString().split('T')[0];
+          }
+
+          const elStd = document.getElementById('admit-standard');
+          if (elStd) {
+            if (cachedStandards.length === 0) {
+              const stdRes = await fetch('/api/academic/standards', {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+              });
+              const stdData = await stdRes.json();
+              if (stdData.success && Array.isArray(stdData.standards)) {
+                cachedStandards = stdData.standards;
+              }
+            }
+            elStd.innerHTML = cachedStandards.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+          }
+
+          if (DOM.adminAdmitStudentModal) {
+            DOM.adminAdmitStudentModal.style.display = 'flex';
+            DOM.adminAdmitStudentModal.classList.add('active');
+          }
+        } catch (e) {
+          showToast('Failed to prepare admission form.', 'error');
+        }
+      });
+    }
+
+    const closeAdmitModal = () => {
+      if (DOM.adminAdmitStudentModal) {
+        DOM.adminAdmitStudentModal.style.display = 'none';
+        DOM.adminAdmitStudentModal.classList.remove('active');
+      }
+    };
+
+    if (DOM.btnCloseAdmitStudentModal) DOM.btnCloseAdmitStudentModal.addEventListener('click', closeAdmitModal);
+    if (DOM.btnCancelAdmitStudent) DOM.btnCancelAdmitStudent.addEventListener('click', closeAdmitModal);
+
+    if (DOM.btnSubmitAdmitStudent) {
+      DOM.btnSubmitAdmitStudent.addEventListener('click', async () => {
+        const firstName = document.getElementById('admit-first-name')?.value.trim();
+        const middleName = document.getElementById('admit-middle-name')?.value.trim();
+        const lastName = document.getElementById('admit-last-name')?.value.trim();
+        const standardId = document.getElementById('admit-standard')?.value;
+        const sectionId = document.getElementById('admit-section')?.value || 1;
+        const rollNo = document.getElementById('admit-roll-no')?.value;
+        const gender = document.getElementById('admit-gender')?.value || 'Male';
+        const dob = document.getElementById('admit-dob')?.value;
+        const bloodGroup = document.getElementById('admit-blood-group')?.value || 'O+';
+        const category = document.getElementById('admit-category')?.value || 'General';
+        const admissionDate = document.getElementById('admit-date')?.value;
+        const fatherName = document.getElementById('admit-father-name')?.value.trim();
+        const motherName = document.getElementById('admit-mother-name')?.value.trim();
+        const primaryPhone = document.getElementById('admit-phone')?.value.trim();
+        const occupation = document.getElementById('admit-occupation')?.value.trim();
+        const annualIncome = document.getElementById('admit-income')?.value.trim();
+        const address = document.getElementById('admit-address')?.value.trim();
+
+        if (!firstName || !lastName || !standardId || !primaryPhone) {
+          showToast('Please provide First Name, Last Name, Standard, and Primary Phone.', 'warning');
+          return;
+        }
+
+        const docs = [];
+        if (document.getElementById('admit-doc-birth')?.checked) docs.push('BIRTH_CERTIFICATE');
+        if (document.getElementById('admit-doc-aadhar')?.checked) docs.push('AADHAR');
+        if (document.getElementById('admit-doc-tc')?.checked) docs.push('TRANSFER_CERTIFICATE');
+        if (document.getElementById('admit-doc-marks')?.checked) docs.push('PREVIOUS_MARKSHEET');
+
+        try {
+          const token = localStorage.getItem('school_erp_token');
+          const res = await fetch('/api/students/admit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            },
+            body: JSON.stringify({
+              firstName, middleName, lastName, standardId, sectionId, rollNo,
+              gender, dob, bloodGroup, category, admissionDate,
+              fatherName, motherName, primaryPhone, occupation, annualIncome, address,
+              verifiedDocuments: docs
+            })
+          });
+
+          const data = await res.json();
+          if (res.ok && data.success) {
+            showToast(`✓ Student Admitted! Allocated GR: ${data.grNumber}`, 'success');
+            closeAdmitModal();
+            loadAdminStudentsView();
+          } else {
+            showToast(data.message || 'Failed to complete admission.', 'error');
+          }
+        } catch (err) {
+          showToast('Error admitting student: ' + err.message, 'error');
+        }
+      });
+    }
+
+    // Edit Student Modal Event Listeners
+    const closeEditModal = () => {
+      if (DOM.adminEditStudentModal) {
+        DOM.adminEditStudentModal.style.display = 'none';
+        DOM.adminEditStudentModal.classList.remove('active');
+      }
+    };
+    if (DOM.btnCloseEditStudentModal) DOM.btnCloseEditStudentModal.addEventListener('click', closeEditModal);
+    if (DOM.btnCancelEditStudent) DOM.btnCancelEditStudent.addEventListener('click', closeEditModal);
+    if (DOM.btnSubmitEditStudent) DOM.btnSubmitEditStudent.addEventListener('click', handleEditStudentSubmit);
   }
 
   function showLoginOverlay() {
@@ -3212,49 +4934,61 @@
   // --- View Switcher ---
   function switchView(viewName) {
     const curUser = (state.auth && state.auth.currentUser) || null;
+    const isPrincipal = curUser && ((curUser.roles && curUser.roles.includes('PRINCIPAL')) || curUser.role === 'Principal');
+    const isAdmin = curUser && ((curUser.roles && (curUser.roles.includes('ADMIN_HEAD') || curUser.roles.includes('ACCOUNTANT'))) || curUser.role === 'Admin');
+    const isTeacher = curUser && ((curUser.roles && curUser.roles.includes('TEACHER')) || curUser.role === 'Teacher');
+    const isAcademic = curUser && ((curUser.roles && (curUser.roles.includes('ACADEMIC_HEAD') || curUser.roles.includes('TIMETABLE_COORDINATOR'))) || curUser.role === 'Academic');
 
-    // Gatekeeper 1: Only authenticated teachers can view teacher-ess-view
-    if (viewName === 'teacher-ess-view') {
-      if (!curUser || curUser.role !== 'Teacher') {
-        showToast('Faculty ESS is an exclusive portal for teachers. Please sign in with faculty credentials.', 'warning');
+    // Strict Role Separation Gatekeepers
+    if (isPrincipal) {
+      if (viewName !== 'principal-cockpit-view') {
+        showToast('Principal portal is restricted to Executive Cockpit.', 'info');
+        switchView('principal-cockpit-view');
+        return;
+      }
+    } else if (isAdmin) {
+      const adminAllowed = ['admin-overview-view', 'admin-students-view', 'admin-staff-view', 'admin-users-view', 'admin-approvals-view'];
+      if (!adminAllowed.includes(viewName)) {
+        showToast('Administration ERP is restricted to Administrative pages.', 'info');
+        switchView('admin-overview-view');
+        return;
+      }
+    } else if (isTeacher) {
+      if (viewName !== 'teacher-ess-view') {
+        showToast('Access restricted to Faculty ESS Portal.', 'info');
+        switchView('teacher-ess-view');
+        return;
+      }
+    } else if (isAcademic) {
+      const academicBlocked = ['principal-cockpit-view', 'admin-overview-view', 'admin-students-view', 'admin-staff-view', 'admin-users-view', 'admin-approvals-view', 'teacher-ess-view'];
+      if (academicBlocked.includes(viewName)) {
+        showToast('Academic workspace is restricted to Academic & Timetable operations.', 'info');
         switchView('dashboard-view');
         return;
       }
     }
 
-    // Gatekeeper 2: When logged in as a teacher, restrict to teacher portal views
-    if (curUser && curUser.role === 'Teacher') {
-      const teacherAllowed = ['teacher-ess-view', 'class-timetable-view', 'teacher-view', 'syllabus-view', 'duty-view'];
-      if (!teacherAllowed.includes(viewName)) {
-        showToast('Access restricted to Faculty Portal views.', 'info');
-        switchView('teacher-ess-view');
-        return;
-      }
-    }
-
-    const isTeacher = curUser && (curUser.role === 'Teacher');
-
     // Manage body view classes
     document.body.className = document.body.className.replace(/\bview-[a-z0-9-]+\b/g, '').trim();
     document.body.classList.add(`view-${viewName}`);
 
-    // Quick Create button visibility: Strictly hide on ESS portal or for teacher role
+    // Quick Create button visibility: Strictly hide on ESS portal or for non-academic
     if (DOM.btnTopbarQuickCreate) {
-      if (isTeacher || viewName === 'teacher-ess-view') {
+      if (isTeacher || isPrincipal || isAdmin || viewName === 'teacher-ess-view') {
         DOM.btnTopbarQuickCreate.style.display = 'none';
       } else {
         DOM.btnTopbarQuickCreate.style.display = 'inline-flex';
       }
     }
 
-    // Shift selector & Bell schedule selector: Strictly hide on ESS portal or for teacher role
+    // Shift selector & Bell schedule selector: Strictly hide on ESS, Principal, or Admin
     const headerShift = document.getElementById('header-shift-selector');
     if (headerShift) {
-      headerShift.style.display = (isTeacher || viewName === 'teacher-ess-view') ? 'none' : '';
+      headerShift.style.display = (isTeacher || isPrincipal || isAdmin || viewName === 'teacher-ess-view') ? 'none' : '';
     }
     const headerBell = document.getElementById('header-bell-selector');
     if (headerBell) {
-      headerBell.style.display = (isTeacher || viewName === 'teacher-ess-view') ? 'none' : '';
+      headerBell.style.display = (isTeacher || isPrincipal || isAdmin || viewName === 'teacher-ess-view') ? 'none' : '';
     }
 
     state.activeView = viewName;
@@ -3262,11 +4996,21 @@
       btn.classList.toggle('active', btn.getAttribute('data-view') === viewName);
     });
     DOM.viewSections.forEach(sec => {
-      sec.classList.toggle('active', sec.id === `section-${viewName}`);
+      const isActive = sec.id === `section-${viewName}`;
+      sec.classList.toggle('active', isActive);
+      sec.style.display = isActive ? 'flex' : 'none';
     });
 
     const titles = {
       'dashboard-view': 'Executive Dashboard',
+      'principal-cockpit-view': 'Principal Executive Supervisory Cockpit',
+      'academic-approvals-view': 'Faculty Leave Requests & Academic Approvals',
+      'admin-approvals-view': 'Subordinate Staff Requisitions & Approvals',
+      'admin-overview-view': 'School Administration & Logistics ERP',
+      'admin-users-view': 'User Accounts & Role Management',
+      'admin-students-view': 'Student Admissions & General Register (GR)',
+      'admin-staff-view': 'Staff HR & Faculty Employment Directory',
+      'academic-master-view': 'Academic Standards, Divisions & Subjects Master',
       'settings-view': 'Master System Settings',
       'class-timetable-view': 'Class-Wise Timetables',
       'class-view': 'Daily Schedule Grid',
@@ -3286,6 +5030,16 @@
     }
 
     if (viewName === 'dashboard-view') renderDashboard();
+    if (viewName === 'principal-cockpit-view') {
+      loadAuditLogsTable();
+      loadPrincipalUrgentApprovals();
+    }
+    if (viewName === 'academic-approvals-view') loadAcademicApprovals();
+    if (viewName === 'admin-approvals-view') loadAdminApprovals();
+    if (viewName === 'admin-users-view') loadAdminUsersTable();
+    if (viewName === 'admin-students-view') loadAdminStudentsView();
+    if (viewName === 'admin-staff-view') loadAdminStaffView();
+    if (viewName === 'academic-master-view') loadAcademicMasterView();
     if (viewName === 'settings-view') renderSettingsView();
     if (viewName === 'class-timetable-view') renderClassTimetable();
     if (viewName === 'exam-schedule-view') renderExamScheduleView();
@@ -4775,20 +6529,40 @@
     DOM.subjectDistributionContainer.innerHTML = subjDistHtml;
   }
 
-  // --- Dynamic Export Bar Updates ---
+  // --- Dynamic Export Bar Updates (Strictly Scoped to Timetable Export Views) ---
   function updateExportBar() {
-    const nonExportViews = ['dashboard-view', 'settings-view', 'profile-view', 'cloud-db-view', 'subject-view', 'teacher-ess-view', 'exam-schedule-view'];
-    if (DOM.stickyExportBar) {
-      DOM.stickyExportBar.style.display = nonExportViews.includes(state.activeView) ? 'none' : 'flex';
+    if (!DOM.stickyExportBar) return;
+
+    const cur = (state.auth && state.auth.currentUser) || null;
+    const isPrincipal = cur && ((cur.roles && cur.roles.includes('PRINCIPAL')) || cur.role === 'Principal');
+    const isAdmin = cur && ((cur.roles && (cur.roles.includes('ADMIN_HEAD') || cur.roles.includes('ACCOUNTANT'))) || cur.role === 'Admin');
+    const isTeacher = cur && (cur.role === 'Teacher' || (cur.roles && cur.roles.includes('TEACHER')));
+
+    // NEVER display Timetable Export Bar for Principal, Admin, or Teacher portals
+    if (isPrincipal || isAdmin || isTeacher || state.activeWorkspace !== 'ACADEMIC') {
+      DOM.stickyExportBar.style.display = 'none';
+      return;
     }
 
-    if (state.activeView === 'dashboard-view') {
-      DOM.exportBarTitle.textContent = "School ERP Management Control Center";
-      DOM.exportBarDesc.textContent = "Institutional dashboard with live timetable KPIs, attendance tracking, and syllabus auditing.";
-      DOM.btnDownloadSingleDay.style.display = 'none';
-      DOM.btnDownloadAllDays.textContent = "Print ERP Overview";
-      DOM.btnDownloadAllDays.onclick = () => window.print();
-    } else if (state.activeView === 'class-timetable-view') {
+    // Only allow export bar on explicit timetable schedule views that generate document files
+    const exportableTimetableViews = [
+      'class-timetable-view',
+      'class-view',
+      'teacher-view',
+      'duty-view',
+      'general-duty-view',
+      'substitution-view'
+    ];
+
+    if (!exportableTimetableViews.includes(state.activeView)) {
+      DOM.stickyExportBar.style.display = 'none';
+      return;
+    }
+
+    // Explicitly show for permitted timetable scheduling views
+    DOM.stickyExportBar.style.display = 'flex';
+
+    if (state.activeView === 'class-timetable-view') {
       const std = (state.standards || []).find(s => s.id === state.selectedClassStd);
       const stdName = std ? std.name : 'Selected Standard';
       DOM.exportBarTitle.textContent = `Export ${stdName} Timetable`;
@@ -4798,24 +6572,6 @@
       DOM.btnDownloadSingleDay.onclick = downloadSelectedClassDocx;
       DOM.btnDownloadAllDays.textContent = "Export All Standards (.docx)";
       DOM.btnDownloadAllDays.onclick = downloadAllDaysDocx;
-    } else if (state.activeView === 'attendance-duty-view') {
-      DOM.exportBarTitle.textContent = "Attendance Duty Management";
-      DOM.exportBarDesc.textContent = "Daily student attendance, gate duty supervision, and morning assembly verification roster.";
-      DOM.btnDownloadSingleDay.style.display = 'none';
-      DOM.btnDownloadAllDays.textContent = "Print Attendance Roster";
-      DOM.btnDownloadAllDays.onclick = () => window.print();
-    } else if (state.activeView === 'class-teacher-duty-view') {
-      DOM.exportBarTitle.textContent = "Class Teacher Duty Allocation";
-      DOM.exportBarDesc.textContent = "Designated classroom teachers, room allocations, and primary contact registry.";
-      DOM.btnDownloadSingleDay.style.display = 'none';
-      DOM.btnDownloadAllDays.textContent = "Print Allocation Roster";
-      DOM.btnDownloadAllDays.onclick = () => window.print();
-    } else if (state.activeView === 'syllabus-view') {
-      DOM.exportBarTitle.textContent = "Syllabus & Verification Progress";
-      DOM.exportBarDesc.textContent = "Semester 1 exam scope, completed chapters/poems/grammar, and notebook checking status.";
-      DOM.btnDownloadSingleDay.style.display = 'none';
-      DOM.btnDownloadAllDays.textContent = "Print Syllabus Audit";
-      DOM.btnDownloadAllDays.onclick = () => window.print();
     } else if (state.activeView === 'class-view') {
       DOM.exportBarTitle.textContent = "Export Official Class Timetables";
       DOM.exportBarDesc.textContent = `Generates formatted Word (.docx) for ${state.currentDay} or full week with school letterhead.`;
@@ -4825,25 +6581,14 @@
       DOM.btnDownloadAllDays.textContent = "Download Full Week (.docx)";
       DOM.btnDownloadAllDays.onclick = downloadAllDaysDocx;
     } else if (state.activeView === 'teacher-view') {
-      const curUser = (state.auth && state.auth.currentUser) || null;
-      const isTeacher = curUser && (curUser.role === 'Teacher');
-
-      if (isTeacher) {
-        DOM.exportBarTitle.textContent = "Export Personal Faculty Timetable";
-        DOM.exportBarDesc.textContent = "Outputs your official weekly teaching schedule document (.docx).";
-        DOM.btnDownloadSingleDay.style.display = 'none';
-        DOM.btnDownloadAllDays.textContent = "Download My Schedule (.docx)";
-        DOM.btnDownloadAllDays.onclick = downloadSingleTeacherDocx;
-      } else {
-        DOM.exportBarTitle.textContent = "Export Individual Faculty Timetables";
-        DOM.exportBarDesc.textContent = "Outputs individual 1-page weekly schedules for each staff member.";
-        DOM.btnDownloadSingleDay.style.display = 'none';
-        DOM.btnDownloadAllDays.textContent = "Download All Staff Schedules (.docx)";
-        DOM.btnDownloadAllDays.onclick = () => {
-          state.activeView = 'teacher-view';
-          downloadAllDaysDocx();
-        };
-      }
+      DOM.exportBarTitle.textContent = "Export Individual Faculty Timetables";
+      DOM.exportBarDesc.textContent = "Outputs individual 1-page weekly schedules for each staff member.";
+      DOM.btnDownloadSingleDay.style.display = 'none';
+      DOM.btnDownloadAllDays.textContent = "Download All Staff Schedules (.docx)";
+      DOM.btnDownloadAllDays.onclick = () => {
+        state.activeView = 'teacher-view';
+        downloadAllDaysDocx();
+      };
     } else if (state.activeView === 'duty-view') {
       DOM.exportBarTitle.textContent = "Export Faculty Extra Duties Matrix";
       DOM.exportBarDesc.textContent = "Outputs standalone official faculty extra duty matrix with subject & grade tally breakdown (.docx).";
@@ -4863,11 +6608,7 @@
       DOM.btnDownloadAllDays.textContent = "Download Substitution Notice (.docx)";
       DOM.btnDownloadAllDays.onclick = downloadSubstitutionDocx;
     } else {
-      DOM.exportBarTitle.textContent = "Export Timetable Data";
-      DOM.exportBarDesc.textContent = "Outputs Word documents or CSV records.";
-      DOM.btnDownloadSingleDay.style.display = 'none';
-      DOM.btnDownloadAllDays.textContent = "Download Full Week (.docx)";
-      DOM.btnDownloadAllDays.onclick = downloadAllDaysDocx;
+      DOM.stickyExportBar.style.display = 'none';
     }
   }
 

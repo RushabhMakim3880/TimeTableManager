@@ -1716,19 +1716,29 @@ html, body {
   background: #f8fafc;
 }
 
-/* Docked Bottom Export Action Bar */
+/* Docked Bottom Export Action Bar (Strictly scoped to Academic Timetable views) */
 .sticky-export-bar {
   height: 60px;
   background: var(--bg-surface);
   border-top: 1px solid var(--border-color);
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.03);
   padding: 0 32px;
-  display: flex;
+  display: none; /* Hidden by default; only shown by updateExportBar for timetable views */
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
   z-index: 30;
   transition: all 0.2s ease;
+}
+
+/* STRICT RULE: Timetable Export Bar must NEVER show for Admin, Principal, or Teacher portals */
+body.role-admin #sticky-export-bar,
+body.role-principal #sticky-export-bar,
+body.role-teacher #sticky-export-bar,
+.role-admin #sticky-export-bar,
+.role-principal #sticky-export-bar,
+.role-teacher #sticky-export-bar {
+  display: none !important;
 }
 
 .sticky-export-container {
@@ -2045,7 +2055,7 @@ html, body {
 }
 
 .enterprise-modal-overlay.active {
-  display: flex;
+  display: flex !important;
 }
 
 .enterprise-modal-card {
@@ -6976,5 +6986,836 @@ body.role-teacher #header-bell-selector {
   font-weight: 700;
   opacity: 0.95;
 }
+
+/* ==========================================================================
+   PHASE 1: RBAC, WORKSPACE SEGREGATION & PRINCIPAL COCKPIT STYLING
+   ========================================================================== */
+
+/* Workspace Switcher in Topbar */
+.workspace-segmented-control {
+  display: inline-flex;
+  align-items: center;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+  margin-right: 8px;
+}
+
+.workspace-segment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.workspace-segment-btn:hover {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.workspace-segment-btn.active {
+  color: #1e40af;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.workspace-segment-btn.active.ws-principal {
+  color: #7c2d12;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+}
+
+.workspace-segment-btn.active.ws-academic {
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.workspace-segment-btn.active.ws-admin {
+  color: #065f46;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+/* User Role Badges in Table / Profile */
+.role-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.role-badge-principal { background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+.role-badge-academic_head { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+.role-badge-timetable_coordinator { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.role-badge-teacher { background: #fdf2f8; color: #9d174d; border: 1px solid #fbcfe8; }
+.role-badge-admin_head { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.role-badge-accountant { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+.role-badge-staff { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+/* Principal Cockpit Styles */
+.principal-hero-banner {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 25px -5px rgba(49, 46, 129, 0.25);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.principal-hero-title {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px 0;
+  color: #ffffff;
+}
+
+.principal-hero-sub {
+  font-size: 13.5px;
+  color: #c7d2fe;
+  margin: 0;
+}
+
+.principal-metric-chip {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.principal-metric-val {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.principal-metric-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #e0e7ff;
+}
+
+/* Two-Column Cross Domain Grid */
+.principal-domain-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+  .principal-domain-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.domain-health-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.domain-health-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 14px;
+}
+
+.domain-health-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.domain-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.domain-mini-kpi {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.domain-mini-kpi-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.domain-mini-kpi-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ====================================================================
+   ENTERPRISE APPROVALS & REQUISITIONS SYSTEM (ADMIN & ACADEMIC & PRINCIPAL)
+   ==================================================================== */
+.approval-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.approval-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.approval-panel-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.approval-panel-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.approval-panel-icon.admin-icon {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+}
+
+.approval-panel-icon.academic-icon {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+
+.approval-panel-icon.principal-icon {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #c2410c;
+}
+
+.approval-panel-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.approval-panel-subtitle {
+  margin: 3px 0 0 0;
+  font-size: 12.5px;
+  color: #64748b;
+}
+
+.approval-kpi-ribbon {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.approval-kpi-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.approval-kpi-card:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.approval-kpi-card .val {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+.approval-kpi-card .lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+
+.approval-kpi-card .icon-chip {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.approval-table-wrap {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.approval-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.approval-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.approval-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.approval-table tr:hover td {
+  background: #f8fafc;
+}
+
+.approval-id-pill {
+  display: inline-block;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  color: #334155;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.approval-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.approval-status-pill.status-pending {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.approval-status-pill.status-approved {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.approval-status-pill.status-escalated {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.approval-status-pill.status-rejected {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.approval-urgency-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.approval-urgency-pill.urgency-normal {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.approval-urgency-pill.urgency-high {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  font-weight: 800;
+}
+
+.approval-urgency-pill.urgency-high::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #dc2626;
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+.approval-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-appr-approve {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: #ffffff !important;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.25);
+  transition: all 0.15s ease;
+}
+
+.btn-appr-approve:hover {
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(5, 150, 105, 0.35);
+}
+
+.btn-appr-reject {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #fee2e2;
+  color: #991b1b !important;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-appr-reject:hover {
+  background: #fecaca;
+  color: #7f1d1d !important;
+}
+
+.btn-appr-escalate {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  color: #c2410c !important;
+  border: 1px solid #ea580c;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-appr-escalate:hover {
+  background: #fff7ed;
+  border-color: #c2410c;
+}
+
+.btn-appr-executive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #c2410c 0%, #9a3412 100%);
+  color: #ffffff !important;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(194, 65, 12, 0.3);
+  transition: all 0.15s ease;
+}
+
+.btn-appr-executive:hover {
+  background: linear-gradient(135deg, #9a3412 0%, #7c2d12 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(194, 65, 12, 0.4);
+}
+
+/* Executive Urgent Escalation Item Card (Principal Cockpit) */
+.principal-urgent-item {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  border-left: 5px solid #ea580c;
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.06);
+  transition: all 0.2s ease;
+}
+
+.principal-urgent-item:hover {
+  border-color: #ea580c;
+  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.12);
+}
+
+.principal-urgent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.principal-urgent-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.principal-escalation-banner {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: #9a3412;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* User Management Table Styles */
+.user-mgmt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-user-table-wrap {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.admin-user-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.admin-user-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-user-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.admin-user-table tr:hover td {
+  background: #f8fafc;
+}
+
+/* Audit Log Table */
+.audit-table-wrap {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow-x: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.audit-action-tag {
+  display: inline-block;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+/* ====================================================================
+   PHASE 2: STUDENT ADMISSIONS & GR REGISTER STYLES
+   ==================================================================== */
+.student-gr-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace, sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.student-filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  background: #ffffff;
+  padding: 14px 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.student-search-input {
+  flex: 1;
+  min-width: 220px;
+  padding: 8px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.student-search-input:focus {
+  border-color: var(--primary-color, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.doc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+
+.doc-chip-verified {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.doc-chip-pending {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+/* Staff HR Directory Cards */
+.staff-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.staff-hr-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.staff-hr-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  border-color: #cbd5e1;
+}
+
+.staff-card-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.staff-avatar-box {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.staff-name-title {
+  margin: 0 0 2px 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.staff-desig-sub {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.staff-details-list {
+  font-size: 12.5px;
+  color: #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+  margin-top: auto;
+}
+
+.staff-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.staff-detail-lbl {
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.staff-detail-val {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Master Standards & Subjects Cards */
+.master-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.master-item-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.master-item-card:hover {
+  border-color: #94a3b8;
+}
+
 
 
