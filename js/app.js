@@ -550,7 +550,9 @@
 
     // Teacher ESS Portal
     selectEssTeacher: document.getElementById('select-ess-teacher'),
+    selectEssTeacherWrapper: document.getElementById('select-ess-teacher-wrapper'),
     btnEssSubmitLeave: document.getElementById('btn-ess-submit-leave'),
+    btnEssViewWeek: document.getElementById('btn-ess-view-week'),
     btnPrintEssPortal: document.getElementById('btn-print-ess-portal'),
     essTeacherAvatar: document.getElementById('ess-teacher-avatar'),
     essTeacherName: document.getElementById('ess-teacher-name'),
@@ -574,6 +576,18 @@
     essSyllabusPctBadge: document.getElementById('ess-syllabus-pct-badge'),
     essSyllabusBarFill: document.getElementById('ess-syllabus-bar-fill'),
     essSyllabusChecklist: document.getElementById('ess-syllabus-checklist'),
+    essLeaveModal: document.getElementById('ess-leave-modal'),
+    btnCloseEssLeaveModal: document.getElementById('btn-close-ess-leave-modal'),
+    essLeaveTeacherName: document.getElementById('ess-leave-teacher-name'),
+    essLeaveDaySelect: document.getElementById('ess-leave-day-select'),
+    essLeaveCategory: document.getElementById('ess-leave-category'),
+    essLeaveReason: document.getElementById('ess-leave-reason'),
+    btnCancelEssLeave: document.getElementById('btn-cancel-ess-leave'),
+    btnConfirmEssLeave: document.getElementById('btn-confirm-ess-leave'),
+    essWeeklyModal: document.getElementById('ess-weekly-modal'),
+    btnCloseEssWeeklyModal: document.getElementById('btn-close-ess-weekly-modal'),
+    btnCloseEssWeeklyFooter: document.getElementById('btn-close-ess-weekly-footer'),
+    essWeeklyGridContainer: document.getElementById('ess-weekly-grid-container'),
 
     // Toasts
     toastContainer: document.getElementById('toast-container')
@@ -1398,6 +1412,7 @@
 
   function initAuth() {
     renderUserProfileBadge();
+    applyRolePermissions();
 
     // Check auth status: show full-page sign-in screen immediately if not logged in
     if (!state.auth || !state.auth.isAuthenticated) {
@@ -1466,6 +1481,92 @@
     if (DOM.headerUserRole) {
       DOM.headerUserRole.textContent = cur.roleLabel || cur.role || "Administrator";
       DOM.headerUserRole.className = `user-role-tag role-${(cur.role || 'Admin').toLowerCase()}`;
+    }
+  }
+
+  function applyRolePermissions() {
+    const cur = (state.auth && state.auth.currentUser) || null;
+    const isTeacher = cur && (cur.role === 'Teacher');
+
+    const navEssBtn = document.getElementById('nav-tab-teacher-ess');
+    const navEssGroup = navEssBtn ? navEssBtn.closest('.nav-group') : null;
+
+    if (isTeacher) {
+      // TEACHER PORTAL MODE:
+      // 1. Show Teacher ESS tab and group
+      if (navEssBtn) navEssBtn.style.display = 'flex';
+      if (navEssGroup) navEssGroup.style.display = 'block';
+
+      // 2. Hide administrative/management-only tabs to keep the teacher portal uncluttered
+      const adminOnlyTabs = [
+        'nav-tab-dashboard',
+        'nav-tab-settings',
+        'nav-tab-exam-schedule',
+        'nav-tab-class-grid',
+        'nav-tab-attendance-duty',
+        'nav-tab-class-teacher',
+        'nav-tab-substitution',
+        'nav-tab-workload',
+        'nav-tab-general-duty'
+      ];
+      adminOnlyTabs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+
+      // 3. Keep teacher-relevant navigation tabs visible
+      const teacherTabs = [
+        'nav-tab-teacher-ess',
+        'nav-tab-class-timetable',
+        'nav-tab-teacher',
+        'nav-tab-syllabus',
+        'nav-tab-extra-duties'
+      ];
+      teacherTabs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'flex';
+      });
+
+      // 4. Lock ESS profile to current authenticated teacher
+      state.selectedESSTeacher = cur.name;
+
+      // 5. Hide the admin switcher dropdown in the ESS view
+      const switcherWrap = document.getElementById('select-ess-teacher-wrapper');
+      if (switcherWrap) switcherWrap.style.display = 'none';
+
+      // 6. If active view is admin-only, redirect to teacher-ess-view
+      const isAllowed = teacherTabs.some(t => {
+        const el = document.getElementById(t);
+        return el && el.getAttribute('data-view') === state.activeView;
+      });
+      if (!isAllowed) {
+        state.activeView = 'teacher-ess-view';
+      }
+
+    } else {
+      // NON-TEACHER / MANAGEMENT MODE (Admin, Principal, Supervision Staff, Guest)
+      // STRICTLY HIDE TEACHER ESS COCKPIT
+      if (navEssBtn) navEssBtn.style.display = 'none';
+      if (navEssGroup) navEssGroup.style.display = 'none';
+
+      // Show all standard management and ERP tabs
+      const allNavBtns = document.querySelectorAll('.nav-item.view-tab-btn');
+      allNavBtns.forEach(btn => {
+        if (btn.id !== 'nav-tab-teacher-ess') {
+          btn.style.display = 'flex';
+        }
+      });
+      const allGroups = document.querySelectorAll('.nav-group');
+      allGroups.forEach(grp => {
+        if (grp !== navEssGroup) {
+          grp.style.display = 'block';
+        }
+      });
+
+      // If currently on teacher-ess-view, redirect away to dashboard
+      if (state.activeView === 'teacher-ess-view') {
+        state.activeView = 'dashboard-view';
+      }
     }
   }
 
@@ -1550,6 +1651,7 @@
 
     saveState();
     renderUserProfileBadge();
+    applyRolePermissions();
     hideLoginOverlay();
     if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
     showToast(`Welcome, ${safeUser.name}! Signed in as ${safeUser.roleLabel}.`, 'success');
@@ -1557,7 +1659,7 @@
       state.selectedESSTeacher = safeUser.name;
       switchView('teacher-ess-view');
     } else {
-      switchView(state.activeView || 'dashboard-view');
+      switchView(state.activeView && state.activeView !== 'teacher-ess-view' ? state.activeView : 'dashboard-view');
     }
   }
 
@@ -1575,6 +1677,7 @@
 
     saveState();
     renderUserProfileBadge();
+    applyRolePermissions();
     if (DOM.authPassword) DOM.authPassword.value = '';
     if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
     showLoginOverlay();
@@ -2802,6 +2905,27 @@
 
   // --- View Switcher ---
   function switchView(viewName) {
+    const curUser = (state.auth && state.auth.currentUser) || null;
+
+    // Gatekeeper 1: Only authenticated teachers can view teacher-ess-view
+    if (viewName === 'teacher-ess-view') {
+      if (!curUser || curUser.role !== 'Teacher') {
+        showToast('Faculty ESS is an exclusive portal for teachers. Please sign in with faculty credentials.', 'warning');
+        switchView('dashboard-view');
+        return;
+      }
+    }
+
+    // Gatekeeper 2: When logged in as a teacher, restrict to teacher portal views
+    if (curUser && curUser.role === 'Teacher') {
+      const teacherAllowed = ['teacher-ess-view', 'class-timetable-view', 'teacher-view', 'syllabus-view', 'duty-view'];
+      if (!teacherAllowed.includes(viewName)) {
+        showToast('Access restricted to Faculty Portal views.', 'info');
+        switchView('teacher-ess-view');
+        return;
+      }
+    }
+
     state.activeView = viewName;
     DOM.viewTabBtns.forEach(btn => {
       btn.classList.toggle('active', btn.getAttribute('data-view') === viewName);
@@ -6793,9 +6917,10 @@
   };
 
   // ==========================================================================
-  // MODULE: TEACHER EMPLOYEE SELF-SERVICE (ESS) COCKPIT
+  // MODULE: TEACHER EMPLOYEE SELF-SERVICE (ESS) COCKPIT - REDESIGNED
   // ==========================================================================
   function initTeacherESSView() {
+    // Admin profile switcher (hidden in Teacher mode)
     if (DOM.selectEssTeacher) {
       DOM.selectEssTeacher.onchange = (e) => {
         state.selectedESSTeacher = e.target.value;
@@ -6803,29 +6928,85 @@
         renderTeacherESSView();
       };
     }
+
+    // Leave & Proxy Relief Request Modal Trigger
     if (DOM.btnEssSubmitLeave) {
       DOM.btnEssSubmitLeave.onclick = () => {
-        const reason = prompt(`Apply for Leave / Proxy for ${state.selectedESSTeacher || 'Teacher'}.\nEnter Leave Reason (e.g. Medical, Urgent Personal, Training):`, 'Medical Leave');
-        if (reason) {
-          const curDay = state.currentDay || 'Monday';
-          state.leaves[curDay] = state.leaves[curDay] || [];
-          if (!state.leaves[curDay].includes(state.selectedESSTeacher)) {
-            state.leaves[curDay].push(state.selectedESSTeacher);
-          }
-          saveState();
-          renderTeacherESSView();
-          renderAttendance();
-          showToast(`Leave application submitted for ${state.selectedESSTeacher}. Proxy recommendations updated.`, 'success');
-        }
+        const teacher = state.selectedESSTeacher || (state.auth && state.auth.currentUser && state.auth.currentUser.name) || 'Faculty Member';
+        if (DOM.essLeaveTeacherName) DOM.essLeaveTeacherName.value = teacher;
+        if (DOM.essLeaveDaySelect) DOM.essLeaveDaySelect.value = state.currentDay || 'Monday';
+        if (DOM.essLeaveReason) DOM.essLeaveReason.value = '';
+        if (DOM.essLeaveModal) DOM.essLeaveModal.style.display = 'flex';
       };
     }
+
+    // Leave Modal Close Buttons
+    if (DOM.btnCloseEssLeaveModal) {
+      DOM.btnCloseEssLeaveModal.onclick = () => {
+        if (DOM.essLeaveModal) DOM.essLeaveModal.style.display = 'none';
+      };
+    }
+    if (DOM.btnCancelEssLeave) {
+      DOM.btnCancelEssLeave.onclick = () => {
+        if (DOM.essLeaveModal) DOM.essLeaveModal.style.display = 'none';
+      };
+    }
+
+    // Leave Modal Confirmation
+    if (DOM.btnConfirmEssLeave) {
+      DOM.btnConfirmEssLeave.onclick = () => {
+        const teacher = (DOM.essLeaveTeacherName ? DOM.essLeaveTeacherName.value : '') || state.selectedESSTeacher || 'Faculty Member';
+        const day = DOM.essLeaveDaySelect ? DOM.essLeaveDaySelect.value : (state.currentDay || 'Monday');
+        const category = DOM.essLeaveCategory ? DOM.essLeaveCategory.value : 'Medical';
+
+        state.leaves[day] = state.leaves[day] || [];
+        if (!state.leaves[day].includes(teacher)) {
+          state.leaves[day].push(teacher);
+        }
+
+        saveState();
+        if (DOM.essLeaveModal) DOM.essLeaveModal.style.display = 'none';
+        renderTeacherESSView();
+        renderAttendance();
+        showToast(`Leave application submitted for ${teacher} (${day}). Category: ${category}. Automated relief initialized.`, 'success');
+      };
+    }
+
+    // Weekly Schedule Grid Modal Trigger
+    if (DOM.btnEssViewWeek) {
+      DOM.btnEssViewWeek.onclick = () => {
+        const teacher = state.selectedESSTeacher || (state.auth && state.auth.currentUser && state.auth.currentUser.name) || 'Faculty Member';
+        renderESSWeeklyTimetable(teacher);
+        if (DOM.essWeeklyModal) DOM.essWeeklyModal.style.display = 'flex';
+      };
+    }
+
+    // Weekly Modal Close Buttons
+    if (DOM.btnCloseEssWeeklyModal) {
+      DOM.btnCloseEssWeeklyModal.onclick = () => {
+        if (DOM.essWeeklyModal) DOM.essWeeklyModal.style.display = 'none';
+      };
+    }
+    if (DOM.btnCloseEssWeeklyFooter) {
+      DOM.btnCloseEssWeeklyFooter.onclick = () => {
+        if (DOM.essWeeklyModal) DOM.essWeeklyModal.style.display = 'none';
+      };
+    }
+
+    // Print Daily Briefing
     if (DOM.btnPrintEssPortal) {
       DOM.btnPrintEssPortal.onclick = () => window.print();
     }
   }
 
   function renderTeacherESSView() {
-    const teacher = state.selectedESSTeacher || 'Priya Ma\'am';
+    const curUser = (state.auth && state.auth.currentUser) || null;
+    let teacher = state.selectedESSTeacher;
+    if (curUser && curUser.role === 'Teacher') {
+      teacher = curUser.name;
+      state.selectedESSTeacher = curUser.name;
+    }
+    if (!teacher) teacher = 'Priya Ma\'am';
 
     if (DOM.selectEssTeacher) {
       DOM.selectEssTeacher.innerHTML = '';
@@ -6846,7 +7027,10 @@
 
     const ctDuty = (state.classTeacherDuties || []).find(c => c.teacher === teacher) || {};
     if (DOM.essTeacherRoleBadge) {
-      DOM.essTeacherRoleBadge.textContent = ctDuty.standardName ? `Class Teacher • ${ctDuty.standardName}` : 'Subject Faculty';
+      DOM.essTeacherRoleBadge.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+        ${ctDuty.standardName ? `Class Teacher • ${escapeHtml(ctDuty.standardName)}` : 'Subject Faculty Specialist'}
+      `;
     }
     if (DOM.essTeacherEmail) {
       DOM.essTeacherEmail.textContent = `${teacher.toLowerCase().replace(/[^a-z]/g, '')}@funland.edu`;
@@ -6855,6 +7039,8 @@
       DOM.essTeacherShift.textContent = state.currentShift === 'morning' ? 'Morning Shift (7:30 AM – 12:15 PM)' : 'Afternoon Shift (1:00 PM – 5:50 PM)';
     }
 
+    // Determine subject specialization from schedule
+    const teachingSubjects = new Set();
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     let weeklyLoad = 0;
     let todayClasses = 0;
@@ -6867,11 +7053,17 @@
         Object.keys(pSlots).forEach(stdId => {
           if (pSlots[stdId] && pSlots[stdId].teacher === teacher) {
             weeklyLoad++;
+            if (pSlots[stdId].subject) teachingSubjects.add(pSlots[stdId].subject);
             if (d === curDay) todayClasses++;
           }
         });
       });
     });
+
+    if (DOM.essTeacherSubjectTag) {
+      const subjs = Array.from(teachingSubjects);
+      DOM.essTeacherSubjectTag.textContent = subjs.length > 0 ? subjs.slice(0, 2).join(' & ') : 'General Faculty';
+    }
 
     if (DOM.essKpiWeeklyLoad) DOM.essKpiWeeklyLoad.textContent = weeklyLoad;
     if (DOM.essKpiTodayCount) DOM.essKpiTodayCount.textContent = todayClasses;
@@ -6907,11 +7099,19 @@
         }
       });
 
+      // Highlight active period (Period 2 simulated as live active in demo)
       const isCurrentPeriod = (idx === 1);
       if (isCurrentPeriod && assignedStd) {
         activeFound = true;
-        if (DOM.essActivePeriodBadge) DOM.essActivePeriodBadge.textContent = `LIVE RADAR • ${p.label.toUpperCase()} IN PROGRESS`;
-        if (DOM.essActiveRoomDisplay) DOM.essActiveRoomDisplay.textContent = `${assignedStd.room || 'Room 101'} • ${assignedStd.name} • ${assignedSubj}`;
+        if (DOM.essActivePeriodBadge) {
+          DOM.essActivePeriodBadge.innerHTML = `
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            LIVE SCHEDULE RADAR • ${escapeHtml(p.label.toUpperCase())} IN PROGRESS
+          `;
+        }
+        if (DOM.essActiveRoomDisplay) {
+          DOM.essActiveRoomDisplay.textContent = `${assignedStd.room || 'Room 101'} • ${assignedStd.name} • ${assignedSubj}`;
+        }
         if (DOM.essActiveTimerDisplay) DOM.essActiveTimerDisplay.textContent = '28 mins remaining';
       }
 
@@ -6919,33 +7119,44 @@
 
       listHtml += `
         <div class="ess-period-row ${isCurrentPeriod ? 'current-active' : ''}">
-          <div style="width: 130px;">
-            <div style="font-weight: 700; font-size: 13px;">${escapeHtml(p.label)}</div>
-            <div style="font-size: 11px; color: var(--text-muted);">${escapeHtml(p.time)}</div>
+          <div class="ess-period-time-col">
+            <div class="ess-period-p-badge">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="${isCurrentPeriod ? '#0284c7' : '#64748b'}"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+              ${escapeHtml(p.label)}
+            </div>
+            <div class="ess-period-time-text">${escapeHtml(p.time)}</div>
           </div>
-          <div style="flex: 1;">
+
+          <div class="ess-period-detail-col">
             ${assignedStd ? `
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="class-tt-subject-badge ${colorClass}" style="font-size: 12px;">${escapeHtml(assignedSubj)}</span>
-                <span style="font-weight: 700; font-size: 13px;">${escapeHtml(assignedStd.name)}</span>
-                <span style="font-size: 11.5px; color: var(--text-muted);">(${escapeHtml(assignedStd.room || 'Room 101')})</span>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span class="class-tt-subject-badge ${colorClass}" style="font-size: 12px; font-weight: 700; padding: 4px 10px;">${escapeHtml(assignedSubj)}</span>
+                <span style="font-weight: 800; font-size: 13.5px; color: #0f172a;">${escapeHtml(assignedStd.name)}</span>
+                <span class="ess-meta-pill" style="color: #475569; background: #ffffff; border: 1px solid #e2e8f0; font-size: 11.5px;">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                  ${escapeHtml(assignedStd.room || 'Room 101')}
+                </span>
               </div>
             ` : `
-              <span style="color: #64748b; font-size: 12px; font-style: italic;">Free / Preparation Period (Library or Staff Room)</span>
+              <div style="display: flex; align-items: center; gap: 8px; color: #64748b; font-size: 12.5px;">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="#8b5cf6"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>
+                <span style="font-style: italic;">Free Preparation &amp; Evaluation Period (Staff Common Room)</span>
+              </div>
             `}
           </div>
-          <div>
+
+          <div class="ess-period-status-col">
             ${isCurrentPeriod 
-              ? `<span class="badge" style="background: #1e3a8a; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px;">● Active Now</span>` 
-              : (assignedStd ? `<span class="badge" style="background: #f1f5f9; color: #475569; font-size: 11px;">Scheduled</span>` : `<span class="badge" style="background: #f0fdf4; color: #166534; font-size: 11px;">Free Slot</span>`)}
+              ? `<span class="badge" style="background: #0284c7; color: #ffffff; font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 20px; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);">● Active Now</span>` 
+              : (assignedStd ? `<span class="badge" style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 12px;">Scheduled</span>` : `<span class="badge" style="background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 12px;">Free Slot</span>`)}
           </div>
         </div>`;
     });
 
     if (!activeFound && DOM.essActiveRoomDisplay) {
-      if (DOM.essActivePeriodBadge) DOM.essActivePeriodBadge.textContent = 'LIVE RADAR • CURRENT SHIFT';
-      DOM.essActiveRoomDisplay.textContent = 'Staff Common Room • Free Period';
-      if (DOM.essActiveTimerDisplay) DOM.essActiveTimerDisplay.textContent = 'Free Time';
+      if (DOM.essActivePeriodBadge) DOM.essActivePeriodBadge.textContent = 'LIVE RADAR • CAMPUS SCHEDULE';
+      DOM.essActiveRoomDisplay.textContent = 'Staff Common Room • Free / Planning Time';
+      if (DOM.essActiveTimerDisplay) DOM.essActiveTimerDisplay.textContent = 'Free Slot';
     }
 
     DOM.essTodayScheduleList.innerHTML = listHtml;
@@ -6957,16 +7168,22 @@
     const days = Object.keys(weekly);
 
     if (days.length === 0) {
-      DOM.essDutyCardContent.innerHTML = `<p style="color: var(--text-muted); font-size: 12.5px; margin: 0;">No extra duties scheduled for this week. Enjoy your preparation time!</p>`;
+      DOM.essDutyCardContent.innerHTML = `
+        <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 14px; text-align: center; color: #64748b; font-size: 12.5px;">
+          ✓ No campus assembly or supervision duties allocated for this cycle.
+        </div>`;
       return;
     }
 
-    let html = `<div style="display: flex; flex-direction: column; gap: 6px;">`;
+    let html = `<div style="display: flex; flex-direction: column; gap: 8px;">`;
     days.forEach(d => {
       html += `
-        <div style="display: flex; justify-content: space-between; align-items: center; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 10px; font-size: 12px;">
-          <span style="font-weight: 700; color: #92400e;">📅 ${escapeHtml(d)}</span>
-          <span style="font-weight: 600; color: #b45309;">${escapeHtml(weekly[d])}</span>
+        <div class="ess-duty-card-box">
+          <span class="ess-duty-day-tag">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+            ${escapeHtml(d)}
+          </span>
+          <span class="ess-duty-desc-text">${escapeHtml(weekly[d])}</span>
         </div>`;
     });
     html += `</div>`;
@@ -7002,15 +7219,25 @@
     }
 
     if (myProxies.length === 0) {
-      DOM.essProxyCardContent.innerHTML = `<p style="color: #16a34a; font-size: 12.5px; font-weight: 600; margin: 0;">✓ No proxy substitutions assigned today. All regular periods!</p>`;
+      DOM.essProxyCardContent.innerHTML = `
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 12px 16px; font-size: 12.5px; color: #166534; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          No proxy substitutions assigned today. All regular schedule!
+        </div>`;
       return;
     }
 
-    let html = `<div style="display: flex; flex-direction: column; gap: 6px;">`;
+    let html = `<div style="display: flex; flex-direction: column; gap: 8px;">`;
     myProxies.forEach(s => {
       html += `
-        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 10px; font-size: 12px; color: #1e40af;">
-          <strong>Proxy Lecture:</strong> Covering for <em>${escapeHtml(s.absentTeacher)}</em> in <strong>${escapeHtml(s.stdName || s.stdId)}</strong> (${escapeHtml(s.periodId)}).
+        <div class="ess-proxy-alert-box">
+          <div style="font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
+            Assigned Proxy Coverage:
+          </div>
+          <div style="font-size: 12px; margin-top: 4px;">
+            Covering for <strong>${escapeHtml(s.absentTeacher)}</strong> in <strong>${escapeHtml(s.stdName || s.stdId)}</strong> (${escapeHtml(s.periodId)}).
+          </div>
         </div>`;
     });
     html += `</div>`;
@@ -7039,13 +7266,82 @@
     let html = '';
     topics.forEach(t => {
       html += `
-        <label style="display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-primary); cursor: pointer; padding: 4px 0;">
-          <input type="checkbox" ${t.done ? 'checked' : ''} onchange="window.toggleESSTopic(this)" style="width: 16px; height: 16px; accent-color: #10b981;">
-          <span style="${t.done ? 'text-decoration: line-through; color: #64748b;' : 'font-weight: 600;'}">${escapeHtml(t.title)}</span>
-        </label>`;
+        <div class="ess-syllabus-item ${t.done ? 'completed' : ''}">
+          <label>
+            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="window.toggleESSTopic(this)" style="width: 17px; height: 17px; accent-color: #10b981; cursor: pointer;">
+            <span style="${t.done ? 'text-decoration: line-through; color: #94a3b8;' : 'font-weight: 600; color: #1e293b;'}">${escapeHtml(t.title)}</span>
+          </label>
+          <span class="badge" style="font-size: 10.5px; background: ${t.done ? '#ecfdf5; color: #059669;' : '#f1f5f9; color: #64748b;'}">${t.done ? 'Completed' : 'Upcoming'}</span>
+        </div>`;
     });
 
     DOM.essSyllabusChecklist.innerHTML = html;
+  }
+
+  function renderESSWeeklyTimetable(teacher) {
+    if (!DOM.essWeeklyGridContainer) return;
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const periods = state.periods || [];
+
+    let html = `
+      <table class="enterprise-table" style="font-size: 12px; width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: #f8fafc;">
+            <th style="width: 110px; padding: 10px;">Day</th>
+            ${periods.map(p => `
+              <th style="text-align: center; padding: 10px 8px;">
+                <div style="font-weight: 800; color: #0f172a;">${escapeHtml(p.label)}</div>
+                <div style="font-size: 10.5px; font-weight: normal; color: var(--text-muted);">${escapeHtml(p.time)}</div>
+              </th>
+            `).join('')}
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    days.forEach(d => {
+      const dSched = (state.schedules || {})[d] || {};
+      const isToday = (d === (state.currentDay || 'Monday'));
+      html += `
+        <tr style="${isToday ? 'background: #f0fdf4;' : ''}">
+          <td style="font-weight: 800; color: ${isToday ? '#15803d' : '#0f172a'}; padding: 12px 10px;">
+            ${escapeHtml(d)}
+            ${isToday ? '<span class="badge" style="background: #bbf7d0; color: #166534; font-size: 9.5px; margin-left: 4px; padding: 1px 6px;">Today</span>' : ''}
+          </td>`;
+
+      periods.forEach(p => {
+        const pSlots = dSched[p.id] || {};
+        let assignedStd = null;
+        let assignedSubj = null;
+
+        Object.keys(pSlots).forEach(stdId => {
+          if (pSlots[stdId] && pSlots[stdId].teacher === teacher) {
+            assignedStd = (state.standards || []).find(s => s.id === stdId) || { name: stdId, room: 'Room 101' };
+            assignedSubj = pSlots[stdId].subject;
+          }
+        });
+
+        if (assignedStd) {
+          const colorClass = getSubjectColorClass(assignedSubj);
+          html += `
+            <td style="text-align: center; padding: 10px 6px; border: 1px solid #e2e8f0;">
+              <div class="class-tt-subject-badge ${colorClass}" style="display: inline-block; font-size: 11px; padding: 2px 8px; margin-bottom: 3px;">${escapeHtml(assignedSubj)}</div>
+              <div style="font-weight: 800; font-size: 12px; color: #0f172a;">${escapeHtml(assignedStd.name)}</div>
+              <div style="font-size: 10.5px; color: #64748b;">${escapeHtml(assignedStd.room || 'Room 101')}</div>
+            </td>`;
+        } else {
+          html += `
+            <td style="text-align: center; padding: 10px 6px; color: #94a3b8; font-style: italic; font-size: 11px; border: 1px solid #f1f5f9; background: #fafafa;">
+              Free Slot
+            </td>`;
+        }
+      });
+
+      html += `</tr>`;
+    });
+
+    html += `</tbody></table>`;
+    DOM.essWeeklyGridContainer.innerHTML = html;
   }
 
   window.toggleESSTopic = function(checkbox) {
