@@ -4862,10 +4862,42 @@ html, body {
   }
 }
 
-/* Responsive Mobile & Tablet Drawer */
+/* Responsive Mobile & Tablet Drawer & Backdrop Overlay */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 89;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 @media (max-width: 900px) {
   .topbar-mobile-btn {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s ease;
+  }
+
+  .topbar-mobile-btn:active {
+    background: #e2e8f0;
   }
 
   .app-sidebar {
@@ -4873,8 +4905,10 @@ html, body {
     top: 0;
     bottom: 0;
     left: 0;
+    z-index: 95;
     transform: translateX(-100%);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .app-sidebar.mobile-open {
@@ -4882,11 +4916,57 @@ html, body {
   }
 
   .main-wrapper {
-    padding: 16px;
+    padding: 14px 12px;
   }
 
   .app-topbar {
-    padding: 0 16px;
+    padding: 0 12px;
+    height: 56px;
+  }
+
+  .topbar-breadcrumb {
+    font-size: 12.5px;
+    max-width: 140px;
+  }
+
+  .breadcrumb-root,
+  .breadcrumb-separator {
+    display: none !important;
+  }
+
+  .breadcrumb-current {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 130px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar-breadcrumb {
+    max-width: 105px;
+  }
+
+  .breadcrumb-current {
+    max-width: 95px;
+  }
+
+  #save-status-badge .badge-text {
+    display: none;
+  }
+
+  #save-status-badge {
+    padding: 6px 8px;
+  }
+
+  .bell-schedule-btn .bell-label,
+  .bell-schedule-btn svg {
+    display: none;
+  }
+
+  .bell-schedule-btn {
+    padding: 6px 8px;
   }
 }
 
@@ -6328,16 +6408,273 @@ html, body {
   }
 }
 
-@media (max-width: 680px) {
+/* ==========================================================================
+   Comprehensive Mobile & Tablet Responsive Engine
+   ========================================================================== */
+
+/* Universal Responsive Table Containers */
+.table-container,
+.timetable-document-sheet,
+.class-tt-table-container,
+.official-grid-table,
+.dash-matrix-table,
+.general-duty-table,
+.weekly-duty-table,
+.substitution-panel,
+.subject-dist-table-wrapper,
+.ess-matrix-table-wrap {
+  max-width: 100%;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ESS Form Grid 2-Column Responsive */
+.ess-form-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 1100px) {
+  .ess-hero-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   .ess-hero-kpis {
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+  }
+  .ess-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .ess-top-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .ess-portal-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ess-portal-title {
+    font-size: 20px;
+  }
+  .ess-top-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+  .ess-top-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 9px 12px;
+    font-size: 12px;
+    min-height: 40px;
+  }
+  .ess-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Universal Modals on Mobile */
+  .enterprise-modal-overlay,
+  .period-popover-overlay {
+    padding: 8px;
+    align-items: center;
+  }
+  .enterprise-modal-card,
+  .period-popover-card,
+  .modal-dialog {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    max-height: 92vh !important;
+    border-radius: 12px;
+  }
+  .enterprise-modal-header,
+  .modal-title-bar {
+    padding: 14px 16px;
+  }
+  .enterprise-modal-body,
+  .modal-content-area {
+    padding: 14px 16px;
+    max-height: calc(92vh - 125px);
+  }
+  .enterprise-modal-footer,
+  .popover-footer,
+  .modal-actions-bar {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Docked Bottom Export Bar */
+  .sticky-export-bar {
+    height: auto;
+    padding: 10px 14px;
+  }
+  .sticky-export-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .export-desc-group {
+    display: none;
+  }
+  .export-action-buttons {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .export-action-buttons .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Dashboard View Mobile Adaptations */
+  .dash-hero-card {
+    padding: 18px 16px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dash-hero-right {
+    align-items: flex-start;
+  }
+  .dash-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (max-width: 680px) {
+  .ess-top-actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .ess-top-btn {
+    font-size: 11px;
+    padding: 8px 6px;
+  }
+  .ess-security-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+  .ess-security-banner .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+  .ess-hero-card {
+    padding: 16px;
+    gap: 16px;
+  }
+  .ess-hero-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .ess-name-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ess-meta-text {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ess-hero-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+    width: 100%;
+  }
+  .ess-kpi-card {
+    padding: 12px 14px;
   }
   .ess-radar-card {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
   }
-  .ess-radar-next-slot {
-    text-align: left;
+  .ess-radar-card > div:last-child {
+    text-align: left !important;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .ess-radar-main-title {
+    font-size: 14px;
+  }
+  .ess-period-card {
+    padding: 12px;
+  }
+
+  /* Weekly Modal Mobile */
+  .ess-weekly-modal-card {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    max-height: 92vh !important;
+    margin: 8px auto;
+  }
+  .ess-weekly-summary-strip {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+  }
+  .ess-weekly-kpi-chip {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .ess-weekly-kpi-val {
+    font-size: 13px;
+  }
+  .ess-weekly-modal-footer {
+    flex-direction: column-reverse;
+    gap: 10px;
+    align-items: stretch !important;
+  }
+  .ess-weekly-modal-footer > div {
+    justify-content: center;
+    width: 100%;
+  }
+  .ess-weekly-modal-footer button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Leave Modal Mobile: Stacks into 1 column */
+  .ess-form-grid-2col {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ess-top-actions {
+    grid-template-columns: 1fr;
+  }
+  .ess-hero-kpis {
+    grid-template-columns: 1fr !important;
+  }
+  .dash-kpi-row {
+    grid-template-columns: 1fr;
+  }
+  .day-nav-bar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px 10px;
+    flex-wrap: nowrap;
+  }
+  .day-pill-btn {
+    flex-shrink: 0;
   }
 }
 
@@ -6621,9 +6958,13 @@ html, body {
     padding-top: 3px;
   }
 
-/* Quick Create button suppression in ESS Portal & for Teacher Role */
+/* Administrative controls suppression in ESS Portal & for Teacher Role */
 body.view-teacher-ess-view #btn-topbar-quick-create,
-body.role-teacher #btn-topbar-quick-create {
+body.role-teacher #btn-topbar-quick-create,
+body.view-teacher-ess-view #header-shift-selector,
+body.role-teacher #header-shift-selector,
+body.view-teacher-ess-view #header-bell-selector,
+body.role-teacher #header-bell-selector {
   display: none !important;
 }
 

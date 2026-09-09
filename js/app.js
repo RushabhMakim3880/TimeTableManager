@@ -1775,6 +1775,10 @@
       if (DOM.btnClearAllWeeklyDuties) DOM.btnClearAllWeeklyDuties.style.display = 'none';
       if (DOM.btnOpenAutoScheduler) DOM.btnOpenAutoScheduler.style.display = 'none';
       if (DOM.btnOpenAddSectionModal) DOM.btnOpenAddSectionModal.style.display = 'none';
+      const headerShift = document.getElementById('header-shift-selector');
+      if (headerShift) headerShift.style.display = 'none';
+      const headerBell = document.getElementById('header-bell-selector');
+      if (headerBell) headerBell.style.display = 'none';
 
       // 7. If active view is admin-only, redirect to teacher-ess-view
       const isAllowed = teacherTabs.some(t => {
@@ -1817,6 +1821,10 @@
       if (DOM.btnClearAllWeeklyDuties) DOM.btnClearAllWeeklyDuties.style.display = 'inline-flex';
       if (DOM.btnOpenAutoScheduler) DOM.btnOpenAutoScheduler.style.display = 'inline-flex';
       if (DOM.btnOpenAddSectionModal) DOM.btnOpenAddSectionModal.style.display = 'inline-flex';
+      const headerShift = document.getElementById('header-shift-selector');
+      if (headerShift) headerShift.style.display = (state.activeView === 'teacher-ess-view') ? 'none' : '';
+      const headerBell = document.getElementById('header-bell-selector');
+      if (headerBell) headerBell.style.display = (state.activeView === 'teacher-ess-view') ? 'none' : '';
 
       // If currently on teacher-ess-view, redirect away to dashboard
       if (state.activeView === 'teacher-ess-view') {
@@ -3237,6 +3245,16 @@
       } else {
         DOM.btnTopbarQuickCreate.style.display = 'inline-flex';
       }
+    }
+
+    // Shift selector & Bell schedule selector: Strictly hide on ESS portal or for teacher role
+    const headerShift = document.getElementById('header-shift-selector');
+    if (headerShift) {
+      headerShift.style.display = (isTeacher || viewName === 'teacher-ess-view') ? 'none' : '';
+    }
+    const headerBell = document.getElementById('header-bell-selector');
+    if (headerBell) {
+      headerBell.style.display = (isTeacher || viewName === 'teacher-ess-view') ? 'none' : '';
     }
 
     state.activeView = viewName;
@@ -4815,7 +4833,7 @@
         DOM.exportBarDesc.textContent = "Outputs your official weekly teaching schedule document (.docx).";
         DOM.btnDownloadSingleDay.style.display = 'none';
         DOM.btnDownloadAllDays.textContent = "Download My Schedule (.docx)";
-        DOM.btnDownloadAllDays.onclick = downloadTeacherDocx;
+        DOM.btnDownloadAllDays.onclick = downloadSingleTeacherDocx;
       } else {
         DOM.exportBarTitle.textContent = "Export Individual Faculty Timetables";
         DOM.exportBarDesc.textContent = "Outputs individual 1-page weekly schedules for each staff member.";
@@ -8104,7 +8122,7 @@
                 </div>
                 <div class="ess-slot-std" title="${escapeHtml(assignedStd.name)}">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color: #64748b; flex-shrink: 0;"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
-                  ${escapeHtml(assignedStd.name)}
+                  ${escapeHtml((assignedStd.name || '').replace('Standard: ', 'Std '))}
                 </div>
                 <div class="ess-room-tag">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="color: #94a3b8;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -8162,12 +8180,25 @@
       };
     }
 
+    function closeMobileSidebar() {
+      if (DOM.appSidebar) DOM.appSidebar.classList.remove('mobile-open');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (backdrop) backdrop.classList.remove('active');
+    }
+
     if (DOM.btnMobileSidebarToggle) {
       DOM.btnMobileSidebarToggle.onclick = () => {
         if (DOM.appSidebar) {
-          DOM.appSidebar.classList.toggle('mobile-open');
+          const isOpen = DOM.appSidebar.classList.toggle('mobile-open');
+          const backdrop = document.getElementById('sidebar-backdrop');
+          if (backdrop) backdrop.classList.toggle('active', isOpen);
         }
       };
+    }
+
+    const backdropEl = document.getElementById('sidebar-backdrop');
+    if (backdropEl) {
+      backdropEl.onclick = closeMobileSidebar;
     }
 
     // Dashboard Quick Export Button
@@ -8177,7 +8208,10 @@
 
     // View tabs
     DOM.viewTabBtns.forEach(btn => {
-      btn.onclick = () => switchView(btn.getAttribute('data-view'));
+      btn.onclick = () => {
+        switchView(btn.getAttribute('data-view'));
+        closeMobileSidebar();
+      };
     });
 
     if (DOM.btnCloseProfileModal) DOM.btnCloseProfileModal.onclick = () => DOM.schoolProfileModal.classList.remove('active');

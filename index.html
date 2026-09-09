@@ -148,6 +148,9 @@
       </div>
     </aside>
 
+    <!-- Mobile Navigation Drawer Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
     <!-- ====================================================================
          MAIN APP WORKSPACE (FULL WIDTH)
          ==================================================================== -->
@@ -2103,7 +2106,7 @@
             <input type="text" id="ess-leave-teacher-name" class="ess-modal-input" readonly>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="ess-form-grid-2col">
             <div class="ess-modal-field">
               <label class="ess-modal-label">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #64748b;"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
@@ -2184,7 +2187,7 @@
             <!-- Populated dynamically in app.js -->
           </div>
         </div>
-        <div class="enterprise-modal-footer" style="padding: 14px 24px; border-top: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+        <div class="enterprise-modal-footer ess-weekly-modal-footer" style="padding: 14px 24px; border-top: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-between; align-items: center;">
           <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b;">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="color: #94a3b8;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
             <span>Funland Educational Trust • Academic Year 2024-25</span>
