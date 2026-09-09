@@ -2078,30 +2078,38 @@
 
     <!-- Faculty Leave & Proxy Relief Request Modal -->
     <div class="enterprise-modal-overlay" id="ess-leave-modal" style="display: none;">
-      <div class="enterprise-modal-card" style="max-width: 520px;">
+      <div class="enterprise-modal-card ess-form-modal-card" style="max-width: 540px; width: 95%;">
         <div class="enterprise-modal-header">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 36px; height: 36px; border-radius: 10px; background: #eff6ff; display: flex; align-items: center; justify-content: center; color: #2563eb;">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 1px solid #bfdbfe; display: flex; align-items: center; justify-content: center; color: #1d4ed8; box-shadow: 0 2px 6px rgba(29, 78, 216, 0.12); flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
             </div>
             <div>
-              <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #0f172a;">Faculty Leave &amp; Proxy Request</h3>
-              <p style="margin: 2px 0 0 0; font-size: 12px; color: #64748b;">Submit planned or emergency absence for instant proxy scheduling.</p>
+              <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #0f172a; letter-spacing: -0.01em;">Faculty Leave &amp; Proxy Request</h3>
+              <p style="margin: 3px 0 0 0; font-size: 12.5px; color: #64748b;">Submit planned or emergency absence for instant proxy scheduling.</p>
             </div>
           </div>
-          <button class="modal-close-btn" id="btn-close-ess-leave-modal">&times;</button>
+          <button class="modal-close-btn" id="btn-close-ess-leave-modal" title="Close">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
 
-        <div class="enterprise-modal-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">
-          <div>
-            <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Faculty Member:</label>
-            <input type="text" id="ess-leave-teacher-name" class="popover-input" readonly style="background: #f8fafc; font-weight: 700; color: #1e293b;">
+        <div class="enterprise-modal-body" style="padding: 22px 26px; display: flex; flex-direction: column; gap: 16px;">
+          <div class="ess-modal-field">
+            <label class="ess-modal-label">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #64748b;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              Faculty Member:
+            </label>
+            <input type="text" id="ess-leave-teacher-name" class="ess-modal-input" readonly>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div>
-              <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Leave Day / Date:</label>
-              <select id="ess-leave-day-select" class="popover-input" style="font-weight: 600;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="ess-modal-field">
+              <label class="ess-modal-label">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #64748b;"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                Leave Day / Date:
+              </label>
+              <select id="ess-leave-day-select" class="ess-modal-select" style="font-weight: 600;">
                 <option value="Monday">Monday</option>
                 <option value="Tuesday">Tuesday</option>
                 <option value="Wednesday">Wednesday</option>
@@ -2109,35 +2117,44 @@
                 <option value="Friday">Friday</option>
               </select>
             </div>
-            <div>
-              <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Category:</label>
-              <select id="ess-leave-category" class="popover-input" style="font-weight: 600;">
-                <option value="Medical">Medical / Health Leave</option>
-                <option value="Personal">Urgent Personal Work</option>
-                <option value="Casual">Casual Leave (CL)</option>
-                <option value="Training">Academic Training / Workshop</option>
-                <option value="Emergency">Family Emergency</option>
+            <div class="ess-modal-field">
+              <label class="ess-modal-label">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #64748b;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                Category:
+              </label>
+              <select id="ess-leave-category" class="ess-modal-select" style="font-weight: 600;">
+                <option value="Medical">🏥 Medical / Health Leave</option>
+                <option value="Personal">💼 Urgent Personal Work</option>
+                <option value="Casual">☕ Casual Leave (CL)</option>
+                <option value="Training">🎓 Academic Workshop / Training</option>
+                <option value="Emergency">🚨 Family Emergency</option>
               </select>
             </div>
           </div>
 
-          <div>
-            <label style="display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px;">Reason / Notes:</label>
-            <textarea id="ess-leave-reason" class="popover-input" rows="3" placeholder="Enter brief justification or coverage handover notes..." style="resize: vertical; font-family: inherit; font-size: 13px;"></textarea>
+          <div class="ess-modal-field">
+            <label class="ess-modal-label">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #64748b;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              Reason / Notes:
+            </label>
+            <textarea id="ess-leave-reason" class="ess-modal-textarea" rows="3" placeholder="Enter brief justification or coverage handover notes..."></textarea>
           </div>
 
-          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 12px 16px; font-size: 12px; color: #166534;">
-            <div style="font-weight: 800; display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          <div class="ess-modal-notice-box">
+            <div style="font-weight: 800; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; color: #047857; font-size: 13px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
               Automated Relief Arrangement
             </div>
             <span>Submitting will mark you as on leave in attendance and automatically nominate free colleagues in your shift as relief proxies.</span>
           </div>
         </div>
 
-        <div class="enterprise-modal-footer" style="padding: 14px 24px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px;">
-          <button id="btn-cancel-ess-leave" class="btn btn-secondary btn-sm">Cancel</button>
-          <button id="btn-confirm-ess-leave" class="btn btn-primary btn-sm" style="font-weight: 700;">Submit Application</button>
+        <div class="enterprise-modal-footer" style="padding: 16px 26px; border-top: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: flex-end; gap: 12px;">
+          <button id="btn-cancel-ess-leave" class="btn btn-secondary btn-sm" style="font-weight: 600;">Cancel</button>
+          <button id="btn-confirm-ess-leave" class="btn btn-primary btn-sm" style="font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            Submit Application
+          </button>
         </div>
       </div>
     </div>
@@ -2158,7 +2175,9 @@
               <p style="margin: 3px 0 0 0; font-size: 12.5px; color: #64748b;" id="ess-weekly-modal-sub">Official 5-Day Academic Schedule &amp; Classroom Allocations</p>
             </div>
           </div>
-          <button class="modal-close-btn" id="btn-close-ess-weekly-modal" title="Close Matrix">&times;</button>
+          <button class="modal-close-btn" id="btn-close-ess-weekly-modal" title="Close Matrix">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
         <div class="enterprise-modal-body" style="padding: 20px 24px; overflow-x: auto; background: #f8fafc;">
           <div id="ess-weekly-grid-container">
@@ -2183,68 +2202,85 @@
 
     <!-- Faculty Change Password Modal -->
     <div class="enterprise-modal-overlay" id="ess-change-password-modal" style="display: none;">
-      <div class="enterprise-modal-card" style="max-width: 480px; width: 95%;">
+      <div class="enterprise-modal-card ess-form-modal-card" style="max-width: 490px; width: 95%;">
         <div class="enterprise-modal-header">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 38px; height: 38px; border-radius: 10px; background: #fef3c7; border: 1px solid #fde68a; display: flex; align-items: center; justify-content: center; color: #d97706;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #fcd34d; display: flex; align-items: center; justify-content: center; color: #b45309; box-shadow: 0 2px 6px rgba(217, 119, 6, 0.15); flex-shrink: 0;">
               <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
             </div>
             <div>
-              <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #0f172a;" id="ess-change-pw-title">Update Account Password</h3>
-              <p style="margin: 2px 0 0 0; font-size: 12px; color: #64748b;" id="ess-change-pw-subtitle">Set your confidential personal password for ERP access.</p>
+              <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #0f172a; letter-spacing: -0.01em;" id="ess-change-pw-title">Update Account Password</h3>
+              <p style="margin: 3px 0 0 0; font-size: 12.5px; color: #64748b;" id="ess-change-pw-subtitle">Set your confidential personal password for ERP access.</p>
             </div>
           </div>
-          <button class="modal-close-btn" id="btn-close-ess-change-pw">&times;</button>
+          <button class="modal-close-btn" id="btn-close-ess-change-pw" title="Close">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
 
-        <div class="enterprise-modal-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">
-          <div>
-            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Faculty Member:</label>
-            <input type="text" id="ess-change-pw-teacher" class="popover-input" readonly style="background: #f8fafc; font-weight: 700; color: #1e293b;">
+        <div class="enterprise-modal-body" style="padding: 22px 26px; display: flex; flex-direction: column; gap: 16px;">
+          <div class="ess-modal-field">
+            <label class="ess-modal-label">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #64748b;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              Faculty Member:
+            </label>
+            <input type="text" id="ess-change-pw-teacher" class="ess-modal-input" readonly>
           </div>
 
-          <div>
-            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Current Password (Default):</label>
+          <div class="ess-modal-field">
+            <label class="ess-modal-label">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #64748b;"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              Current Password (Default):
+            </label>
             <div class="pw-input-wrap">
-              <input type="password" id="ess-change-pw-current" class="popover-input" placeholder="Enter current default password">
+              <input type="password" id="ess-change-pw-current" class="ess-modal-input" placeholder="Enter current default password">
               <button type="button" class="pw-toggle-btn" data-target="ess-change-pw-current" title="Toggle password visibility">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
               </button>
             </div>
           </div>
 
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-              <label style="font-size: 12px; font-weight: 700; color: #334155;">New Confidential Password:</label>
-              <span style="font-size: 11px; color: #64748b;">Min 6 characters</span>
+          <div class="ess-modal-field">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label class="ess-modal-label" style="margin-bottom: 0;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #64748b;"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+                New Confidential Password:
+              </label>
+              <span style="font-size: 11px; font-weight: 600; color: #64748b;">Min 6 characters</span>
             </div>
             <div class="pw-input-wrap">
-              <input type="password" id="ess-change-pw-new" class="popover-input" placeholder="Enter secure new password">
+              <input type="password" id="ess-change-pw-new" class="ess-modal-input" placeholder="Enter secure new password">
               <button type="button" class="pw-toggle-btn" data-target="ess-change-pw-new" title="Toggle password visibility">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
               </button>
             </div>
           </div>
 
-          <div>
-            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">Confirm New Password:</label>
+          <div class="ess-modal-field">
+            <label class="ess-modal-label">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="color: #64748b;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              Confirm New Password:
+            </label>
             <div class="pw-input-wrap">
-              <input type="password" id="ess-change-pw-confirm" class="popover-input" placeholder="Confirm your new password">
+              <input type="password" id="ess-change-pw-confirm" class="ess-modal-input" placeholder="Confirm your new password">
               <button type="button" class="pw-toggle-btn" data-target="ess-change-pw-confirm" title="Toggle password visibility">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
               </button>
             </div>
           </div>
 
-          <div id="ess-change-pw-alert" style="display: none; padding: 10px 14px; border-radius: 8px; font-size: 12.5px; line-height: 1.4; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; align-items: center; gap: 8px;">
+          <div id="ess-change-pw-alert" style="display: none; padding: 11px 14px; border-radius: 10px; font-size: 12.5px; line-height: 1.4; background: #fef2f2; border: 1.5px solid #fecaca; color: #991b1b; align-items: center; gap: 8px;">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink: 0;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
             <span id="ess-change-pw-alert-msg">Passwords do not match.</span>
           </div>
         </div>
 
-        <div class="enterprise-modal-footer" style="padding: 14px 24px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px;">
-          <button id="btn-cancel-ess-change-pw" class="btn btn-secondary btn-sm">Remind Me Later</button>
-          <button id="btn-submit-ess-change-pw" class="btn btn-primary btn-sm" style="font-weight: 700;">Save New Password</button>
+        <div class="enterprise-modal-footer" style="padding: 16px 26px; border-top: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: flex-end; gap: 12px;">
+          <button id="btn-cancel-ess-change-pw" class="btn btn-secondary btn-sm" style="font-weight: 600;">Remind Me Later</button>
+          <button id="btn-submit-ess-change-pw" class="btn btn-primary btn-sm" style="font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+            Save New Password
+          </button>
         </div>
       </div>
     </div>
