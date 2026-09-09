@@ -46,6 +46,10 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
           Staff & Subject Roster
         </button>
+        <button id="btn-open-cloud-db" class="btn btn-secondary" title="Configure Cloud Database (Firebase Firestore) for Multi-Device Sync">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/></svg>
+          Cloud Database
+        </button>
         <button id="btn-export-json" class="btn btn-secondary" title="Export JSON backup file">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
           Backup
@@ -906,15 +910,107 @@
     </div>
   </div>
 
+  <!-- Enterprise Modal: Cloud Database (Firebase Firestore) -->
+  <div class="enterprise-modal-overlay" id="cloud-db-modal">
+    <div class="enterprise-modal-card" style="max-width: 680px;">
+      <div class="modal-title-bar">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary-color)"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/></svg>
+          <h3>Cloud Database (Firebase Firestore)</h3>
+        </div>
+        <button class="popover-close-btn" id="btn-close-cloud-db-modal">&times;</button>
+      </div>
+      <div class="modal-content-area" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Status Box -->
+        <div id="cloud-status-card" class="cloud-status-box unconfigured">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="cloud-status-indicator" id="cloud-status-dot"></span>
+              <div>
+                <strong id="cloud-status-title" style="font-size: 13px;">Firebase Cloud Sync: Offline / Local Mode</strong>
+                <div id="cloud-status-desc" style="font-size: 11.5px; color: var(--text-muted);">Enter your free Firebase configuration below to enable multi-device sync.</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button id="btn-cloud-sync-now" class="btn btn-secondary btn-sm" title="Force save current timetable to Cloud Firestore">
+                ☁️ Save to Cloud
+              </button>
+              <button id="btn-cloud-fetch-now" class="btn btn-secondary btn-sm" title="Pull latest timetable from Cloud Firestore">
+                🔄 Pull from Cloud
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuration Form -->
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">
+            FIREBASE CREDENTIALS
+          </label>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+            Values can be pasted here directly or configured in <code>js/firebase-config.js</code>.
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 2px;">API KEY</label>
+              <input type="text" id="fb-input-apiKey" class="popover-input" placeholder="AIzaSy...">
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 2px;">PROJECT ID</label>
+              <input type="text" id="fb-input-projectId" class="popover-input" placeholder="funland-timetable">
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 2px;">AUTH DOMAIN</label>
+              <input type="text" id="fb-input-authDomain" class="popover-input" placeholder="project-id.firebaseapp.com">
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 2px;">APP ID</label>
+              <input type="text" id="fb-input-appId" class="popover-input" placeholder="1:123456789:web:abcdef">
+            </div>
+          </div>
+          <div style="margin-top: 10px;">
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 2px;">OR PASTE FULL FIREBASE CONFIG CODE SNIPPET</label>
+            <textarea id="fb-input-rawSnippet" class="popover-input" style="height: 65px; font-family: monospace; font-size: 11px; resize: vertical;" placeholder='const firebaseConfig = { apiKey: "...", projectId: "..." };'></textarea>
+          </div>
+        </div>
+
+        <!-- 3-Step Setup Instructions Box -->
+        <div class="cloud-instructions-box">
+          <div style="font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary);">
+            📋 Quick 2-Minute Setup Guide (100% Free):
+          </div>
+          <ol style="margin: 0; padding-left: 18px; font-size: 11.5px; color: var(--text-secondary); line-height: 1.6;">
+            <li>Visit <a href="https://console.firebase.google.com/" target="_blank" rel="noopener" style="color: var(--primary-color); font-weight: 600; text-decoration: underline;">console.firebase.google.com</a> and click <strong>"Add project"</strong>.</li>
+            <li>Click the Web icon (<strong>&lt;/&gt;</strong>), register an app name, and copy the <code>firebaseConfig</code> keys.</li>
+            <li>In the left sidebar, click <strong>"Build" &rarr; "Firestore Database" &rarr; "Create database"</strong> &rarr; select <strong>"Start in test mode"</strong> (allows read/write) &rarr; Click Enable.</li>
+            <li>Paste your keys into the boxes above and click <strong>"Save &amp; Connect"</strong>!</li>
+          </ol>
+        </div>
+      </div>
+      <div class="modal-actions-bar" style="justify-content: space-between;">
+        <button id="btn-disconnect-cloud" class="btn btn-secondary btn-sm" style="color: #dc2626;">Disconnect</button>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-close-cloud-db-footer" class="btn btn-secondary btn-sm">Close</button>
+          <button id="btn-save-cloud-config" class="btn btn-primary btn-sm">Save &amp; Connect</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="toast-area" id="toast-container"></div>
 
   <!-- Scripts -->
   <script src="js/vendor/jszip.min.js"></script>
-  <script src="js/template-assets.js?v=5"></script>
-  <script src="js/default-data.js?v=5"></script>
-  <script src="js/docx-generator.js?v=5"></script>
-  <script src="js/app.js?v=5"></script>
+  <!-- Firebase SDK Compat via CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js?v=6"></script>
+  <script src="js/firebase-sync.js?v=6"></script>
+  <script src="js/template-assets.js?v=6"></script>
+  <script src="js/default-data.js?v=6"></script>
+  <script src="js/docx-generator.js?v=6"></script>
+  <script src="js/app.js?v=6"></script>
 
 </body>
 </html>

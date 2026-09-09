@@ -168,6 +168,12 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.status-pill:hover {
+  filter: brightness(0.96);
 }
 
 .status-pill .dot {
@@ -175,6 +181,101 @@ body {
   height: 5px;
   border-radius: 50%;
   background: var(--status-success);
+}
+
+.status-pill.cloud-synced {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+.status-pill.cloud-synced .dot {
+  background: #10b981;
+}
+
+.status-pill.cloud-syncing {
+  background: #eff6ff;
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+.status-pill.cloud-syncing .dot {
+  background: #3b82f6;
+  animation: pulse-dot 1s infinite;
+}
+
+.status-pill.cloud-offline {
+  background: #fffbeb;
+  color: #92400e;
+  border-color: #fde68a;
+}
+.status-pill.cloud-offline .dot {
+  background: #f59e0b;
+}
+
+.status-pill.cloud-unconfigured {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+.status-pill.cloud-unconfigured .dot {
+  background: #94a3b8;
+}
+
+@keyframes pulse-dot {
+  0% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.4; transform: scale(0.9); }
+}
+
+/* Cloud Status Card in Modal */
+.cloud-status-box {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--bg-subtle, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+.cloud-status-box.connected {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+.cloud-status-box.unconfigured {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+.cloud-status-box.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+.cloud-status-box.offline {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.cloud-status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #94a3b8;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.cloud-status-box.connected .cloud-status-indicator {
+  background: #10b981;
+}
+.cloud-status-box.unconfigured .cloud-status-indicator {
+  background: #94a3b8;
+}
+.cloud-status-box.error .cloud-status-indicator {
+  background: #ef4444;
+}
+.cloud-status-box.offline .cloud-status-indicator {
+  background: #f59e0b;
+}
+
+.cloud-instructions-box {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
 }
 
 .brand-info p {

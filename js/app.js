@@ -215,6 +215,25 @@
     btnAddSubject: document.getElementById('btn-add-subject'),
     settingsTeacherSubjectMapping: document.getElementById('settings-teacher-subject-mapping'),
 
+    // Cloud Database Modal (Firebase Firestore)
+    btnOpenCloudDb: document.getElementById('btn-open-cloud-db'),
+    cloudDbModal: document.getElementById('cloud-db-modal'),
+    btnCloseCloudDbModal: document.getElementById('btn-close-cloud-db-modal'),
+    btnCloseCloudDbFooter: document.getElementById('btn-close-cloud-db-footer'),
+    btnSaveCloudConfig: document.getElementById('btn-save-cloud-config'),
+    btnDisconnectCloud: document.getElementById('btn-disconnect-cloud'),
+    btnCloudSyncNow: document.getElementById('btn-cloud-sync-now'),
+    btnCloudFetchNow: document.getElementById('btn-cloud-fetch-now'),
+    cloudStatusCard: document.getElementById('cloud-status-card'),
+    cloudStatusDot: document.getElementById('cloud-status-dot'),
+    cloudStatusTitle: document.getElementById('cloud-status-title'),
+    cloudStatusDesc: document.getElementById('cloud-status-desc'),
+    fbInputApiKey: document.getElementById('fb-input-apiKey'),
+    fbInputProjectId: document.getElementById('fb-input-projectId'),
+    fbInputAuthDomain: document.getElementById('fb-input-authDomain'),
+    fbInputAppId: document.getElementById('fb-input-appId'),
+    fbInputRawSnippet: document.getElementById('fb-input-rawSnippet'),
+
     // Toasts
     toastContainer: document.getElementById('toast-container')
   };
@@ -240,6 +259,9 @@
     });
     // On local startup, ensure disk matches current localStorage state
     syncStateToDisk();
+
+    // Initialize Firebase Firestore Cloud Database
+    initCloudSyncIntegration();
   }
 
   // --- State Persistence ---
@@ -356,13 +378,20 @@
 
   function saveState(silent = false) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    if (!silent && DOM.saveBadge) {
-      DOM.saveBadge.innerHTML = '<span class="dot"></span> Saved';
-      setTimeout(() => {
-        DOM.saveBadge.innerHTML = '<span class="dot"></span> Auto-Saved';
-      }, 1500);
-    }
+
+    // Auto-save to local disk (when running on localhost server)
     syncStateToDisk();
+
+    // Auto-save to Firebase Firestore Cloud (multi-device cloud sync)
+    if (window.FirebaseSync && window.FirebaseSync.isConfigured()) {
+      window.FirebaseSync.save(state);
+    } else {
+      if (!silent && DOM.saveBadge) {
+        DOM.saveBadge.className = 'status-pill cloud-unconfigured';
+        DOM.saveBadge.innerHTML = '<span class="dot"></span> Saved Locally';
+        DOM.saveBadge.title = 'Saved in browser. Click here to connect Cloud Database (Firebase) for Netlify.';
+      }
+    }
   }
 
   let syncDiskTimeout = null;
@@ -379,7 +408,7 @@
         body: JSON.stringify(state)
       })
       .then(res => {
-        if (res.ok && DOM.saveBadge) {
+        if (res.ok && DOM.saveBadge && (!window.FirebaseSync || !window.FirebaseSync.isConfigured())) {
           DOM.saveBadge.title = 'Saved to browser & disk (js/default-data.js)';
         }
       })
@@ -387,6 +416,229 @@
         // Silent catch if server is static
       });
     }, 350);
+  }
+
+  // --- Cloud Database (Firebase Firestore) Integration ---
+  function initCloudSyncIntegration() {
+    if (!window.FirebaseSync) return;
+
+    // Listen for connection / sync status updates
+    window.FirebaseSync.onStatusChange(updateCloudStatusUI);
+
+    // If configured, initialize connection
+    if (window.FirebaseSync.isConfigured()) {
+      window.FirebaseSync.init().then(async (res) => {
+        if (res.success) {
+          // Attempt to pull existing cloud document
+          const cloudData = await window.FirebaseSync.fetch();
+          if (cloudData && cloudData.schedules) {
+            console.log('[Firebase Sync] Hydrating timetable from Cloud Firestore');
+            state = Object.assign({}, state, cloudData);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            renderSchoolProfile();
+            renderAll();
+            showToast('Loaded latest timetable from Cloud Firestore', 'success');
+          } else {
+            // First time connection: upload current timetable to Cloud
+            console.log('[Firebase Sync] Cloud empty. Seeding initial timetable to Firestore');
+            window.FirebaseSync.save(state, { immediate: true });
+          }
+
+          // Start listening to real-time changes made on other devices
+          window.FirebaseSync.listen(handleRemoteCloudUpdate);
+        }
+      });
+    } else {
+      updateCloudStatusUI('unconfigured');
+    }
+  }
+
+  function handleRemoteCloudUpdate(cloudData) {
+    if (!cloudData || !cloudData.schedules) return;
+    console.log('[Firebase Sync] Remote timetable update received from another device');
+    state = Object.assign({}, state, cloudData);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    renderSchoolProfile();
+    renderAll();
+    showToast('Timetable updated from another device in real time', 'info');
+  }
+
+  function updateCloudStatusUI(status, details = {}) {
+    if (!DOM.saveBadge) return;
+
+    const lastSavedText = details.lastSavedAt ? details.lastSavedAt.toLocaleTimeString() : '';
+
+    if (status === 'synced') {
+      DOM.saveBadge.className = 'status-pill cloud-synced';
+      DOM.saveBadge.innerHTML = '<span class="dot"></span> Cloud Synced';
+      DOM.saveBadge.title = `Saved to Google Firebase Firestore (${lastSavedText}). Click to open Cloud Settings.`;
+    } else if (status === 'syncing') {
+      DOM.saveBadge.className = 'status-pill cloud-syncing';
+      DOM.saveBadge.innerHTML = '<span class="dot"></span> Syncing...';
+      DOM.saveBadge.title = 'Uploading timetable changes to Cloud Firestore...';
+    } else if (status === 'offline') {
+      DOM.saveBadge.className = 'status-pill cloud-offline';
+      DOM.saveBadge.innerHTML = '<span class="dot"></span> Offline (Saved)';
+      DOM.saveBadge.title = 'Offline: Changes saved locally and will sync to Cloud once reconnected.';
+    } else if (status === 'connected') {
+      DOM.saveBadge.className = 'status-pill cloud-synced';
+      DOM.saveBadge.innerHTML = '<span class="dot"></span> Cloud Connected';
+      DOM.saveBadge.title = 'Connected to Firestore. Click to open Cloud Settings.';
+    } else if (status === 'error') {
+      DOM.saveBadge.className = 'status-pill cloud-offline';
+      DOM.saveBadge.innerHTML = '<span class="dot"></span> Cloud Error';
+      DOM.saveBadge.title = details.message || 'Error connecting to Firestore. Click for details.';
+    } else {
+      // unconfigured
+      DOM.saveBadge.className = 'status-pill cloud-unconfigured';
+      DOM.saveBadge.innerHTML = '<span class="dot"></span> Saved Locally';
+      DOM.saveBadge.title = 'Saved in browser. Click here to connect Cloud Database (Firebase) for Netlify.';
+    }
+
+    // Update modal card status if present
+    if (DOM.cloudStatusCard && DOM.cloudStatusTitle && DOM.cloudStatusDesc) {
+      DOM.cloudStatusCard.className = `cloud-status-box ${status === 'synced' ? 'connected' : status}`;
+      if (status === 'synced' || status === 'connected') {
+        DOM.cloudStatusTitle.textContent = 'Connected to Cloud Firestore';
+        DOM.cloudStatusDesc.textContent = `Multi-device cloud synchronization is active.${lastSavedText ? ' Last synced at ' + lastSavedText : ''}`;
+      } else if (status === 'syncing') {
+        DOM.cloudStatusTitle.textContent = 'Syncing with Cloud...';
+        DOM.cloudStatusDesc.textContent = details.message || 'Saving state to Firestore...';
+      } else if (status === 'offline') {
+        DOM.cloudStatusTitle.textContent = 'Offline Mode (Local Auto-Save)';
+        DOM.cloudStatusDesc.textContent = 'You are currently offline. Edits are saved in local storage and will sync automatically when back online.';
+      } else if (status === 'error') {
+        DOM.cloudStatusTitle.textContent = 'Firebase Connection Error';
+        DOM.cloudStatusDesc.textContent = details.message || 'Check your Firebase keys and Firestore database rules.';
+      } else {
+        DOM.cloudStatusTitle.textContent = 'Firebase Cloud Sync: Offline / Local Mode';
+        DOM.cloudStatusDesc.textContent = 'Enter your free Firebase configuration below to enable multi-device sync.';
+      }
+    }
+  }
+
+  function openCloudDbModal() {
+    if (!DOM.cloudDbModal) return;
+    const cfg = window.FirebaseSync ? window.FirebaseSync.getConfig() : null;
+    if (cfg) {
+      if (DOM.fbInputApiKey) DOM.fbInputApiKey.value = cfg.apiKey || '';
+      if (DOM.fbInputProjectId) DOM.fbInputProjectId.value = cfg.projectId || '';
+      if (DOM.fbInputAuthDomain) DOM.fbInputAuthDomain.value = cfg.authDomain || '';
+      if (DOM.fbInputAppId) DOM.fbInputAppId.value = cfg.appId || '';
+    }
+    updateCloudStatusUI(window.FirebaseSync ? window.FirebaseSync.getStatus() : 'unconfigured', {
+      lastSavedAt: window.FirebaseSync ? window.FirebaseSync.getLastSavedAt() : null
+    });
+    DOM.cloudDbModal.classList.add('active');
+  }
+
+  function parseFirebaseSnippet(raw) {
+    if (!raw || !raw.trim()) return null;
+    const str = raw.trim();
+    try {
+      return JSON.parse(str);
+    } catch (e) {}
+
+    const extract = (key) => {
+      const match = str.match(new RegExp(`${key}\\s*:\\s*["']([^"']+)["']`));
+      return match ? match[1] : '';
+    };
+
+    const apiKey = extract('apiKey');
+    const projectId = extract('projectId');
+    const authDomain = extract('authDomain');
+    const appId = extract('appId');
+    const storageBucket = extract('storageBucket');
+    const messagingSenderId = extract('messagingSenderId');
+
+    if (apiKey || projectId) {
+      return { apiKey, projectId, authDomain, appId, storageBucket, messagingSenderId };
+    }
+    return null;
+  }
+
+  async function handleSaveCloudConfig() {
+    let cfg = null;
+    const raw = DOM.fbInputRawSnippet ? DOM.fbInputRawSnippet.value.trim() : '';
+    if (raw) {
+      cfg = parseFirebaseSnippet(raw);
+    }
+    if (!cfg) {
+      cfg = {
+        apiKey: DOM.fbInputApiKey ? DOM.fbInputApiKey.value.trim() : '',
+        projectId: DOM.fbInputProjectId ? DOM.fbInputProjectId.value.trim() : '',
+        authDomain: DOM.fbInputAuthDomain ? DOM.fbInputAuthDomain.value.trim() : '',
+        appId: DOM.fbInputAppId ? DOM.fbInputAppId.value.trim() : ''
+      };
+    }
+
+    if (!cfg.apiKey || !cfg.projectId) {
+      showToast('Please enter at least an API Key and Project ID', 'error');
+      return;
+    }
+
+    if (DOM.fbInputApiKey) DOM.fbInputApiKey.value = cfg.apiKey;
+    if (DOM.fbInputProjectId) DOM.fbInputProjectId.value = cfg.projectId;
+    if (DOM.fbInputAuthDomain) DOM.fbInputAuthDomain.value = cfg.authDomain || '';
+    if (DOM.fbInputAppId) DOM.fbInputAppId.value = cfg.appId || '';
+
+    showToast('Connecting to Firebase Firestore...', 'info');
+    const res = await window.FirebaseSync.saveConfig(cfg);
+    if (res.success) {
+      showToast('Successfully connected to Firebase Firestore!', 'success');
+      // Sync current timetable to Cloud
+      await window.FirebaseSync.save(state, { immediate: true });
+      window.FirebaseSync.listen(handleRemoteCloudUpdate);
+      setTimeout(() => {
+        if (DOM.cloudDbModal) DOM.cloudDbModal.classList.remove('active');
+      }, 900);
+    } else {
+      showToast('Connection failed: ' + (res.error ? res.error.message : (res.reason || 'Check keys')), 'error');
+    }
+  }
+
+  function handleDisconnectCloud() {
+    if (confirm('Disconnect from Firebase Cloud Database? The app will continue saving locally in this browser.')) {
+      if (window.FirebaseSync) window.FirebaseSync.clearConfig();
+      if (DOM.fbInputApiKey) DOM.fbInputApiKey.value = '';
+      if (DOM.fbInputProjectId) DOM.fbInputProjectId.value = '';
+      if (DOM.fbInputAuthDomain) DOM.fbInputAuthDomain.value = '';
+      if (DOM.fbInputAppId) DOM.fbInputAppId.value = '';
+      if (DOM.fbInputRawSnippet) DOM.fbInputRawSnippet.value = '';
+      showToast('Disconnected from Cloud Database', 'info');
+    }
+  }
+
+  async function handleCloudSyncNow() {
+    if (!window.FirebaseSync || !window.FirebaseSync.isConfigured()) {
+      showToast('Firebase is not configured. Please enter credentials first.', 'error');
+      return;
+    }
+    showToast('Uploading timetable to Cloud Firestore...', 'info');
+    const res = await window.FirebaseSync.save(state, { immediate: true });
+    if (res.success) {
+      showToast('Cloud sync complete!', 'success');
+    } else {
+      showToast('Sync failed: ' + (res.error ? res.error.message : 'Unknown error'), 'error');
+    }
+  }
+
+  async function handleCloudFetchNow() {
+    if (!window.FirebaseSync || !window.FirebaseSync.isConfigured()) {
+      showToast('Firebase is not configured. Please enter credentials first.', 'error');
+      return;
+    }
+    showToast('Fetching latest timetable from Cloud Firestore...', 'info');
+    const cloudData = await window.FirebaseSync.fetch();
+    if (cloudData && cloudData.schedules) {
+      state = Object.assign({}, state, cloudData);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderSchoolProfile();
+      renderAll();
+      showToast('Timetable loaded from Cloud Firestore', 'success');
+    } else {
+      showToast('No timetable found in Cloud Firestore yet', 'info');
+    }
   }
 
   // --- School Profile & Branding ---
@@ -2538,6 +2790,28 @@
     DOM.btnImportJson.onclick = () => DOM.importFileInput.click();
     DOM.importFileInput.onchange = importJsonRestore;
 
+    // Cloud Database Modal Actions
+    if (DOM.btnOpenCloudDb) DOM.btnOpenCloudDb.onclick = openCloudDbModal;
+    if (DOM.saveBadge) DOM.saveBadge.onclick = openCloudDbModal;
+    if (DOM.btnCloseCloudDbModal) DOM.btnCloseCloudDbModal.onclick = () => DOM.cloudDbModal.classList.remove('active');
+    if (DOM.btnCloseCloudDbFooter) DOM.btnCloseCloudDbFooter.onclick = () => DOM.cloudDbModal.classList.remove('active');
+    if (DOM.btnSaveCloudConfig) DOM.btnSaveCloudConfig.onclick = handleSaveCloudConfig;
+    if (DOM.btnDisconnectCloud) DOM.btnDisconnectCloud.onclick = handleDisconnectCloud;
+    if (DOM.btnCloudSyncNow) DOM.btnCloudSyncNow.onclick = handleCloudSyncNow;
+    if (DOM.btnCloudFetchNow) DOM.btnCloudFetchNow.onclick = handleCloudFetchNow;
+
+    if (DOM.fbInputRawSnippet) {
+      DOM.fbInputRawSnippet.oninput = () => {
+        const parsed = parseFirebaseSnippet(DOM.fbInputRawSnippet.value);
+        if (parsed) {
+          if (DOM.fbInputApiKey && parsed.apiKey) DOM.fbInputApiKey.value = parsed.apiKey;
+          if (DOM.fbInputProjectId && parsed.projectId) DOM.fbInputProjectId.value = parsed.projectId;
+          if (DOM.fbInputAuthDomain && parsed.authDomain) DOM.fbInputAuthDomain.value = parsed.authDomain;
+          if (DOM.fbInputAppId && parsed.appId) DOM.fbInputAppId.value = parsed.appId;
+        }
+      };
+    }
+
     // Period Popover Modal
     DOM.btnClosePeriodModal.onclick = () => DOM.periodModal.classList.remove('active');
     DOM.btnModalCancel.onclick = () => DOM.periodModal.classList.remove('active');
@@ -2552,7 +2826,7 @@
     };
 
     // Close Modals on background click
-    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal].forEach(m => {
+    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal, DOM.cloudDbModal].forEach(m => {
       if (m) m.onclick = (e) => { if (e.target === m) m.classList.remove('active'); };
     });
 
@@ -2565,6 +2839,7 @@
         if (DOM.copyModal) DOM.copyModal.classList.remove('active');
         if (DOM.settingsModal) DOM.settingsModal.classList.remove('active');
         if (DOM.schoolProfileModal) DOM.schoolProfileModal.classList.remove('active');
+        if (DOM.cloudDbModal) DOM.cloudDbModal.classList.remove('active');
       }
     };
   }
