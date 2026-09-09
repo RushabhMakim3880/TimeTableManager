@@ -1,5 +1,5 @@
 // Default presets for School Timetable Management System
-// Auto-synchronized from local edits on 2026-09-09T20:45:47.174Z
+// Auto-synchronized from local edits on 2026-09-09T21:13:34.015Z
 
 const DEFAULT_DATA = {
   "schoolProfile": {
@@ -21,7 +21,8 @@ const DEFAULT_DATA = {
       "baseName": "Standard: 3",
       "sup": "rd",
       "shift": "afternoon",
-      "room": "Room 101"
+      "room": "Room 101",
+      "section": "A"
     },
     {
       "id": "std_4",
@@ -29,7 +30,8 @@ const DEFAULT_DATA = {
       "baseName": "Standard: 4",
       "sup": "th",
       "shift": "afternoon",
-      "room": "Room 102"
+      "room": "Room 102",
+      "section": "A"
     },
     {
       "id": "std_5",
@@ -37,7 +39,8 @@ const DEFAULT_DATA = {
       "baseName": "Standard: 5",
       "sup": "th",
       "shift": "afternoon",
-      "room": "Room 103"
+      "room": "Room 103",
+      "section": "A"
     },
     {
       "id": "std_6",
@@ -45,7 +48,8 @@ const DEFAULT_DATA = {
       "baseName": "Standard: 6",
       "sup": "th",
       "shift": "afternoon",
-      "room": "Room 201"
+      "room": "Room 201",
+      "section": "A"
     },
     {
       "id": "std_7",
@@ -53,7 +57,8 @@ const DEFAULT_DATA = {
       "baseName": "Standard: 7",
       "sup": "th",
       "shift": "afternoon",
-      "room": "Room 202"
+      "room": "Room 202",
+      "section": "A"
     },
     {
       "id": "std_8",
@@ -61,7 +66,8 @@ const DEFAULT_DATA = {
       "baseName": "Standard: 8",
       "sup": "th",
       "shift": "afternoon",
-      "room": "Room 203"
+      "room": "Room 203",
+      "section": "A"
     },
     {
       "id": "std_nursery",
@@ -69,7 +75,8 @@ const DEFAULT_DATA = {
       "baseName": "Nursery",
       "sup": "",
       "shift": "morning",
-      "room": "Pre-Primary Hall"
+      "room": "Pre-Primary Hall",
+      "section": "A"
     },
     {
       "id": "std_jr_kg",
@@ -77,7 +84,8 @@ const DEFAULT_DATA = {
       "baseName": "Jr. KG",
       "sup": "",
       "shift": "morning",
-      "room": "Room KG-1"
+      "room": "Room KG-1",
+      "section": "A"
     },
     {
       "id": "std_sr_kg",
@@ -85,7 +93,8 @@ const DEFAULT_DATA = {
       "baseName": "Sr. KG",
       "sup": "",
       "shift": "morning",
-      "room": "Room KG-2"
+      "room": "Room KG-2",
+      "section": "A"
     },
     {
       "id": "std_1",
@@ -93,7 +102,8 @@ const DEFAULT_DATA = {
       "baseName": "Standard: 1",
       "sup": "st",
       "shift": "morning",
-      "room": "Room 001"
+      "room": "Room 001",
+      "section": "A"
     },
     {
       "id": "std_2",
@@ -101,7 +111,8 @@ const DEFAULT_DATA = {
       "baseName": "Standard: 2",
       "sup": "nd",
       "shift": "morning",
-      "room": "Room 002"
+      "room": "Room 002",
+      "section": "A"
     }
   ],
   "periods": [
@@ -156,73 +167,73 @@ const DEFAULT_DATA = {
   ],
   "teacherProfiles": {
     "Alpa Ma'am": {
-      "assignedShift": "afternoon",
-      "halfDayAvailability": "all",
       "maxPeriods": 5,
       "primarySubject": "Maths",
+      "assignedShift": "afternoon",
+      "halfDayAvailability": "all",
       "workSchedule": "full_day"
     },
     "Astha Ma'am": {
-      "assignedShift": "afternoon",
-      "halfDayAvailability": "all",
       "maxPeriods": 5,
       "primarySubject": "Computer",
+      "assignedShift": "afternoon",
+      "halfDayAvailability": "all",
       "workSchedule": "full_day"
     },
     "Dolly Ma'am": {
-      "assignedShift": "afternoon",
-      "halfDayAvailability": "all",
       "maxPeriods": 5,
       "primarySubject": "Maths",
+      "assignedShift": "afternoon",
+      "halfDayAvailability": "all",
       "workSchedule": "full_day"
     },
     "Khushi Ma'am": {
-      "assignedShift": "afternoon",
-      "halfDayAvailability": "all",
       "maxPeriods": 5,
       "primarySubject": "English",
+      "assignedShift": "afternoon",
+      "halfDayAvailability": "all",
       "workSchedule": "full_day"
     },
     "Manali Ma'am": {
-      "assignedShift": "afternoon",
-      "halfDayAvailability": "all",
       "maxPeriods": 5,
       "primarySubject": "Computer",
+      "assignedShift": "afternoon",
+      "halfDayAvailability": "all",
       "workSchedule": "full_day"
     },
     "Payal Ma'am": {
-      "assignedShift": "afternoon",
-      "halfDayAvailability": "first_half",
       "maxPeriods": 5,
       "primarySubject": "English",
-      "workSchedule": "half_day"
-    },
-    "Priya Ma'am": {
       "assignedShift": "afternoon",
       "halfDayAvailability": "all",
+      "workSchedule": "full_day"
+    },
+    "Priya Ma'am": {
       "maxPeriods": 5,
       "primarySubject": "Gujarati",
+      "assignedShift": "afternoon",
+      "halfDayAvailability": "all",
       "workSchedule": "full_day"
     },
     "Sakina Ma'am": {
-      "assignedShift": "afternoon",
-      "halfDayAvailability": "all",
       "maxPeriods": 5,
       "primarySubject": "Social Science",
+      "assignedShift": "afternoon",
+      "halfDayAvailability": "all",
       "workSchedule": "full_day"
     },
     "Taniya Ma'am": {
-      "assignedShift": "afternoon",
-      "halfDayAvailability": "all",
       "maxPeriods": 5,
       "primarySubject": "Science",
+      "assignedShift": "afternoon",
+      "halfDayAvailability": "all",
       "workSchedule": "full_day"
     },
     "Yamin Ma'am": {
-      "assignedShift": "afternoon",
-      "halfDayAvailability": "all",
       "maxPeriods": 5,
       "primarySubject": "Environment",
+      "assignedShift": "afternoon",
+      "halfDayAvailability": "all",
       "workSchedule": "full_day"
     }
   },
@@ -237,7 +248,9 @@ const DEFAULT_DATA = {
     "Hindi",
     "Sanskrit",
     "Drawing",
-    "P.T."
+    "P.T.",
+    "Robotics & AI",
+    "Vedic Math"
   ],
   "days": [
     "Monday",
@@ -248,6 +261,164 @@ const DEFAULT_DATA = {
     "Saturday"
   ],
   "initialSchedules": {
+    "Friday": {
+      "p1": {
+        "std_3": {
+          "subject": "English",
+          "teacher": "Payal Ma'am"
+        },
+        "std_4": {
+          "subject": "Environment",
+          "teacher": "Yamin Ma'am"
+        },
+        "std_5": {
+          "subject": "Computer",
+          "teacher": "Manali Ma'am"
+        },
+        "std_6": {
+          "subject": "Social Science",
+          "teacher": "Sakina Ma'am"
+        },
+        "std_7": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        },
+        "std_8": {
+          "subject": "Maths",
+          "teacher": "Alpa Ma'am"
+        }
+      },
+      "p2": {
+        "std_3": {
+          "subject": "Environment",
+          "teacher": "Yamin Ma'am"
+        },
+        "std_4": {
+          "subject": "Computer",
+          "teacher": "Manali Ma'am"
+        },
+        "std_5": {
+          "subject": "English",
+          "teacher": "Payal Ma'am"
+        },
+        "std_6": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        },
+        "std_7": {
+          "subject": "Social Science",
+          "teacher": "Sakina Ma'am"
+        },
+        "std_8": {
+          "subject": "Science",
+          "teacher": "Taniya Ma'am"
+        }
+      },
+      "p3": {
+        "std_3": {
+          "subject": "Computer",
+          "teacher": "Manali Ma'am"
+        },
+        "std_4": {
+          "subject": "Maths",
+          "teacher": "Dolly Ma'am"
+        },
+        "std_5": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        },
+        "std_6": {
+          "subject": "Maths",
+          "teacher": "Alpa Ma'am"
+        },
+        "std_7": {
+          "subject": "Science",
+          "teacher": "Taniya Ma'am"
+        },
+        "std_8": {
+          "subject": "Social Science",
+          "teacher": "Sakina Ma'am"
+        }
+      },
+      "p4": {
+        "std_3": {
+          "subject": "Maths",
+          "teacher": "Dolly Ma'am"
+        },
+        "std_4": {
+          "subject": "English",
+          "teacher": "Payal Ma'am"
+        },
+        "std_5": {
+          "subject": "Environment",
+          "teacher": "Yamin Ma'am"
+        },
+        "std_6": {
+          "subject": "English",
+          "teacher": "Khushi Ma'am"
+        },
+        "std_7": {
+          "subject": "Computer",
+          "teacher": "Astha Ma'am"
+        },
+        "std_8": {
+          "subject": "Maths",
+          "teacher": "Alpa Ma'am"
+        }
+      },
+      "p5": {
+        "std_3": {
+          "subject": "Environment",
+          "teacher": "Yamin Ma'am"
+        },
+        "std_4": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        },
+        "std_5": {
+          "subject": "English",
+          "teacher": "Payal Ma'am"
+        },
+        "std_6": {
+          "subject": "Science",
+          "teacher": "Taniya Ma'am"
+        },
+        "std_7": {
+          "subject": "English",
+          "teacher": "Khushi Ma'am"
+        },
+        "std_8": {
+          "subject": "Computer",
+          "teacher": "Astha Ma'am"
+        }
+      },
+      "p6": {
+        "std_3": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        },
+        "std_4": {
+          "subject": "Maths",
+          "teacher": "Dolly Ma'am"
+        },
+        "std_5": {
+          "subject": "Environment",
+          "teacher": "Yamin Ma'am"
+        },
+        "std_6": {
+          "subject": "Computer",
+          "teacher": "Astha Ma'am"
+        },
+        "std_7": {
+          "subject": "Maths",
+          "teacher": "Alpa Ma'am"
+        },
+        "std_8": {
+          "subject": "English",
+          "teacher": "Khushi Ma'am"
+        }
+      }
+    },
     "Monday": {
       "p1": {
         "std_3": {
@@ -403,6 +574,160 @@ const DEFAULT_DATA = {
         "std_8": {
           "subject": "Computer",
           "teacher": "Astha Ma'am"
+        }
+      }
+    },
+    "Thursday": {
+      "p1": {
+        "std_3": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        },
+        "std_4": {
+          "subject": "Computer",
+          "teacher": "Manali Ma'am"
+        },
+        "std_5": {
+          "subject": "English",
+          "teacher": "Payal Ma'am"
+        },
+        "std_6": {
+          "subject": "Science",
+          "teacher": "Taniya Ma'am"
+        },
+        "std_7": {
+          "subject": "Maths",
+          "teacher": "Alpa Ma'am"
+        },
+        "std_8": {
+          "subject": "Social Science",
+          "teacher": "Sakina Ma'am"
+        }
+      },
+      "p2": {
+        "std_3": {
+          "subject": "Computer",
+          "teacher": "Manali Ma'am"
+        },
+        "std_4": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        },
+        "std_5": {
+          "subject": "Maths",
+          "teacher": "Dolly Ma'am"
+        },
+        "std_6": {
+          "subject": "Social Science",
+          "teacher": "Sakina Ma'am"
+        },
+        "std_7": {
+          "subject": "Science",
+          "teacher": "Taniya Ma'am"
+        }
+      },
+      "p3": {
+        "std_3": {
+          "subject": "English",
+          "teacher": "Payal Ma'am"
+        },
+        "std_4": {
+          "subject": "Maths",
+          "teacher": "Dolly Ma'am"
+        },
+        "std_5": {
+          "subject": "Computer",
+          "teacher": "Manali Ma'am"
+        },
+        "std_6": {
+          "subject": "English",
+          "teacher": "Khushi Ma'am"
+        },
+        "std_7": {
+          "subject": "Social Science",
+          "teacher": "Sakina Ma'am"
+        },
+        "std_8": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        }
+      },
+      "p4": {
+        "std_3": {
+          "subject": "Maths",
+          "teacher": "Dolly Ma'am"
+        },
+        "std_4": {
+          "subject": "Environment",
+          "teacher": "Yamin Ma'am"
+        },
+        "std_5": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        },
+        "std_6": {
+          "subject": "Maths",
+          "teacher": "Alpa Ma'am"
+        },
+        "std_7": {
+          "subject": "English",
+          "teacher": "Khushi Ma'am"
+        },
+        "std_8": {
+          "subject": "Computer",
+          "teacher": "Astha Ma'am"
+        }
+      },
+      "p5": {
+        "std_3": {
+          "subject": "Environment",
+          "teacher": "Yamin Ma'am"
+        },
+        "std_4": {
+          "subject": "English",
+          "teacher": "Payal Ma'am"
+        },
+        "std_5": {
+          "subject": "Maths",
+          "teacher": "Dolly Ma'am"
+        },
+        "std_6": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        },
+        "std_7": {
+          "subject": "Computer",
+          "teacher": "Astha Ma'am"
+        },
+        "std_8": {
+          "subject": "English",
+          "teacher": "Khushi Ma'am"
+        }
+      },
+      "p6": {
+        "std_3": {
+          "subject": "English",
+          "teacher": "Payal Ma'am"
+        },
+        "std_4": {
+          "subject": "Environment",
+          "teacher": "Yamin Ma'am"
+        },
+        "std_5": {
+          "subject": "Maths",
+          "teacher": "Dolly Ma'am"
+        },
+        "std_6": {
+          "subject": "Computer",
+          "teacher": "Astha Ma'am"
+        },
+        "std_7": {
+          "subject": "Gujarati",
+          "teacher": "Priya Ma'am"
+        },
+        "std_8": {
+          "subject": "Science",
+          "teacher": "Taniya Ma'am"
         }
       }
     },
@@ -719,318 +1044,6 @@ const DEFAULT_DATA = {
         "std_8": {
           "subject": "Computer",
           "teacher": "Astha Ma'am"
-        }
-      }
-    },
-    "Thursday": {
-      "p1": {
-        "std_3": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        },
-        "std_4": {
-          "subject": "Computer",
-          "teacher": "Manali Ma'am"
-        },
-        "std_5": {
-          "subject": "English",
-          "teacher": "Payal Ma'am"
-        },
-        "std_6": {
-          "subject": "Science",
-          "teacher": "Taniya Ma'am"
-        },
-        "std_7": {
-          "subject": "Maths",
-          "teacher": "Alpa Ma'am"
-        },
-        "std_8": {
-          "subject": "Social Science",
-          "teacher": "Sakina Ma'am"
-        }
-      },
-      "p2": {
-        "std_3": {
-          "subject": "Computer",
-          "teacher": "Manali Ma'am"
-        },
-        "std_4": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        },
-        "std_5": {
-          "subject": "Maths",
-          "teacher": "Dolly Ma'am"
-        },
-        "std_6": {
-          "subject": "Social Science",
-          "teacher": "Sakina Ma'am"
-        },
-        "std_7": {
-          "subject": "Science",
-          "teacher": "Taniya Ma'am"
-        }
-      },
-      "p3": {
-        "std_3": {
-          "subject": "English",
-          "teacher": "Payal Ma'am"
-        },
-        "std_4": {
-          "subject": "Maths",
-          "teacher": "Dolly Ma'am"
-        },
-        "std_5": {
-          "subject": "Computer",
-          "teacher": "Manali Ma'am"
-        },
-        "std_6": {
-          "subject": "English",
-          "teacher": "Khushi Ma'am"
-        },
-        "std_7": {
-          "subject": "Social Science",
-          "teacher": "Sakina Ma'am"
-        },
-        "std_8": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        }
-      },
-      "p4": {
-        "std_3": {
-          "subject": "Maths",
-          "teacher": "Dolly Ma'am"
-        },
-        "std_4": {
-          "subject": "Environment",
-          "teacher": "Yamin Ma'am"
-        },
-        "std_5": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        },
-        "std_6": {
-          "subject": "Maths",
-          "teacher": "Alpa Ma'am"
-        },
-        "std_7": {
-          "subject": "English",
-          "teacher": "Khushi Ma'am"
-        },
-        "std_8": {
-          "subject": "Computer",
-          "teacher": "Astha Ma'am"
-        }
-      },
-      "p5": {
-        "std_3": {
-          "subject": "Environment",
-          "teacher": "Yamin Ma'am"
-        },
-        "std_4": {
-          "subject": "English",
-          "teacher": "Payal Ma'am"
-        },
-        "std_5": {
-          "subject": "Maths",
-          "teacher": "Dolly Ma'am"
-        },
-        "std_6": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        },
-        "std_7": {
-          "subject": "Computer",
-          "teacher": "Astha Ma'am"
-        },
-        "std_8": {
-          "subject": "English",
-          "teacher": "Khushi Ma'am"
-        }
-      },
-      "p6": {
-        "std_3": {
-          "subject": "English",
-          "teacher": "Payal Ma'am"
-        },
-        "std_4": {
-          "subject": "Environment",
-          "teacher": "Yamin Ma'am"
-        },
-        "std_5": {
-          "subject": "Maths",
-          "teacher": "Dolly Ma'am"
-        },
-        "std_6": {
-          "subject": "Computer",
-          "teacher": "Astha Ma'am"
-        },
-        "std_7": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        },
-        "std_8": {
-          "subject": "Science",
-          "teacher": "Taniya Ma'am"
-        }
-      }
-    },
-    "Friday": {
-      "p1": {
-        "std_3": {
-          "subject": "English",
-          "teacher": "Payal Ma'am"
-        },
-        "std_4": {
-          "subject": "Environment",
-          "teacher": "Yamin Ma'am"
-        },
-        "std_5": {
-          "subject": "Computer",
-          "teacher": "Manali Ma'am"
-        },
-        "std_6": {
-          "subject": "Social Science",
-          "teacher": "Sakina Ma'am"
-        },
-        "std_7": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        },
-        "std_8": {
-          "subject": "Maths",
-          "teacher": "Alpa Ma'am"
-        }
-      },
-      "p2": {
-        "std_3": {
-          "subject": "Environment",
-          "teacher": "Yamin Ma'am"
-        },
-        "std_4": {
-          "subject": "Computer",
-          "teacher": "Manali Ma'am"
-        },
-        "std_5": {
-          "subject": "English",
-          "teacher": "Payal Ma'am"
-        },
-        "std_6": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        },
-        "std_7": {
-          "subject": "Social Science",
-          "teacher": "Sakina Ma'am"
-        },
-        "std_8": {
-          "subject": "Science",
-          "teacher": "Taniya Ma'am"
-        }
-      },
-      "p3": {
-        "std_3": {
-          "subject": "Computer",
-          "teacher": "Manali Ma'am"
-        },
-        "std_4": {
-          "subject": "Maths",
-          "teacher": "Dolly Ma'am"
-        },
-        "std_5": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        },
-        "std_6": {
-          "subject": "Maths",
-          "teacher": "Alpa Ma'am"
-        },
-        "std_7": {
-          "subject": "Science",
-          "teacher": "Taniya Ma'am"
-        },
-        "std_8": {
-          "subject": "Social Science",
-          "teacher": "Sakina Ma'am"
-        }
-      },
-      "p4": {
-        "std_3": {
-          "subject": "Maths",
-          "teacher": "Dolly Ma'am"
-        },
-        "std_4": {
-          "subject": "English",
-          "teacher": "Payal Ma'am"
-        },
-        "std_5": {
-          "subject": "Environment",
-          "teacher": "Yamin Ma'am"
-        },
-        "std_6": {
-          "subject": "English",
-          "teacher": "Khushi Ma'am"
-        },
-        "std_7": {
-          "subject": "Computer",
-          "teacher": "Astha Ma'am"
-        },
-        "std_8": {
-          "subject": "Maths",
-          "teacher": "Alpa Ma'am"
-        }
-      },
-      "p5": {
-        "std_3": {
-          "subject": "Environment",
-          "teacher": "Yamin Ma'am"
-        },
-        "std_4": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        },
-        "std_5": {
-          "subject": "English",
-          "teacher": "Payal Ma'am"
-        },
-        "std_6": {
-          "subject": "Science",
-          "teacher": "Taniya Ma'am"
-        },
-        "std_7": {
-          "subject": "English",
-          "teacher": "Khushi Ma'am"
-        },
-        "std_8": {
-          "subject": "Computer",
-          "teacher": "Astha Ma'am"
-        }
-      },
-      "p6": {
-        "std_3": {
-          "subject": "Gujarati",
-          "teacher": "Priya Ma'am"
-        },
-        "std_4": {
-          "subject": "Maths",
-          "teacher": "Dolly Ma'am"
-        },
-        "std_5": {
-          "subject": "Environment",
-          "teacher": "Yamin Ma'am"
-        },
-        "std_6": {
-          "subject": "Computer",
-          "teacher": "Astha Ma'am"
-        },
-        "std_7": {
-          "subject": "Maths",
-          "teacher": "Alpa Ma'am"
-        },
-        "std_8": {
-          "subject": "English",
-          "teacher": "Khushi Ma'am"
         }
       }
     }

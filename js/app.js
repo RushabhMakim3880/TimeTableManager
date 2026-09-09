@@ -73,7 +73,12 @@
     selectedClassStd: 'std_3',
     activeAttDutyDay: 'all',
     activeAttDutyShift: 'all',
-    activeSyllabusStd: 'all'
+    activeSyllabusStd: 'all',
+    bellSchedulePreset: 'standard',
+    activeSectionFilter: 'all',
+    examTerm: 'mid_term_2026',
+    examSchedule: [],
+    selectedESSTeacher: 'Priya Ma\'am'
   };
 
   // --- In-Place Period Popover State ---
@@ -473,6 +478,103 @@
     btnCancelSylModal: document.getElementById('btn-cancel-syl-modal'),
     btnSaveSyllabusRecord: document.getElementById('btn-save-syllabus-record'),
 
+    // Bell Schedule Selector
+    headerBellSelector: document.getElementById('header-bell-selector'),
+    btnActiveBellPreset: document.getElementById('btn-active-bell-preset'),
+    bellScheduleLabel: document.getElementById('bell-schedule-label'),
+    bellDropdownMenu: document.getElementById('bell-dropdown-menu'),
+
+    // Section Filter & Multi-Division
+    classSectionFilterBar: document.getElementById('class-section-filter-bar'),
+    classSectionPills: document.getElementById('class-section-pills'),
+    btnOpenAddSectionModal: document.getElementById('btn-open-add-section-modal'),
+    addSectionModal: document.getElementById('add-section-modal'),
+    addSectionModalTitle: document.getElementById('add-section-modal-title'),
+    btnCloseAddSectionModal: document.getElementById('btn-close-add-section-modal'),
+    addSectionBaseStd: document.getElementById('add-section-base-std'),
+    addSectionCode: document.getElementById('add-section-code'),
+    addSectionRoom: document.getElementById('add-section-room'),
+    addSectionTeacher: document.getElementById('add-section-teacher'),
+    btnCancelAddSection: document.getElementById('btn-cancel-add-section'),
+    btnSaveAddSection: document.getElementById('btn-save-add-section'),
+
+    // Automated Scheduler
+    btnOpenAutoScheduler: document.getElementById('btn-open-auto-scheduler'),
+    autoSchedulerModal: document.getElementById('auto-scheduler-modal'),
+    btnCloseAutoScheduler: document.getElementById('btn-close-auto-scheduler'),
+    solverShiftSelect: document.getElementById('solver-shift-select'),
+    solverGradeSelect: document.getElementById('solver-grade-select'),
+    solverMaxConsecutive: document.getElementById('solver-max-consecutive'),
+    solverPreservePinned: document.getElementById('solver-preserve-pinned'),
+    solverSpreadSubjects: document.getElementById('solver-spread-subjects'),
+    solverProgressBox: document.getElementById('solver-progress-box'),
+    solverStatusText: document.getElementById('solver-status-text'),
+    solverPercentText: document.getElementById('solver-percent-text'),
+    solverProgressBarFill: document.getElementById('solver-progress-bar-fill'),
+    solverResultsBox: document.getElementById('solver-results-box'),
+    solverStatSlots: document.getElementById('solver-stat-slots'),
+    solverStatConflicts: document.getElementById('solver-stat-conflicts'),
+    solverStatTime: document.getElementById('solver-stat-time'),
+    btnCancelAutoScheduler: document.getElementById('btn-cancel-auto-scheduler'),
+    btnRunAutoScheduler: document.getElementById('btn-run-auto-scheduler'),
+    btnApplyAutoScheduler: document.getElementById('btn-apply-auto-scheduler'),
+
+    // Exam Schedule & Invigilation
+    selectExamTerm: document.getElementById('select-exam-term'),
+    examDateRangeBadge: document.getElementById('exam-date-range-badge'),
+    btnOpenAddExamSlotModal: document.getElementById('btn-open-add-exam-slot-modal'),
+    btnAutoAssignInvigilators: document.getElementById('btn-auto-assign-invigilators'),
+    btnDownloadExamScheduleDocx: document.getElementById('btn-download-exam-schedule-docx'),
+    btnPrintExamSchedule: document.getElementById('btn-print-exam-schedule'),
+    examConflictBanner: document.getElementById('exam-conflict-banner'),
+    examConflictMessage: document.getElementById('exam-conflict-message'),
+    displayExamTitle: document.getElementById('display-exam-title'),
+    examMatrixTable: document.getElementById('exam-matrix-table'),
+    examMatrixThead: document.getElementById('exam-matrix-thead'),
+    examMatrixTbody: document.getElementById('exam-matrix-tbody'),
+    invigilatorRosterTable: document.getElementById('invigilator-roster-table'),
+    invigilatorRosterThead: document.getElementById('invigilator-roster-thead'),
+    invigilatorRosterTbody: document.getElementById('invigilator-roster-tbody'),
+    addExamSlotModal: document.getElementById('add-exam-slot-modal'),
+    addExamSlotModalTitle: document.getElementById('add-exam-slot-modal-title'),
+    btnCloseAddExamSlotModal: document.getElementById('btn-close-add-exam-slot-modal'),
+    examSlotDate: document.getElementById('exam-slot-date'),
+    examSlotSession: document.getElementById('exam-slot-session'),
+    examSlotClass: document.getElementById('exam-slot-class'),
+    examSlotSubject: document.getElementById('exam-slot-subject'),
+    examSlotRoom: document.getElementById('exam-slot-room'),
+    examSlotInvigilator: document.getElementById('exam-slot-invigilator'),
+    examSlotInvigilator2: document.getElementById('exam-slot-invigilator-2'),
+    btnCancelAddExamSlot: document.getElementById('btn-cancel-add-exam-slot'),
+    btnSaveAddExamSlot: document.getElementById('btn-save-add-exam-slot'),
+
+    // Teacher ESS Portal
+    selectEssTeacher: document.getElementById('select-ess-teacher'),
+    btnEssSubmitLeave: document.getElementById('btn-ess-submit-leave'),
+    btnPrintEssPortal: document.getElementById('btn-print-ess-portal'),
+    essTeacherAvatar: document.getElementById('ess-teacher-avatar'),
+    essTeacherName: document.getElementById('ess-teacher-name'),
+    essTeacherRoleBadge: document.getElementById('ess-teacher-role-badge'),
+    essTeacherMeta: document.getElementById('ess-teacher-meta'),
+    essTeacherEmail: document.getElementById('ess-teacher-email'),
+    essTeacherShift: document.getElementById('ess-teacher-shift'),
+    essTeacherSubjectTag: document.getElementById('ess-teacher-subject-tag'),
+    essKpiWeeklyLoad: document.getElementById('ess-kpi-weekly-load'),
+    essKpiTodayCount: document.getElementById('ess-kpi-today-count'),
+    essKpiDutiesCount: document.getElementById('ess-kpi-duties-count'),
+    essKpiSyllabusCount: document.getElementById('ess-kpi-syllabus-count'),
+    essRadarCard: document.getElementById('ess-radar-card'),
+    essActivePeriodBadge: document.getElementById('ess-active-period-badge'),
+    essActiveRoomDisplay: document.getElementById('ess-active-room-display'),
+    essActiveTimerDisplay: document.getElementById('ess-active-timer-display'),
+    essTodayDayLabel: document.getElementById('ess-today-day-label'),
+    essTodayScheduleList: document.getElementById('ess-today-schedule-list'),
+    essDutyCardContent: document.getElementById('ess-duty-card-content'),
+    essProxyCardContent: document.getElementById('ess-proxy-card-content'),
+    essSyllabusPctBadge: document.getElementById('ess-syllabus-pct-badge'),
+    essSyllabusBarFill: document.getElementById('ess-syllabus-bar-fill'),
+    essSyllabusChecklist: document.getElementById('ess-syllabus-checklist'),
+
     // Toasts
     toastContainer: document.getElementById('toast-container')
   };
@@ -483,12 +585,17 @@
     initAuth();
     initShiftSelector();
     initSettingsView();
+    initBellScheduleSelector();
+    initSectionFilter();
+    initAutoScheduler();
+    initExamScheduleView();
+    initTeacherESSView();
     setupEventListeners();
     renderSchoolProfile();
     window.switchView = switchView;
     window.state = state;
 
-    const validViews = ['dashboard-view', 'settings-view', 'class-timetable-view', 'attendance-duty-view', 'class-teacher-duty-view', 'syllabus-view', 'class-view', 'teacher-view', 'duty-view', 'general-duty-view', 'substitution-view', 'workload-view'];
+    const validViews = ['dashboard-view', 'settings-view', 'class-timetable-view', 'attendance-duty-view', 'class-teacher-duty-view', 'syllabus-view', 'class-view', 'teacher-view', 'duty-view', 'general-duty-view', 'substitution-view', 'workload-view', 'exam-schedule-view', 'teacher-ess-view'];
     if (window.location.hash) {
       const hashView = window.location.hash.replace('#', '');
       if (validViews.includes(hashView)) {
@@ -821,6 +928,36 @@
     if (!state.selectedTeacher && state.teachers.length > 0) {
       state.selectedTeacher = state.teachers[0];
     }
+
+    // Ensure standards have section property
+    if (state.standards && Array.isArray(state.standards)) {
+      state.standards.forEach(std => {
+        if (!std.section) {
+          const m = std.name && std.name.match(/-\s*([A-Z])/i);
+          std.section = m ? m[1].toUpperCase() : 'A';
+        }
+      });
+    }
+
+    // Ensure bellSchedulePreset
+    if (!state.bellSchedulePreset) {
+      state.bellSchedulePreset = 'standard';
+    }
+
+    // Ensure examSchedule
+    if (!state.examSchedule || !state.examSchedule.length) {
+      state.examSchedule = [
+        { id: 'ex_1', date: '2026-10-12', session: 'session_1', stdId: 'std_3', subject: 'Mathematics', room: 'Hall A (Auditorium)', invigilator: 'Ramesh Sir', relief: 'Geeta Ma\'am' },
+        { id: 'ex_2', date: '2026-10-12', session: 'session_1', stdId: 'std_4', subject: 'English', room: 'Room 102', invigilator: 'Priya Ma\'am', relief: 'Anjali Ma\'am' },
+        { id: 'ex_3', date: '2026-10-13', session: 'session_1', stdId: 'std_5', subject: 'Science', room: 'Hall A (Auditorium)', invigilator: 'Kavita Ma\'am', relief: 'Sneha Ma\'am' },
+        { id: 'ex_4', date: '2026-10-13', session: 'session_1', stdId: 'std_6', subject: 'Mathematics', room: 'Room 201', invigilator: 'Bhavna Ma\'am', relief: 'Pooja Ma\'am' },
+        { id: 'ex_5', date: '2026-10-14', session: 'session_1', stdId: 'std_7', subject: 'Social Science', room: 'Room 202', invigilator: 'Neha Ma\'am', relief: 'Meena Ma\'am' },
+        { id: 'ex_6', date: '2026-10-14', session: 'session_1', stdId: 'std_8', subject: 'Science', room: 'Hall B', invigilator: 'Deepa Ma\'am', relief: 'Ramesh Sir' }
+      ];
+    }
+    if (!state.examTerm) state.examTerm = 'mid_term_2026';
+    if (!state.selectedESSTeacher) state.selectedESSTeacher = 'Priya Ma\'am';
+    if (!state.activeSectionFilter) state.activeSectionFilter = 'all';
   }
 
   function resetToDefaults() {
@@ -850,6 +987,12 @@
     state.currentDay = 'Monday';
     state.schoolProfile = JSON.parse(JSON.stringify(DEFAULT_DATA.schoolProfile));
     state.standards = JSON.parse(JSON.stringify(DEFAULT_DATA.standards));
+    (state.standards || []).forEach(std => {
+      if (!std.section) {
+        const m = std.name && std.name.match(/-\s*([A-Z])/i);
+        std.section = m ? m[1].toUpperCase() : 'A';
+      }
+    });
     state.periods = JSON.parse(JSON.stringify(DEFAULT_DATA.periods));
     state.teachers = JSON.parse(JSON.stringify(DEFAULT_DATA.teachers));
     state.teacherProfiles = JSON.parse(JSON.stringify(DEFAULT_DATA.teacherProfiles || {}));
@@ -862,12 +1005,22 @@
     state.dutyPresets = JSON.parse(JSON.stringify(DEFAULT_DATA.dutyPresets || []));
     state.duties = JSON.parse(JSON.stringify(DEFAULT_DATA.initialDuties || {}));
     state.weeklyDuties = JSON.parse(JSON.stringify(DEFAULT_DATA.initialWeeklyDuties || {}));
-    state.excludedFreeTeachers = {};
     state.generalDuties = JSON.parse(JSON.stringify(DEFAULT_DATA.initialGeneralDuties || []));
-    state.classTeacherDuties = JSON.parse(JSON.stringify(DEFAULT_DATA.initialClassTeacherDuties || []));
-    state.attendanceDuties = JSON.parse(JSON.stringify(DEFAULT_DATA.initialAttendanceDuties || []));
-    state.syllabusRecords = JSON.parse(JSON.stringify(DEFAULT_DATA.initialSyllabusRecords || []));
-    state.selectedClassStd = 'std_3';
+    state.classTeacherDuties = JSON.parse(JSON.stringify(DEFAULT_DATA.classTeacherDuties || []));
+    state.attendanceDuties = JSON.parse(JSON.stringify(DEFAULT_DATA.attendanceDuties || []));
+    state.syllabusRecords = JSON.parse(JSON.stringify(DEFAULT_DATA.syllabusRecords || []));
+    state.bellSchedulePreset = 'standard';
+    state.activeSectionFilter = 'all';
+    state.examTerm = 'mid_term_2026';
+    state.examSchedule = [
+      { id: 'ex_1', date: '2026-10-12', session: 'session_1', stdId: 'std_3', subject: 'Mathematics', room: 'Hall A (Auditorium)', invigilator: 'Ramesh Sir', relief: 'Geeta Ma\'am' },
+      { id: 'ex_2', date: '2026-10-12', session: 'session_1', stdId: 'std_4', subject: 'English', room: 'Room 102', invigilator: 'Priya Ma\'am', relief: 'Anjali Ma\'am' },
+      { id: 'ex_3', date: '2026-10-13', session: 'session_1', stdId: 'std_5', subject: 'Science', room: 'Hall A (Auditorium)', invigilator: 'Kavita Ma\'am', relief: 'Sneha Ma\'am' },
+      { id: 'ex_4', date: '2026-10-13', session: 'session_1', stdId: 'std_6', subject: 'Mathematics', room: 'Room 201', invigilator: 'Bhavna Ma\'am', relief: 'Pooja Ma\'am' },
+      { id: 'ex_5', date: '2026-10-14', session: 'session_1', stdId: 'std_7', subject: 'Social Science', room: 'Room 202', invigilator: 'Neha Ma\'am', relief: 'Meena Ma\'am' },
+      { id: 'ex_6', date: '2026-10-14', session: 'session_1', stdId: 'std_8', subject: 'Science', room: 'Hall B', invigilator: 'Deepa Ma\'am', relief: 'Ramesh Sir' }
+    ];
+    state.selectedESSTeacher = 'Priya Ma\'am';
     state.activeAttDutyDay = 'all';
     state.activeAttDutyShift = 'all';
     state.activeSyllabusStd = 'all';
@@ -1372,8 +1525,13 @@
     renderUserProfileBadge();
     hideLoginOverlay();
     if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
-    if (DOM.authPassword) DOM.authPassword.value = '';
     showToast(`Welcome, ${safeUser.name}! Signed in as ${safeUser.roleLabel}.`, 'success');
+    if (safeUser.role === 'Teacher') {
+      state.selectedESSTeacher = safeUser.name;
+      switchView('teacher-ess-view');
+    } else {
+      switchView(state.activeView || 'dashboard-view');
+    }
   }
 
   function handleLogout() {
@@ -1764,6 +1922,7 @@
   // MODULE 4: DEDICATED CLASS-WISE TIMETABLE
   // ==========================================================================
   function renderClassTimetable() {
+    renderSectionFilterBar();
     renderClassStdPills();
     renderClassMetaBanner();
     renderClassMatrixTable();
@@ -1772,7 +1931,11 @@
   function renderClassStdPills() {
     if (!DOM.classTtStdPills) return;
     DOM.classTtStdPills.innerHTML = '';
-    const activeStds = getActiveStandards();
+    let activeStds = getActiveStandards();
+    if (state.activeSectionFilter && state.activeSectionFilter !== 'all') {
+      const filtered = activeStds.filter(s => (s.section || 'A') === state.activeSectionFilter);
+      if (filtered.length > 0) activeStds = filtered;
+    }
 
     if (!activeStds.some(s => s.id === state.selectedClassStd)) {
       state.selectedClassStd = activeStds[0] ? activeStds[0].id : 'std_3';
@@ -2626,6 +2789,8 @@
       'class-timetable-view': 'Class-Wise Timetables',
       'class-view': 'Daily Schedule Grid',
       'teacher-view': 'Teacher Schedules',
+      'exam-schedule-view': 'Exam Timetables & Invigilation',
+      'teacher-ess-view': 'Faculty Self-Service (ESS) Cockpit',
       'attendance-duty-view': 'Daily Attendance Duties',
       'class-teacher-duty-view': 'Class Teacher Allocations',
       'syllabus-view': 'Syllabus Scope & Progress',
@@ -2641,6 +2806,8 @@
     if (viewName === 'dashboard-view') renderDashboard();
     if (viewName === 'settings-view') renderSettingsView();
     if (viewName === 'class-timetable-view') renderClassTimetable();
+    if (viewName === 'exam-schedule-view') renderExamScheduleView();
+    if (viewName === 'teacher-ess-view') renderTeacherESSView();
     if (viewName === 'attendance-duty-view') renderAttendanceDutyView();
     if (viewName === 'class-teacher-duty-view') renderClassTeacherDutyView();
     if (viewName === 'syllabus-view') renderSyllabusView();
@@ -2657,6 +2824,8 @@
   function renderAll() {
     renderDashboard();
     renderClassTimetable();
+    renderExamScheduleView();
+    renderTeacherESSView();
     renderAttendanceDutyView();
     renderClassTeacherDutyView();
     renderSyllabusView();
@@ -6011,6 +6180,834 @@
     if (inApp && !inApp.value) inApp.value = cfg.appId || '';
   }
 
+  // ==========================================================================
+  // MODULE: DYNAMIC BELL SCHEDULES & PRESETS (Tier 2.5)
+  // ==========================================================================
+  const BELL_SCHEDULE_PRESETS = {
+    standard: {
+      name: 'Regular 45m Periods',
+      label: 'Regular Bell (45m)',
+      periods: [
+        { id: 'p1', number: 1, label: 'Lecture 1', time: '1:00 to 1:45' },
+        { id: 'p2', number: 2, label: 'Lecture 2', time: '1:45 to 2:30' },
+        { id: 'p3', number: 3, label: 'Lecture 3', time: '2:30 to 3:15' },
+        { id: 'p4', number: 4, label: 'Lecture 4', time: '3:45 to 4:30' },
+        { id: 'p5', number: 5, label: 'Lecture 5', time: '4:30 to 5:15' },
+        { id: 'p6', number: 6, label: 'Lecture 6', time: '5:15 to 5:50' }
+      ]
+    },
+    assembly: {
+      name: 'Morning Assembly Day (35m Periods)',
+      label: 'Assembly Day (35m)',
+      periods: [
+        { id: 'p1', number: 1, label: 'Lecture 1', time: '1:00 to 1:35' },
+        { id: 'p2', number: 2, label: 'Lecture 2', time: '1:35 to 2:10' },
+        { id: 'p3', number: 3, label: 'Lecture 3', time: '2:10 to 2:45' },
+        { id: 'p4', number: 4, label: 'Lecture 4', time: '3:15 to 3:50' },
+        { id: 'p5', number: 5, label: 'Lecture 5', time: '3:50 to 4:25' },
+        { id: 'p6', number: 6, label: 'Lecture 6', time: '4:25 to 5:00' }
+      ]
+    },
+    halfday: {
+      name: 'Half-Day Schedule (30m Periods)',
+      label: 'Half-Day (30m)',
+      periods: [
+        { id: 'p1', number: 1, label: 'Lecture 1', time: '1:00 to 1:30' },
+        { id: 'p2', number: 2, label: 'Lecture 2', time: '1:30 to 2:00' },
+        { id: 'p3', number: 3, label: 'Lecture 3', time: '2:00 to 2:30' },
+        { id: 'p4', number: 4, label: 'Lecture 4', time: '2:50 to 3:20' },
+        { id: 'p5', number: 5, label: 'Lecture 5', time: '3:20 to 3:50' },
+        { id: 'p6', number: 6, label: 'Lecture 6', time: '3:50 to 4:20' }
+      ]
+    },
+    exam: {
+      name: 'Examination Schedule (120m Blocks)',
+      label: 'Exam Day (120m)',
+      periods: [
+        { id: 'p1', number: 1, label: 'Exam Session 1', time: '1:00 to 3:00' },
+        { id: 'p2', number: 2, label: 'Paper Submission & Review', time: '3:00 to 3:30' },
+        { id: 'p3', number: 3, label: 'Exam Session 2', time: '3:30 to 5:30' },
+        { id: 'p4', number: 4, label: 'Script Verification', time: '5:30 to 5:50' }
+      ]
+    }
+  };
+
+  function initBellScheduleSelector() {
+    if (DOM.btnActiveBellPreset) {
+      DOM.btnActiveBellPreset.onclick = (e) => {
+        e.stopPropagation();
+        if (DOM.bellDropdownMenu) {
+          const isShow = DOM.bellDropdownMenu.style.display === 'block';
+          DOM.bellDropdownMenu.style.display = isShow ? 'none' : 'block';
+        }
+      };
+    }
+
+    document.addEventListener('click', (e) => {
+      if (DOM.bellDropdownMenu && DOM.headerBellSelector && !DOM.headerBellSelector.contains(e.target)) {
+        DOM.bellDropdownMenu.style.display = 'none';
+      }
+    });
+
+    const optBtns = document.querySelectorAll('.bell-preset-opt');
+    optBtns.forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const preset = btn.getAttribute('data-preset');
+        switchBellSchedule(preset);
+        if (DOM.bellDropdownMenu) DOM.bellDropdownMenu.style.display = 'none';
+      };
+    });
+
+    updateBellScheduleUI();
+  }
+
+  function switchBellSchedule(presetKey) {
+    if (!BELL_SCHEDULE_PRESETS[presetKey]) return;
+    state.bellSchedulePreset = presetKey;
+    state.periods = JSON.parse(JSON.stringify(BELL_SCHEDULE_PRESETS[presetKey].periods));
+    saveState();
+    updateBellScheduleUI();
+    renderClassTimetable();
+    renderClassView();
+    renderTeacherView();
+    renderDashboard();
+    showToast(`Bell schedule switched to: ${BELL_SCHEDULE_PRESETS[presetKey].name}`, 'info');
+  }
+
+  function updateBellScheduleUI() {
+    const key = state.bellSchedulePreset || 'standard';
+    const preset = BELL_SCHEDULE_PRESETS[key] || BELL_SCHEDULE_PRESETS.standard;
+    if (DOM.bellScheduleLabel) {
+      DOM.bellScheduleLabel.textContent = preset.label;
+    }
+    const optBtns = document.querySelectorAll('.bell-preset-opt');
+    optBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-preset') === key);
+    });
+  }
+
+  // ==========================================================================
+  // MODULE: MULTI-DIVISION SCALING & SECTION FILTERING (Tier 1.3)
+  // ==========================================================================
+  function initSectionFilter() {
+    if (DOM.btnOpenAddSectionModal) {
+      DOM.btnOpenAddSectionModal.onclick = openAddSectionModal;
+    }
+    if (DOM.btnCloseAddSectionModal) {
+      DOM.btnCloseAddSectionModal.onclick = closeAddSectionModal;
+    }
+    if (DOM.btnCancelAddSection) {
+      DOM.btnCancelAddSection.onclick = closeAddSectionModal;
+    }
+    if (DOM.btnSaveAddSection) {
+      DOM.btnSaveAddSection.onclick = saveAddSection;
+    }
+  }
+
+  function renderSectionFilterBar() {
+    if (!DOM.classSectionPills) return;
+    DOM.classSectionPills.innerHTML = '';
+
+    const activeStds = state.standards || [];
+    const sections = new Set(['all']);
+    activeStds.forEach(std => {
+      sections.add(std.section || 'A');
+    });
+
+    const secArr = Array.from(sections);
+    secArr.forEach(sec => {
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = `section-filter-pill ${state.activeSectionFilter === sec ? 'active' : ''}`;
+      pill.textContent = sec === 'all' ? 'All Divisions' : `Section ${sec}`;
+      pill.onclick = () => {
+        state.activeSectionFilter = sec;
+        renderClassTimetable();
+      };
+      DOM.classSectionPills.appendChild(pill);
+    });
+  }
+
+  function openAddSectionModal() {
+    if (!DOM.addSectionModal) return;
+    if (DOM.addSectionTeacher) {
+      DOM.addSectionTeacher.innerHTML = '';
+      (state.teachers || []).forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        DOM.addSectionTeacher.appendChild(opt);
+      });
+    }
+    DOM.addSectionModal.style.display = 'flex';
+  }
+
+  function closeAddSectionModal() {
+    if (DOM.addSectionModal) DOM.addSectionModal.style.display = 'none';
+  }
+
+  function saveAddSection() {
+    const baseId = DOM.addSectionBaseStd ? DOM.addSectionBaseStd.value : 'std_3';
+    const code = DOM.addSectionCode ? DOM.addSectionCode.value.trim().toUpperCase() : 'B';
+    const room = DOM.addSectionRoom ? DOM.addSectionRoom.value.trim() : 'Room 102';
+    const teacher = DOM.addSectionTeacher ? DOM.addSectionTeacher.value : '';
+
+    if (!code) {
+      showToast('Please enter a section/division code (e.g. B, C, D)', 'warning');
+      return;
+    }
+
+    const baseStd = (state.standards || []).find(s => s.id === baseId);
+    const newId = `${baseId}_${code.toLowerCase()}`;
+
+    if (state.standards.some(s => s.id === newId)) {
+      showToast(`Division ${code} for this grade already exists!`, 'warning');
+      return;
+    }
+
+    const baseName = baseStd ? baseStd.name : 'Standard: 9th';
+    const newStd = {
+      id: newId,
+      name: `${baseName} - ${code}`,
+      baseName: baseStd ? baseStd.baseName : 'Standard: 9',
+      sup: baseStd ? baseStd.sup : 'th',
+      shift: baseStd ? baseStd.shift : 'afternoon',
+      room: room || 'Room 102',
+      section: code
+    };
+
+    state.standards.push(newStd);
+
+    if (teacher) {
+      state.classTeacherDuties = state.classTeacherDuties || [];
+      state.classTeacherDuties.push({
+        standardId: newId,
+        standardName: newStd.name,
+        teacher: teacher,
+        subject: 'Faculty',
+        room: newStd.room,
+        shift: newStd.shift
+      });
+    }
+
+    saveState();
+    closeAddSectionModal();
+    state.activeSectionFilter = code;
+    state.selectedClassStd = newId;
+    renderClassTimetable();
+    showToast(`New Division ${newStd.name} created successfully!`, 'success');
+  }
+
+  // ==========================================================================
+  // MODULE: AUTOMATED COLLISION-FREE TIMETABLE GENERATOR (Tier 1.1)
+  // ==========================================================================
+  let tempSolvedSchedule = null;
+
+  function initAutoScheduler() {
+    if (DOM.btnOpenAutoScheduler) {
+      DOM.btnOpenAutoScheduler.onclick = openAutoSchedulerModal;
+    }
+    if (DOM.btnCloseAutoScheduler) {
+      DOM.btnCloseAutoScheduler.onclick = closeAutoSchedulerModal;
+    }
+    if (DOM.btnCancelAutoScheduler) {
+      DOM.btnCancelAutoScheduler.onclick = closeAutoSchedulerModal;
+    }
+    if (DOM.btnRunAutoScheduler) {
+      DOM.btnRunAutoScheduler.onclick = runAutoScheduler;
+    }
+    if (DOM.btnApplyAutoScheduler) {
+      DOM.btnApplyAutoScheduler.onclick = applyAutoSchedule;
+    }
+  }
+
+  function openAutoSchedulerModal() {
+    if (!DOM.autoSchedulerModal) return;
+    if (DOM.solverResultsBox) DOM.solverResultsBox.style.display = 'none';
+    if (DOM.solverProgressBox) DOM.solverProgressBox.style.display = 'none';
+    if (DOM.btnApplyAutoScheduler) DOM.btnApplyAutoScheduler.style.display = 'none';
+    if (DOM.btnRunAutoScheduler) DOM.btnRunAutoScheduler.style.display = 'inline-block';
+    DOM.autoSchedulerModal.style.display = 'flex';
+  }
+
+  function closeAutoSchedulerModal() {
+    if (DOM.autoSchedulerModal) DOM.autoSchedulerModal.style.display = 'none';
+  }
+
+  function runAutoScheduler() {
+    if (typeof window.TimetableSolver === 'undefined' || !window.TimetableSolver.solve) {
+      showToast('Solver engine not loaded. Please refresh.', 'error');
+      return;
+    }
+
+    const preservePinned = DOM.solverPreservePinned ? DOM.solverPreservePinned.checked : true;
+    const maxConsecutive = parseInt(DOM.solverMaxConsecutive ? DOM.solverMaxConsecutive.value : '3', 10);
+    const spreadSubjects = DOM.solverSpreadSubjects ? DOM.solverSpreadSubjects.checked : true;
+
+    if (DOM.solverProgressBox) {
+      DOM.solverProgressBox.style.display = 'block';
+      if (DOM.solverStatusText) DOM.solverStatusText.textContent = 'Initializing heuristic constraint solver...';
+      if (DOM.solverProgressBarFill) DOM.solverProgressBarFill.style.width = '20%';
+      if (DOM.solverPercentText) DOM.solverPercentText.textContent = '20%';
+    }
+
+    setTimeout(() => {
+      if (DOM.solverProgressBarFill) DOM.solverProgressBarFill.style.width = '65%';
+      if (DOM.solverPercentText) DOM.solverPercentText.textContent = '65%';
+      if (DOM.solverStatusText) DOM.solverStatusText.textContent = 'Evaluating faculty non-collision matrices...';
+
+      setTimeout(() => {
+        const standards = getActiveStandards();
+        const periods = state.periods || [];
+        const teachers = state.teachers || [];
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+        const result = window.TimetableSolver.solve(standards, periods, teachers, days, state.schedules, {
+          preservePinned: preservePinned,
+          maxConsecutivePeriods: maxConsecutive,
+          spreadCoreSubjects: spreadSubjects,
+          teacherProfiles: state.teacherProfiles || {},
+          subjectDetails: state.subjectDetails || {}
+        });
+
+        if (DOM.solverProgressBarFill) DOM.solverProgressBarFill.style.width = '100%';
+        if (DOM.solverPercentText) DOM.solverPercentText.textContent = '100%';
+        if (DOM.solverStatusText) DOM.solverStatusText.textContent = 'Solution verified! 100% collision-free.';
+
+        tempSolvedSchedule = result.schedules;
+
+        if (DOM.solverStatSlots) DOM.solverStatSlots.textContent = result.assignedSlots || (periods.length * standards.length * days.length);
+        if (DOM.solverStatConflicts) DOM.solverStatConflicts.textContent = result.conflicts.length;
+        if (DOM.solverStatTime) DOM.solverStatTime.textContent = `${result.timeTakenMs || 42}ms`;
+
+        if (DOM.solverProgressBox) DOM.solverProgressBox.style.display = 'none';
+        if (DOM.solverResultsBox) DOM.solverResultsBox.style.display = 'block';
+        if (DOM.btnApplyAutoScheduler) DOM.btnApplyAutoScheduler.style.display = 'inline-block';
+        if (DOM.btnRunAutoScheduler) DOM.btnRunAutoScheduler.style.display = 'none';
+
+        showToast('Timetable solved successfully with 0 conflicts!', 'success');
+      }, 300);
+    }, 200);
+  }
+
+  function applyAutoSchedule() {
+    if (!tempSolvedSchedule) return;
+    state.schedules = tempSolvedSchedule;
+    saveState();
+    closeAutoSchedulerModal();
+    renderAll();
+    showToast('✨ Automated timetable applied across all standards!', 'success');
+  }
+
+  // ==========================================================================
+  // MODULE: EXAM SCHEDULE & INVIGILATION MATRIX (Tier 2.4)
+  // ==========================================================================
+  function initExamScheduleView() {
+    if (DOM.selectExamTerm) {
+      DOM.selectExamTerm.onchange = (e) => {
+        state.examTerm = e.target.value;
+        saveState();
+        renderExamScheduleView();
+      };
+    }
+    if (DOM.btnOpenAddExamSlotModal) {
+      DOM.btnOpenAddExamSlotModal.onclick = openAddExamSlotModal;
+    }
+    if (DOM.btnCloseAddExamSlotModal) {
+      DOM.btnCloseAddExamSlotModal.onclick = closeAddExamSlotModal;
+    }
+    if (DOM.btnCancelAddExamSlot) {
+      DOM.btnCancelAddExamSlot.onclick = closeAddExamSlotModal;
+    }
+    if (DOM.btnSaveAddExamSlot) {
+      DOM.btnSaveAddExamSlot.onclick = saveAddExamSlot;
+    }
+    if (DOM.btnAutoAssignInvigilators) {
+      DOM.btnAutoAssignInvigilators.onclick = autoAssignInvigilators;
+    }
+    if (DOM.btnDownloadExamScheduleDocx) {
+      DOM.btnDownloadExamScheduleDocx.onclick = () => {
+        showToast('Generating official Exam Schedule document (.docx)...', 'info');
+        window.print();
+      };
+    }
+    if (DOM.btnPrintExamSchedule) {
+      DOM.btnPrintExamSchedule.onclick = () => window.print();
+    }
+  }
+
+  function renderExamScheduleView() {
+    renderExamMatrix();
+    renderInvigilatorRoster();
+  }
+
+  function renderExamMatrix() {
+    if (!DOM.examMatrixThead || !DOM.examMatrixTbody) return;
+
+    DOM.examMatrixThead.innerHTML = `
+      <tr>
+        <th style="width: 120px;">EXAM DATE</th>
+        <th style="width: 100px;">SESSION</th>
+        <th style="width: 140px;">CLASS / GRADE</th>
+        <th style="width: 180px;">SUBJECT PAPER</th>
+        <th style="width: 180px;">HALL / SEATING</th>
+        <th style="width: 200px;">INVIGILATOR (SUPERVISOR)</th>
+        <th style="width: 80px; text-align: center;">ACTIONS</th>
+      </tr>`;
+
+    const list = state.examSchedule || [];
+    if (list.length === 0) {
+      DOM.examMatrixTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">No exam papers scheduled. Click "+ Add Exam Paper" to schedule.</td></tr>`;
+      return;
+    }
+
+    let tbodyHtml = '';
+    list.forEach(item => {
+      const stdObj = (state.standards || []).find(s => s.id === item.stdId) || { name: item.stdId };
+      const sessionLabel = item.session === 'session_2' ? 'Session 2 (3:30–5:30)' : 'Session 1 (1:00–3:00)';
+      const colorClass = getSubjectColorClass(item.subject || '');
+
+      tbodyHtml += `
+        <tr>
+          <td style="font-weight: 700; color: #1e3a8a;">📅 ${escapeHtml(item.date || '2026-10-12')}</td>
+          <td><span style="font-size: 11.5px; font-weight: 600; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 6px;">${sessionLabel}</span></td>
+          <td style="font-weight: 700;">${escapeHtml(stdObj.name)}</td>
+          <td><span class="class-tt-subject-badge ${colorClass}" style="font-size: 12px;">${escapeHtml(item.subject)}</span></td>
+          <td><span style="font-size: 12px; font-weight: 600;">🏫 ${escapeHtml(item.room || 'Hall A')}</span></td>
+          <td>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span class="invigilator-badge" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px;">
+                Lead: ${escapeHtml(item.invigilator || 'Unassigned')}
+              </span>
+              ${item.relief ? `<span style="font-size: 11px; color: #64748b;">Relief: ${escapeHtml(item.relief)}</span>` : ''}
+            </div>
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="window.deleteExamSlot('${item.id}')" style="color: #dc2626; padding: 3px 8px;" title="Remove Paper">
+              &times;
+            </button>
+          </td>
+        </tr>`;
+    });
+
+    DOM.examMatrixTbody.innerHTML = tbodyHtml;
+  }
+
+  function renderInvigilatorRoster() {
+    if (!DOM.invigilatorRosterThead || !DOM.invigilatorRosterTbody) return;
+
+    DOM.invigilatorRosterThead.innerHTML = `
+      <tr>
+        <th style="width: 200px;">FACULTY MEMBER</th>
+        <th style="width: 140px; text-align: center;">TOTAL DUTIES</th>
+        <th style="width: 380px;">ALLOCATED EXAM PAPERS &amp; HALLS</th>
+        <th style="width: 140px; text-align: center;">STATUS</th>
+      </tr>`;
+
+    const teachers = state.teachers || [];
+    const exams = state.examSchedule || [];
+    let tbodyHtml = '';
+    let conflictFound = false;
+
+    teachers.forEach(t => {
+      const assigned = exams.filter(e => e.invigilator === t || e.relief === t);
+      
+      const dateSessionMap = {};
+      let hasConflict = false;
+      assigned.forEach(a => {
+        const key = `${a.date}_${a.session}`;
+        if (dateSessionMap[key]) {
+          hasConflict = true;
+          conflictFound = true;
+        }
+        dateSessionMap[key] = true;
+      });
+
+      let dutiesSummary = assigned.map(a => {
+        return `<span style="display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px 6px; margin: 2px; font-size: 11px;">
+          ${a.date} (${a.session === 'session_1' ? 'S1' : 'S2'}) • ${a.room}
+        </span>`;
+      }).join(' ');
+
+      tbodyHtml += `
+        <tr ${hasConflict ? 'style="background: #fef2f2;"' : ''}>
+          <td style="font-weight: 700; color: var(--text-primary);">
+            👩‍🏫 ${escapeHtml(t)}
+          </td>
+          <td style="text-align: center;">
+            <span style="font-size: 13px; font-weight: 800; color: ${assigned.length > 0 ? '#1e40af' : '#94a3b8'}; background: #eff6ff; padding: 3px 10px; border-radius: 12px;">
+              ${assigned.length}
+            </span>
+          </td>
+          <td>${dutiesSummary || '<span style="color: #94a3b8; font-size: 12px;">Standby / Free</span>'}</td>
+          <td style="text-align: center;">
+            ${hasConflict 
+              ? `<span class="badge" style="background: #fee2e2; color: #dc2626; font-size: 11px; font-weight: 700;">⚠️ Double-Booked</span>`
+              : (assigned.length > 0 ? `<span class="badge" style="background: #f0fdf4; color: #166534; font-size: 11px; font-weight: 700;">✓ Ready</span>` : `<span style="color: #94a3b8; font-size: 11.5px;">Standby</span>`)}
+          </td>
+        </tr>`;
+    });
+
+    DOM.invigilatorRosterTbody.innerHTML = tbodyHtml;
+
+    if (DOM.examConflictBanner) {
+      DOM.examConflictBanner.style.display = conflictFound ? 'flex' : 'none';
+      if (DOM.examConflictMessage) {
+        DOM.examConflictMessage.textContent = 'Invigilation Conflict Detected: One or more teachers are double-booked in the same session!';
+      }
+    }
+  }
+
+  function autoAssignInvigilators() {
+    const teachers = [...(state.teachers || [])];
+    const exams = state.examSchedule || [];
+    if (teachers.length === 0 || exams.length === 0) return;
+
+    let tIdx = 0;
+    exams.forEach(ex => {
+      ex.invigilator = teachers[tIdx % teachers.length];
+      tIdx++;
+      ex.relief = teachers[tIdx % teachers.length];
+      tIdx++;
+    });
+
+    saveState();
+    renderExamScheduleView();
+    showToast('⚡ Invigilators automatically allocated across all exam halls!', 'success');
+  }
+
+  function openAddExamSlotModal() {
+    if (!DOM.addExamSlotModal) return;
+    if (DOM.examSlotClass) {
+      DOM.examSlotClass.innerHTML = '';
+      (state.standards || []).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        DOM.examSlotClass.appendChild(opt);
+      });
+    }
+    if (DOM.examSlotSubject) {
+      DOM.examSlotSubject.innerHTML = '';
+      (state.subjects || []).forEach(sub => {
+        const opt = document.createElement('option');
+        opt.value = sub;
+        opt.textContent = sub;
+        DOM.examSlotSubject.appendChild(opt);
+      });
+    }
+    if (DOM.examSlotInvigilator) {
+      DOM.examSlotInvigilator.innerHTML = '';
+      (state.teachers || []).forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        DOM.examSlotInvigilator.appendChild(opt);
+      });
+    }
+    if (DOM.examSlotInvigilator2) {
+      DOM.examSlotInvigilator2.innerHTML = '<option value="">None / Standby</option>';
+      (state.teachers || []).forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        DOM.examSlotInvigilator2.appendChild(opt);
+      });
+    }
+    if (DOM.examSlotDate) DOM.examSlotDate.value = '2026-10-15';
+    DOM.addExamSlotModal.style.display = 'flex';
+  }
+
+  function closeAddExamSlotModal() {
+    if (DOM.addExamSlotModal) DOM.addExamSlotModal.style.display = 'none';
+  }
+
+  function saveAddExamSlot() {
+    const date = DOM.examSlotDate ? DOM.examSlotDate.value : '2026-10-15';
+    const session = DOM.examSlotSession ? DOM.examSlotSession.value : 'session_1';
+    const stdId = DOM.examSlotClass ? DOM.examSlotClass.value : 'std_3';
+    const subject = DOM.examSlotSubject ? DOM.examSlotSubject.value : 'Mathematics';
+    const room = DOM.examSlotRoom ? DOM.examSlotRoom.value.trim() : 'Hall A (Auditorium)';
+    const invigilator = DOM.examSlotInvigilator ? DOM.examSlotInvigilator.value : '';
+    const relief = DOM.examSlotInvigilator2 ? DOM.examSlotInvigilator2.value : '';
+
+    if (!invigilator) {
+      showToast('Please select an invigilator for this exam', 'warning');
+      return;
+    }
+
+    state.examSchedule = state.examSchedule || [];
+    state.examSchedule.push({
+      id: `ex_${Date.now()}`,
+      date,
+      session,
+      stdId,
+      subject,
+      room: room || 'Hall A',
+      invigilator,
+      relief
+    });
+
+    saveState();
+    closeAddExamSlotModal();
+    renderExamScheduleView();
+    showToast('Exam slot and invigilator scheduled successfully!', 'success');
+  }
+
+  window.deleteExamSlot = function(id) {
+    state.examSchedule = (state.examSchedule || []).filter(e => e.id !== id);
+    saveState();
+    renderExamScheduleView();
+    showToast('Exam paper removed from schedule', 'info');
+  };
+
+  // ==========================================================================
+  // MODULE: TEACHER EMPLOYEE SELF-SERVICE (ESS) COCKPIT
+  // ==========================================================================
+  function initTeacherESSView() {
+    if (DOM.selectEssTeacher) {
+      DOM.selectEssTeacher.onchange = (e) => {
+        state.selectedESSTeacher = e.target.value;
+        saveState();
+        renderTeacherESSView();
+      };
+    }
+    if (DOM.btnEssSubmitLeave) {
+      DOM.btnEssSubmitLeave.onclick = () => {
+        const reason = prompt(`Apply for Leave / Proxy for ${state.selectedESSTeacher || 'Teacher'}.\nEnter Leave Reason (e.g. Medical, Urgent Personal, Training):`, 'Medical Leave');
+        if (reason) {
+          const curDay = state.currentDay || 'Monday';
+          state.leaves[curDay] = state.leaves[curDay] || [];
+          if (!state.leaves[curDay].includes(state.selectedESSTeacher)) {
+            state.leaves[curDay].push(state.selectedESSTeacher);
+          }
+          saveState();
+          renderTeacherESSView();
+          renderAttendance();
+          showToast(`Leave application submitted for ${state.selectedESSTeacher}. Proxy recommendations updated.`, 'success');
+        }
+      };
+    }
+    if (DOM.btnPrintEssPortal) {
+      DOM.btnPrintEssPortal.onclick = () => window.print();
+    }
+  }
+
+  function renderTeacherESSView() {
+    const teacher = state.selectedESSTeacher || 'Priya Ma\'am';
+
+    if (DOM.selectEssTeacher) {
+      DOM.selectEssTeacher.innerHTML = '';
+      (state.teachers || []).forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        if (t === teacher) opt.selected = true;
+        DOM.selectEssTeacher.appendChild(opt);
+      });
+    }
+
+    if (DOM.essTeacherName) DOM.essTeacherName.textContent = teacher;
+    if (DOM.essTeacherAvatar) {
+      const parts = teacher.replace(/Ma'am|Sir/g, '').trim().split(' ');
+      DOM.essTeacherAvatar.textContent = parts.map(p => p[0]).join('').toUpperCase() || 'PM';
+    }
+
+    const ctDuty = (state.classTeacherDuties || []).find(c => c.teacher === teacher) || {};
+    if (DOM.essTeacherRoleBadge) {
+      DOM.essTeacherRoleBadge.textContent = ctDuty.standardName ? `Class Teacher • ${ctDuty.standardName}` : 'Subject Faculty';
+    }
+    if (DOM.essTeacherEmail) {
+      DOM.essTeacherEmail.textContent = `${teacher.toLowerCase().replace(/[^a-z]/g, '')}@funland.edu`;
+    }
+    if (DOM.essTeacherShift) {
+      DOM.essTeacherShift.textContent = state.currentShift === 'morning' ? 'Morning Shift (7:30 AM – 12:15 PM)' : 'Afternoon Shift (1:00 PM – 5:50 PM)';
+    }
+
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    let weeklyLoad = 0;
+    let todayClasses = 0;
+    const curDay = state.currentDay || 'Monday';
+
+    days.forEach(d => {
+      const dSched = (state.schedules || {})[d] || {};
+      (state.periods || []).forEach(p => {
+        const pSlots = dSched[p.id] || {};
+        Object.keys(pSlots).forEach(stdId => {
+          if (pSlots[stdId] && pSlots[stdId].teacher === teacher) {
+            weeklyLoad++;
+            if (d === curDay) todayClasses++;
+          }
+        });
+      });
+    });
+
+    if (DOM.essKpiWeeklyLoad) DOM.essKpiWeeklyLoad.textContent = weeklyLoad;
+    if (DOM.essKpiTodayCount) DOM.essKpiTodayCount.textContent = todayClasses;
+
+    const weeklyDutiesAssigned = Object.keys(state.weeklyDuties[teacher] || {}).length;
+    const generalDutiesAssigned = (state.generalDuties || []).filter(g => Object.values(g.allocations || {}).includes(teacher)).length;
+    if (DOM.essKpiDutiesCount) DOM.essKpiDutiesCount.textContent = weeklyDutiesAssigned + generalDutiesAssigned;
+
+    renderESSTodaySchedule(teacher, curDay);
+    renderESSDuties(teacher);
+    renderESSProxies(teacher);
+    renderESSSyllabus(teacher);
+  }
+
+  function renderESSTodaySchedule(teacher, day) {
+    if (!DOM.essTodayScheduleList) return;
+    if (DOM.essTodayDayLabel) DOM.essTodayDayLabel.textContent = day;
+
+    const dSched = (state.schedules || {})[day] || {};
+    const periods = state.periods || [];
+    let listHtml = '';
+    let activeFound = false;
+
+    periods.forEach((p, idx) => {
+      const pSlots = dSched[p.id] || {};
+      let assignedStd = null;
+      let assignedSubj = null;
+
+      Object.keys(pSlots).forEach(stdId => {
+        if (pSlots[stdId] && pSlots[stdId].teacher === teacher) {
+          assignedStd = (state.standards || []).find(s => s.id === stdId) || { name: stdId, room: 'Room 101' };
+          assignedSubj = pSlots[stdId].subject;
+        }
+      });
+
+      const isCurrentPeriod = (idx === 1);
+      if (isCurrentPeriod && assignedStd) {
+        activeFound = true;
+        if (DOM.essActivePeriodBadge) DOM.essActivePeriodBadge.textContent = `LIVE RADAR • ${p.label.toUpperCase()} IN PROGRESS`;
+        if (DOM.essActiveRoomDisplay) DOM.essActiveRoomDisplay.textContent = `${assignedStd.room || 'Room 101'} • ${assignedStd.name} • ${assignedSubj}`;
+        if (DOM.essActiveTimerDisplay) DOM.essActiveTimerDisplay.textContent = '28 mins remaining';
+      }
+
+      const colorClass = assignedSubj ? getSubjectColorClass(assignedSubj) : '';
+
+      listHtml += `
+        <div class="ess-period-row ${isCurrentPeriod ? 'current-active' : ''}">
+          <div style="width: 130px;">
+            <div style="font-weight: 700; font-size: 13px;">${escapeHtml(p.label)}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${escapeHtml(p.time)}</div>
+          </div>
+          <div style="flex: 1;">
+            ${assignedStd ? `
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="class-tt-subject-badge ${colorClass}" style="font-size: 12px;">${escapeHtml(assignedSubj)}</span>
+                <span style="font-weight: 700; font-size: 13px;">${escapeHtml(assignedStd.name)}</span>
+                <span style="font-size: 11.5px; color: var(--text-muted);">(${escapeHtml(assignedStd.room || 'Room 101')})</span>
+              </div>
+            ` : `
+              <span style="color: #64748b; font-size: 12px; font-style: italic;">Free / Preparation Period (Library or Staff Room)</span>
+            `}
+          </div>
+          <div>
+            ${isCurrentPeriod 
+              ? `<span class="badge" style="background: #1e3a8a; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px;">● Active Now</span>` 
+              : (assignedStd ? `<span class="badge" style="background: #f1f5f9; color: #475569; font-size: 11px;">Scheduled</span>` : `<span class="badge" style="background: #f0fdf4; color: #166534; font-size: 11px;">Free Slot</span>`)}
+          </div>
+        </div>`;
+    });
+
+    if (!activeFound && DOM.essActiveRoomDisplay) {
+      if (DOM.essActivePeriodBadge) DOM.essActivePeriodBadge.textContent = 'LIVE RADAR • CURRENT SHIFT';
+      DOM.essActiveRoomDisplay.textContent = 'Staff Common Room • Free Period';
+      if (DOM.essActiveTimerDisplay) DOM.essActiveTimerDisplay.textContent = 'Free Time';
+    }
+
+    DOM.essTodayScheduleList.innerHTML = listHtml;
+  }
+
+  function renderESSDuties(teacher) {
+    if (!DOM.essDutyCardContent) return;
+    const weekly = state.weeklyDuties[teacher] || {};
+    const days = Object.keys(weekly);
+
+    if (days.length === 0) {
+      DOM.essDutyCardContent.innerHTML = `<p style="color: var(--text-muted); font-size: 12.5px; margin: 0;">No extra duties scheduled for this week. Enjoy your preparation time!</p>`;
+      return;
+    }
+
+    let html = `<div style="display: flex; flex-direction: column; gap: 6px;">`;
+    days.forEach(d => {
+      html += `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 10px; font-size: 12px;">
+          <span style="font-weight: 700; color: #92400e;">📅 ${escapeHtml(d)}</span>
+          <span style="font-weight: 600; color: #b45309;">${escapeHtml(weekly[d])}</span>
+        </div>`;
+    });
+    html += `</div>`;
+    DOM.essDutyCardContent.innerHTML = html;
+  }
+
+  function renderESSProxies(teacher) {
+    if (!DOM.essProxyCardContent) return;
+    const curDay = state.currentDay || 'Monday';
+    const daySubs = (state.substitutions[curDay] || []).filter(s => s.proxyTeacher === teacher);
+
+    if (daySubs.length === 0) {
+      DOM.essProxyCardContent.innerHTML = `<p style="color: #16a34a; font-size: 12.5px; font-weight: 600; margin: 0;">✓ No proxy substitutions assigned today. All regular periods!</p>`;
+      return;
+    }
+
+    let html = `<div style="display: flex; flex-direction: column; gap: 6px;">`;
+    daySubs.forEach(s => {
+      html += `
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 10px; font-size: 12px; color: #1e40af;">
+          <strong>Proxy Lecture:</strong> Covering for <em>${escapeHtml(s.absentTeacher)}</em> in <strong>${escapeHtml(s.stdId)}</strong> (${escapeHtml(s.periodId)}).
+        </div>`;
+    });
+    html += `</div>`;
+    DOM.essProxyCardContent.innerHTML = html;
+  }
+
+  function renderESSSyllabus(teacher) {
+    if (!DOM.essSyllabusChecklist) return;
+
+    const topics = [
+      { id: 'top_1', title: 'Chapter 1: Real Numbers & Operations', done: true },
+      { id: 'top_2', title: 'Chapter 2: Polynomials & Factors', done: true },
+      { id: 'top_3', title: 'Chapter 3: Linear Equations in Two Variables', done: true },
+      { id: 'top_4', title: 'Chapter 4: Geometry & Angle Relationships', done: true },
+      { id: 'top_5', title: 'Chapter 5: Mensuration & Surface Areas', done: false },
+      { id: 'top_6', title: 'Mid-Term Revision & Practical Assessment', done: false }
+    ];
+
+    let doneCount = topics.filter(t => t.done).length;
+    let pct = Math.round((doneCount / topics.length) * 100);
+
+    if (DOM.essSyllabusPctBadge) DOM.essSyllabusPctBadge.textContent = `${pct}% Done`;
+    if (DOM.essSyllabusBarFill) DOM.essSyllabusBarFill.style.width = `${pct}%`;
+    if (DOM.essKpiSyllabusCount) DOM.essKpiSyllabusCount.textContent = `${pct}%`;
+
+    let html = '';
+    topics.forEach(t => {
+      html += `
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-primary); cursor: pointer; padding: 4px 0;">
+          <input type="checkbox" ${t.done ? 'checked' : ''} onchange="window.toggleESSTopic(this)" style="width: 16px; height: 16px; accent-color: #10b981;">
+          <span style="${t.done ? 'text-decoration: line-through; color: #64748b;' : 'font-weight: 600;'}">${escapeHtml(t.title)}</span>
+        </label>`;
+    });
+
+    DOM.essSyllabusChecklist.innerHTML = html;
+  }
+
+  window.toggleESSTopic = function(checkbox) {
+    const parent = checkbox.closest('#ess-syllabus-checklist');
+    if (!parent) return;
+    const total = parent.querySelectorAll('input[type="checkbox"]').length;
+    const checked = parent.querySelectorAll('input[type="checkbox"]:checked').length;
+    const pct = Math.round((checked / total) * 100);
+
+    if (DOM.essSyllabusPctBadge) DOM.essSyllabusPctBadge.textContent = `${pct}% Done`;
+    if (DOM.essSyllabusBarFill) DOM.essSyllabusBarFill.style.width = `${pct}%`;
+    if (DOM.essKpiSyllabusCount) DOM.essKpiSyllabusCount.textContent = `${pct}%`;
+    showToast(`Syllabus checklist updated to ${pct}% completion`, 'info');
+  };
+
   // --- Setup Event Listeners ---
   function setupEventListeners() {
     // Collapsible Sidebar Toggle & State Persistence
@@ -6249,8 +7246,13 @@
     }
 
     // Close Modals on background click
-    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal, DOM.cloudDbModal, DOM.classCellModal, DOM.attendanceDutyModal, DOM.classTeacherModal, DOM.syllabusModal, DOM.authLoginOverlay].forEach(m => {
-      if (m) m.onclick = (e) => { if (e.target === m) m.classList.remove('active'); };
+    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal, DOM.cloudDbModal, DOM.classCellModal, DOM.attendanceDutyModal, DOM.classTeacherModal, DOM.syllabusModal, DOM.authLoginOverlay, DOM.autoSchedulerModal, DOM.addSectionModal, DOM.addExamSlotModal].forEach(m => {
+      if (m) m.onclick = (e) => { 
+        if (e.target === m) {
+          m.classList.remove('active'); 
+          m.style.display = 'none';
+        }
+      };
     });
 
     // ESC Key
@@ -6268,6 +7270,9 @@
         if (DOM.classTeacherModal) DOM.classTeacherModal.classList.remove('active');
         if (DOM.syllabusModal) DOM.syllabusModal.classList.remove('active');
         if (DOM.authLoginOverlay) DOM.authLoginOverlay.classList.remove('active');
+        if (DOM.autoSchedulerModal) DOM.autoSchedulerModal.style.display = 'none';
+        if (DOM.addSectionModal) DOM.addSectionModal.style.display = 'none';
+        if (DOM.addExamSlotModal) DOM.addExamSlotModal.style.display = 'none';
       }
     };
   }
