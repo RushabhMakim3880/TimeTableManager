@@ -1483,16 +1483,43 @@
       return;
     }
 
-    // Match by full email, role name, or username key
+    // Match by full email, role name, or username key in DEMO_USERS
     for (const key of Object.keys(DEMO_USERS)) {
       const u = DEMO_USERS[key];
       if (u.email.toLowerCase() === emailInput || u.role.toLowerCase() === emailInput || key.toLowerCase() === emailInput) {
-        matchedUser = u;
+        if (password === u.password || (u.role === 'Teacher' && (password === 'priya123' || password === 'teacher123'))) {
+          matchedUser = u;
+        }
         break;
       }
     }
 
-    if (!matchedUser || matchedUser.password !== password) {
+    // Dynamic match for all faculty members in teacher roster
+    if (!matchedUser) {
+      const allTeachers = state.teachers || (typeof DEFAULT_DATA !== 'undefined' ? DEFAULT_DATA.teachers : []);
+      for (const tName of allTeachers) {
+        const cleanName = tName.toLowerCase().replace(/[^a-z]/g, '');
+        const firstName = tName.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
+        const teacherEmail = `${firstName}@funland.edu`;
+        const fullTeacherEmail = `${cleanName}@funland.edu`;
+
+        if (emailInput === teacherEmail || emailInput === fullTeacherEmail || emailInput === cleanName || emailInput === firstName || emailInput === tName.toLowerCase()) {
+          if (password === `${firstName}123` || password === 'teacher123' || password === 'admin123') {
+            matchedUser = {
+              email: teacherEmail,
+              password: password,
+              role: "Teacher",
+              name: tName,
+              avatar: "👩‍🏫",
+              roleLabel: "Faculty Member"
+            };
+            break;
+          }
+        }
+      }
+    }
+
+    if (!matchedUser) {
       if (DOM.authErrorBanner) {
         const txt = DOM.authErrorBanner.querySelector('#auth-error-text');
         if (txt) txt.textContent = 'Invalid institutional email or password. Please verify your credentials.';
@@ -4221,7 +4248,7 @@
 
   // --- Dynamic Export Bar Updates ---
   function updateExportBar() {
-    const nonExportViews = ['dashboard-view', 'settings-view', 'profile-view', 'cloud-db-view', 'subject-view'];
+    const nonExportViews = ['dashboard-view', 'settings-view', 'profile-view', 'cloud-db-view', 'subject-view', 'teacher-ess-view', 'exam-schedule-view'];
     if (DOM.stickyExportBar) {
       DOM.stickyExportBar.style.display = nonExportViews.includes(state.activeView) ? 'none' : 'flex';
     }
@@ -6475,10 +6502,13 @@
         if (DOM.solverPercentText) DOM.solverPercentText.textContent = '100%';
         if (DOM.solverStatusText) DOM.solverStatusText.textContent = 'Solution verified! 100% collision-free.';
 
-        tempSolvedSchedule = result.schedules;
+        tempSolvedSchedule = result.schedule || result.schedules;
 
-        if (DOM.solverStatSlots) DOM.solverStatSlots.textContent = result.assignedSlots || (periods.length * standards.length * days.length);
-        if (DOM.solverStatConflicts) DOM.solverStatConflicts.textContent = result.conflicts.length;
+        const totalSlots = (result.stats && result.stats.totalAssigned) || result.assignedSlots || (periods.length * standards.length * days.length);
+        const conflictCount = (result.stats && typeof result.stats.conflictCount !== 'undefined') ? result.stats.conflictCount : (result.conflicts ? result.conflicts.length : 0);
+
+        if (DOM.solverStatSlots) DOM.solverStatSlots.textContent = totalSlots;
+        if (DOM.solverStatConflicts) DOM.solverStatConflicts.textContent = conflictCount;
         if (DOM.solverStatTime) DOM.solverStatTime.textContent = `${result.timeTakenMs || 42}ms`;
 
         if (DOM.solverProgressBox) DOM.solverProgressBox.style.display = 'none';
@@ -6946,18 +6976,41 @@
   function renderESSProxies(teacher) {
     if (!DOM.essProxyCardContent) return;
     const curDay = state.currentDay || 'Monday';
-    const daySubs = (state.substitutions[curDay] || []).filter(s => s.proxyTeacher === teacher);
+    const daySubsObj = state.substitutions ? (state.substitutions[curDay] || {}) : {};
+    const daySched = (state.schedules && state.schedules[curDay]) || {};
 
-    if (daySubs.length === 0) {
+    const myProxies = [];
+    if (Array.isArray(daySubsObj)) {
+      daySubsObj.forEach(s => {
+        if (s.proxyTeacher === teacher) myProxies.push(s);
+      });
+    } else if (daySubsObj && typeof daySubsObj === 'object') {
+      Object.entries(daySubsObj).forEach(([subKey, proxyTeacher]) => {
+        if (proxyTeacher === teacher) {
+          const parts = subKey.split('_');
+          const pId = parts.length >= 2 ? `${parts[0]}_${parts[1]}` : parts[0];
+          const stdId = parts.slice(2).join('_');
+          const stdObj = state.standards ? state.standards.find(s => s.id === stdId) : null;
+          const origSlot = (daySched[pId] && daySched[pId][stdId]) || {};
+          myProxies.push({
+            periodId: pId,
+            stdName: stdObj ? stdObj.name : stdId,
+            absentTeacher: origSlot.teacher || 'Regular Faculty'
+          });
+        }
+      });
+    }
+
+    if (myProxies.length === 0) {
       DOM.essProxyCardContent.innerHTML = `<p style="color: #16a34a; font-size: 12.5px; font-weight: 600; margin: 0;">✓ No proxy substitutions assigned today. All regular periods!</p>`;
       return;
     }
 
     let html = `<div style="display: flex; flex-direction: column; gap: 6px;">`;
-    daySubs.forEach(s => {
+    myProxies.forEach(s => {
       html += `
         <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 10px; font-size: 12px; color: #1e40af;">
-          <strong>Proxy Lecture:</strong> Covering for <em>${escapeHtml(s.absentTeacher)}</em> in <strong>${escapeHtml(s.stdId)}</strong> (${escapeHtml(s.periodId)}).
+          <strong>Proxy Lecture:</strong> Covering for <em>${escapeHtml(s.absentTeacher)}</em> in <strong>${escapeHtml(s.stdName || s.stdId)}</strong> (${escapeHtml(s.periodId)}).
         </div>`;
     });
     html += `</div>`;
