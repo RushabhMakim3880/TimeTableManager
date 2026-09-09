@@ -970,8 +970,8 @@
       DOM.saveBadge.title = 'Connected to Firestore. Click to open Cloud Settings.';
     } else if (status === 'error') {
       DOM.saveBadge.className = 'status-pill cloud-offline';
-      DOM.saveBadge.innerHTML = '<span class="dot"></span> Cloud Error';
-      DOM.saveBadge.title = details.message || 'Error connecting to Firestore. Click for details.';
+      DOM.saveBadge.innerHTML = '<span class="dot"></span> Saved Locally (Cloud Offline)';
+      DOM.saveBadge.title = details.message || 'Saved locally. Firestore cloud offline or not enabled.';
     } else {
       // unconfigured
       DOM.saveBadge.className = 'status-pill cloud-unconfigured';
@@ -4841,14 +4841,14 @@
             <input type="text" class="settings-input cfg-slot-time" data-id="${p.id}" value="${escapeHtml(p.time)}" style="width: 170px;">
           </td>
           <td style="text-align: center;">
-            <label style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; cursor: pointer;">
+            <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer;">
               <input type="checkbox" class="cfg-slot-break" data-id="${p.id}" ${isBreak ? 'checked' : ''}>
-              ${isBreak ? '<span style="color: #b45309; font-weight: 700;">Break</span>' : 'Class'}
+              <span class="slot-type-badge ${isBreak ? 'badge-recess' : 'badge-lecture'}">${isBreak ? 'Recess / Break' : 'Regular Lecture'}</span>
             </label>
           </td>
           <td style="text-align: center;">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="window.deletePeriodSlot('${activeCfgShift}', '${p.id}')" style="color: #dc2626;" title="Delete Slot">
-              🗑️
+            <button type="button" class="btn btn-danger-outline btn-sm action-icon-btn" onclick="window.deletePeriodSlot('${activeCfgShift}', '${p.id}')" title="Delete Slot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path></svg>
             </button>
           </td>
         </tr>`;

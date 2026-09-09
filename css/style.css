@@ -786,11 +786,14 @@ html, body {
   gap: 20px;
 }
 
-/* View Sections */
+/* View Sections - Full Width Workspace */
 .view-section {
   display: none;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .view-section.active {
@@ -3448,8 +3451,10 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 1380px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 /* Executive Settings Header Card */
@@ -3650,6 +3655,31 @@ html, body {
 
 .period-slots-table tr:hover td {
   background: #f8fafc;
+}
+
+.slot-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.slot-type-badge.badge-recess {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  font-weight: 700;
+}
+
+.slot-type-badge.badge-lecture {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
 }
 
 /* Faculty Shifts & Half Day Allocation Table */

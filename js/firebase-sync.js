@@ -31,17 +31,31 @@
     });
   }
 
+  function withTimeout(promise, ms = 7000, errorMsg = 'Operation timed out') {
+    let timer;
+    const timeoutPromise = new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(errorMsg)), ms);
+    });
+    return Promise.race([promise, timeoutPromise]).finally(() => {
+      if (timer) clearTimeout(timer);
+    });
+  }
+
   function getStoredConfig() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_CONFIG);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        if (isValidConfig(parsed)) return parsed;
       }
     } catch (e) {
       console.warn('Could not read stored Firebase config:', e);
     }
-    if (typeof window.FIREBASE_CONFIG === 'object' && window.FIREBASE_CONFIG !== null) {
+    if (typeof window !== 'undefined' && typeof window.FIREBASE_CONFIG === 'object' && window.FIREBASE_CONFIG !== null) {
       return window.FIREBASE_CONFIG;
+    }
+    if (typeof FIREBASE_CONFIG === 'object' && FIREBASE_CONFIG !== null) {
+      return FIREBASE_CONFIG;
     }
     return null;
   }
@@ -85,18 +99,22 @@
 
       db = window.firebase.firestore();
 
-      // Enable offline persistence with multi-tab support
+      // Enable offline persistence with multi-tab support (safely caught)
       try {
-        await db.enablePersistence({ synchronizeTabs: true });
-        console.log('[Firebase Sync] Offline persistence enabled with multi-tab sync');
-      } catch (err) {
-        if (err.code === 'failed-precondition') {
-          console.warn('[Firebase Sync] Persistence failed: Multiple tabs open simultaneously');
-        } else if (err.code === 'unimplemented') {
-          console.warn('[Firebase Sync] Browser does not support IndexedDB persistence');
-        } else {
-          console.warn('[Firebase Sync] Persistence warning:', err);
+        if (typeof db.enablePersistence === 'function') {
+          await db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+            if (err.code === 'failed-precondition') {
+              console.warn('[Firebase Sync] Persistence notice: multiple tabs open simultaneously');
+            } else if (err.code === 'unimplemented') {
+              console.warn('[Firebase Sync] Browser does not support IndexedDB persistence');
+            } else {
+              console.warn('[Firebase Sync] Persistence notice:', err.message || err);
+            }
+          });
+          console.log('[Firebase Sync] Offline persistence initialized with multi-tab sync');
         }
+      } catch (err) {
+        console.warn('[Firebase Sync] Persistence initialization skipped:', err);
       }
 
       isInitialized = true;
@@ -132,9 +150,12 @@
             schoolProfile: state.schoolProfile || {},
             standards: state.standards || [],
             periods: state.periods || [],
+            shifts: state.shifts || {},
+            shiftSettings: state.shiftSettings || {},
             teachers: state.teachers || [],
             teacherProfiles: state.teacherProfiles || {},
             subjects: state.subjects || [],
+            subjectDetails: state.subjectDetails || {},
             days: state.days || [],
             schedules: state.schedules || {},
             leaves: state.leaves || {},
@@ -143,20 +164,34 @@
             duties: state.duties || {},
             weeklyDuties: state.weeklyDuties || {},
             generalDuties: state.generalDuties || [],
+            classTeachers: state.classTeachers || [],
+            specialDuties: state.specialDuties || [],
+            assemblyDuties: state.assemblyDuties || [],
+            syllabusScope: state.syllabusScope || {},
             excludedFreeTeachers: state.excludedFreeTeachers || {},
             updatedAt: new Date().toISOString(),
-            clientVersion: 'v4.1'
+            clientVersion: 'v4.2'
           };
 
           const docRef = db.collection(COLLECTION_NAME).doc(DOCUMENT_ID);
-          await docRef.set(payload, { merge: true });
+          await withTimeout(docRef.set(payload, { merge: true }), 8000, 'Cloud save timed out');
 
           lastSavedAt = new Date();
           notifyStatus('synced', { lastSavedAt });
           resolve({ success: true, savedAt: lastSavedAt });
         } catch (err) {
-          console.error('[Firebase Sync] Cloud save error:', err);
-          notifyStatus(navigator.onLine ? 'error' : 'offline', { message: err.message });
+          console.warn('[Firebase Sync] Cloud save notice:', err.message || err);
+          const isConfigOrPermError = err.message && (
+            err.message.includes('PERMISSION_DENIED') ||
+            err.message.includes('permission') ||
+            err.message.includes('not been used in project') ||
+            err.message.includes('disabled')
+          );
+          if (isConfigOrPermError) {
+            notifyStatus('error', { message: 'Firestore API not enabled in Firebase Console.' });
+          } else {
+            notifyStatus('offline', { message: 'Cloud save queued locally' });
+          }
           resolve({ success: false, error: err });
         } finally {
           setTimeout(() => { isSavingLocally = false; }, 500);
@@ -182,19 +217,29 @@
     try {
       notifyStatus('syncing', { message: 'Fetching timetable from Cloud...' });
       const docRef = db.collection(COLLECTION_NAME).doc(DOCUMENT_ID);
-      const snap = await docRef.get();
+      const snap = await withTimeout(docRef.get(), 6000, 'Cloud fetch timed out');
 
-      if (snap.exists) {
+      if (snap && snap.exists) {
         lastSavedAt = snap.data().updatedAt ? new Date(snap.data().updatedAt) : new Date();
         notifyStatus('synced', { lastSavedAt });
         return snap.data();
       } else {
-        notifyStatus('connected', { message: 'Database empty. Ready to upload initial data.' });
+        notifyStatus('connected', { message: 'Database ready. Ready to upload initial data.' });
         return null;
       }
     } catch (err) {
-      console.error('[Firebase Sync] Cloud fetch error:', err);
-      notifyStatus(navigator.onLine ? 'error' : 'offline', { message: err.message });
+      console.warn('[Firebase Sync] Cloud fetch error:', err.message || err);
+      const isConfigOrPermError = err.message && (
+        err.message.includes('PERMISSION_DENIED') ||
+        err.message.includes('permission') ||
+        err.message.includes('not been used in project') ||
+        err.message.includes('disabled')
+      );
+      if (isConfigOrPermError) {
+        notifyStatus('error', { message: 'Firestore API disabled or permission denied in Firebase Console.' });
+      } else {
+        notifyStatus('offline', { message: 'Cloud connection offline (saved locally)' });
+      }
       return null;
     }
   }
