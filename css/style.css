@@ -6396,5 +6396,244 @@ html, body {
   body.printing-ess-modal #ess-weekly-modal .enterprise-modal-footer button {
     display: none !important;
   }
+
+  /* Support printing Official Faculty Daily Teaching & Duty Slip */
+  body.printing-daily-slip {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body.printing-daily-slip .app-shell,
+  body.printing-daily-slip .app-main-layout,
+  body.printing-daily-slip .app-sidebar,
+  body.printing-daily-slip .app-topbar,
+  body.printing-daily-slip .sticky-export-bar,
+  body.printing-daily-slip .main-wrapper,
+  body.printing-daily-slip .enterprise-modal-overlay,
+  body.printing-daily-slip .toast-area {
+    display: none !important;
+  }
+  body.printing-daily-slip #ess-daily-slip-printout {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 6mm 8mm !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    box-sizing: border-box !important;
+  }
 }
+
+.slip-document-container {
+    width: 100%;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 2px solid #0f172a;
+    padding: 14px 18px;
+    box-sizing: border-box;
+    page-break-inside: avoid;
+  }
+  .slip-header-brand {
+    text-align: center;
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+  }
+  .slip-school-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 2px 0;
+  }
+  .slip-school-subtitle {
+    font-size: 11px;
+    color: #475569;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+  }
+  .slip-document-badge {
+    display: inline-block;
+    background: #0f172a;
+    color: #ffffff !important;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 14px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .slip-faculty-ribbon {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+  }
+  .slip-ribbon-item {
+    font-size: 11px;
+  }
+  .slip-ribbon-label {
+    display: block;
+    font-size: 9px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 1px;
+  }
+  .slip-ribbon-val {
+    font-weight: 800;
+    color: #0f172a;
+    font-size: 11.5px;
+  }
+  .slip-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-left: 3px solid #0f172a;
+    padding-left: 6px;
+    margin: 10px 0 5px 0;
+  }
+  .slip-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+  .slip-table th {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 5px 7px;
+    border: 1px solid #0f172a;
+    text-align: left;
+  }
+  .slip-table td {
+    padding: 5px 7px;
+    font-size: 10.5px;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    vertical-align: middle;
+  }
+  .slip-table tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+  .slip-table .recess-row td {
+    background: #f1f5f9 !important;
+    text-align: center;
+    font-weight: 800;
+    font-size: 9.5px;
+    letter-spacing: 0.05em;
+    color: #475569;
+    padding: 3px;
+  }
+  .slip-dual-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .slip-panel-box {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: #f8fafc;
+  }
+  .slip-panel-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: #0f172a;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .slip-panel-body {
+    font-size: 10.5px;
+    color: #1e293b;
+  }
+  .slip-duty-tag {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .slip-footer-signs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 22px;
+    padding-top: 8px;
+    border-top: 1px dashed #94a3b8;
+  }
+  .slip-sign-col {
+    text-align: center;
+  }
+  .slip-sign-line {
+    border-top: 1.5px solid #0f172a;
+    margin-bottom: 3px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .slip-sign-label {
+    font-size: 9.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #334155;
+    letter-spacing: 0.03em;
+  }
+  .slip-sign-sub {
+    font-size: 8.5px;
+    color: #64748b;
+  }
+  .slip-bottom-meta {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8px;
+    color: #64748b;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 3px;
+  }
+
+/* Quick Create button suppression in ESS Portal & for Teacher Role */
+body.view-teacher-ess-view #btn-topbar-quick-create,
+body.role-teacher #btn-topbar-quick-create {
+  display: none !important;
+}
+
+#select-teacher-filter:disabled {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  cursor: default;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
 

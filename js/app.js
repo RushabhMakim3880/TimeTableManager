@@ -591,6 +591,7 @@
     essWeeklyShiftBadge: document.getElementById('ess-weekly-shift-badge'),
     essWeeklyModalSub: document.getElementById('ess-weekly-modal-sub'),
     essWeeklyGridContainer: document.getElementById('ess-weekly-grid-container'),
+    essDailySlipPrintout: document.getElementById('ess-daily-slip-printout'),
 
     // ESS Default Password Warning Banner & Change Password Modal
     btnEssChangePassword: document.getElementById('btn-ess-change-password'),
@@ -1723,6 +1724,9 @@
 
     if (isTeacher) {
       // TEACHER PORTAL MODE:
+      document.body.classList.add('role-teacher');
+      document.body.classList.remove('role-admin');
+
       // 1. Show Teacher ESS tab and group
       if (navEssBtn) navEssBtn.style.display = 'flex';
       if (navEssGroup) navEssGroup.style.display = 'block';
@@ -1764,7 +1768,15 @@
       const switcherWrap = document.getElementById('select-ess-teacher-wrapper');
       if (switcherWrap) switcherWrap.style.display = 'none';
 
-      // 6. If active view is admin-only, redirect to teacher-ess-view
+      // 6. Strictly hide administrative management buttons across all views
+      if (DOM.btnTopbarQuickCreate) DOM.btnTopbarQuickCreate.style.display = 'none';
+      if (DOM.btnQuickNewTeacherView) DOM.btnQuickNewTeacherView.style.display = 'none';
+      if (DOM.btnDownloadAllTeachersDocx) DOM.btnDownloadAllTeachersDocx.style.display = 'none';
+      if (DOM.btnClearAllWeeklyDuties) DOM.btnClearAllWeeklyDuties.style.display = 'none';
+      if (DOM.btnOpenAutoScheduler) DOM.btnOpenAutoScheduler.style.display = 'none';
+      if (DOM.btnOpenAddSectionModal) DOM.btnOpenAddSectionModal.style.display = 'none';
+
+      // 7. If active view is admin-only, redirect to teacher-ess-view
       const isAllowed = teacherTabs.some(t => {
         const el = document.getElementById(t);
         return el && el.getAttribute('data-view') === state.activeView;
@@ -1775,6 +1787,9 @@
 
     } else {
       // NON-TEACHER / MANAGEMENT MODE (Admin, Principal, Supervision Staff, Guest)
+      document.body.classList.remove('role-teacher');
+      document.body.classList.add('role-admin');
+
       // STRICTLY HIDE TEACHER ESS COCKPIT
       if (navEssBtn) navEssBtn.style.display = 'none';
       if (navEssGroup) navEssGroup.style.display = 'none';
@@ -1792,6 +1807,16 @@
           grp.style.display = 'block';
         }
       });
+
+      // Restore administrative management buttons
+      if (DOM.btnTopbarQuickCreate && state.activeView !== 'teacher-ess-view') {
+        DOM.btnTopbarQuickCreate.style.display = 'inline-flex';
+      }
+      if (DOM.btnQuickNewTeacherView) DOM.btnQuickNewTeacherView.style.display = 'inline-flex';
+      if (DOM.btnDownloadAllTeachersDocx) DOM.btnDownloadAllTeachersDocx.style.display = 'inline-flex';
+      if (DOM.btnClearAllWeeklyDuties) DOM.btnClearAllWeeklyDuties.style.display = 'inline-flex';
+      if (DOM.btnOpenAutoScheduler) DOM.btnOpenAutoScheduler.style.display = 'inline-flex';
+      if (DOM.btnOpenAddSectionModal) DOM.btnOpenAddSectionModal.style.display = 'inline-flex';
 
       // If currently on teacher-ess-view, redirect away to dashboard
       if (state.activeView === 'teacher-ess-view') {
@@ -2432,6 +2457,11 @@
   }
 
   window.openClassCellModal = function(day, periodId, stdId) {
+    const curUser = (state.auth && state.auth.currentUser) || null;
+    if (curUser && curUser.role === 'Teacher') {
+      showToast('Class timetable schedules are managed by School Administration.', 'info');
+      return;
+    }
     if (!DOM.classCellModal) return;
 
     DOM.classCellDay.value = day;
@@ -3194,6 +3224,21 @@
       }
     }
 
+    const isTeacher = curUser && (curUser.role === 'Teacher');
+
+    // Manage body view classes
+    document.body.className = document.body.className.replace(/\bview-[a-z0-9-]+\b/g, '').trim();
+    document.body.classList.add(`view-${viewName}`);
+
+    // Quick Create button visibility: Strictly hide on ESS portal or for teacher role
+    if (DOM.btnTopbarQuickCreate) {
+      if (isTeacher || viewName === 'teacher-ess-view') {
+        DOM.btnTopbarQuickCreate.style.display = 'none';
+      } else {
+        DOM.btnTopbarQuickCreate.style.display = 'inline-flex';
+      }
+    }
+
     state.activeView = viewName;
     DOM.viewTabBtns.forEach(btn => {
       btn.classList.toggle('active', btn.getAttribute('data-view') === viewName);
@@ -3494,30 +3539,69 @@
 
   // --- 2. Teacher-Wise Individual Timetable Rendering ---
   function renderTeacherView() {
-    DOM.selectTeacherFilter.innerHTML = '';
-    state.teachers.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t;
-      opt.textContent = t;
-      if (t === state.selectedTeacher) opt.selected = true;
-      DOM.selectTeacherFilter.appendChild(opt);
-    });
-    const addTeacherOpt = document.createElement('option');
-    addTeacherOpt.value = '__NEW_TEACHER__';
-    addTeacherOpt.textContent = '➕ + Add New Teacher...';
-    addTeacherOpt.style.fontWeight = '700';
-    addTeacherOpt.style.color = '#2563eb';
-    DOM.selectTeacherFilter.appendChild(addTeacherOpt);
+    const curUser = (state.auth && state.auth.currentUser) || null;
+    const isTeacher = curUser && (curUser.role === 'Teacher');
 
-    DOM.selectTeacherFilter.onchange = function() {
-      if (this.value === '__NEW_TEACHER__') {
-        openQuickAddModal('teacher', this);
-        this.value = state.selectedTeacher || state.teachers[0];
-      } else {
-        state.selectedTeacher = this.value;
-        renderTeacherGrid();
+    DOM.selectTeacherFilter.innerHTML = '';
+
+    if (isTeacher) {
+      // Strictly restrict teacher to their own timetable
+      const myName = (curUser.name || '').trim() || state.teachers[0];
+      state.selectedTeacher = myName;
+
+      const opt = document.createElement('option');
+      opt.value = myName;
+      opt.textContent = `${myName} (Your Personal Timetable)`;
+      opt.selected = true;
+      DOM.selectTeacherFilter.appendChild(opt);
+      DOM.selectTeacherFilter.disabled = true; // Lock dropdown
+
+      // Hide New Teacher button & Bulk export button
+      if (DOM.btnQuickNewTeacherView) DOM.btnQuickNewTeacherView.style.display = 'none';
+      if (DOM.btnDownloadAllTeachersDocx) DOM.btnDownloadAllTeachersDocx.style.display = 'none';
+      if (DOM.btnDownloadTeacherDocx) {
+        DOM.btnDownloadTeacherDocx.style.display = 'inline-flex';
+        DOM.btnDownloadTeacherDocx.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download My Schedule (.docx)
+        `;
       }
-    };
+    } else {
+      DOM.selectTeacherFilter.disabled = false;
+      state.teachers.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        if (t === state.selectedTeacher) opt.selected = true;
+        DOM.selectTeacherFilter.appendChild(opt);
+      });
+      const addTeacherOpt = document.createElement('option');
+      addTeacherOpt.value = '__NEW_TEACHER__';
+      addTeacherOpt.textContent = '➕ + Add New Teacher...';
+      addTeacherOpt.style.fontWeight = '700';
+      addTeacherOpt.style.color = '#2563eb';
+      DOM.selectTeacherFilter.appendChild(addTeacherOpt);
+
+      if (DOM.btnQuickNewTeacherView) DOM.btnQuickNewTeacherView.style.display = 'inline-flex';
+      if (DOM.btnDownloadAllTeachersDocx) DOM.btnDownloadAllTeachersDocx.style.display = 'inline-flex';
+      if (DOM.btnDownloadTeacherDocx) {
+        DOM.btnDownloadTeacherDocx.style.display = 'inline-flex';
+        DOM.btnDownloadTeacherDocx.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download Teacher's Schedule (.docx)
+        `;
+      }
+
+      DOM.selectTeacherFilter.onchange = function() {
+        if (this.value === '__NEW_TEACHER__') {
+          openQuickAddModal('teacher', this);
+          this.value = state.selectedTeacher || state.teachers[0];
+        } else {
+          state.selectedTeacher = this.value;
+          renderTeacherGrid();
+        }
+      };
+    }
 
     renderTeacherGrid();
   }
@@ -3617,7 +3701,34 @@
     const tallyMap = {};
     let grandTotal = 0;
 
-    state.teachers.forEach(teacher => {
+    const curUser = (state.auth && state.auth.currentUser) || null;
+    const isTeacher = curUser && (curUser.role === 'Teacher');
+
+    // Role filtering: Teachers strictly only see their own extra duty row
+    let targetTeachers = state.teachers || [];
+    if (isTeacher) {
+      const myName = (curUser.name || '').trim().toLowerCase();
+      targetTeachers = (state.teachers || []).filter(t => t.trim().toLowerCase() === myName);
+      if (targetTeachers.length === 0) targetTeachers = [curUser.name || 'Faculty'];
+
+      if (DOM.btnClearAllWeeklyDuties) DOM.btnClearAllWeeklyDuties.style.display = 'none';
+      if (DOM.btnDownloadWeeklyDutyDocx) {
+        DOM.btnDownloadWeeklyDutyDocx.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download My Extra Duties (.docx)
+        `;
+      }
+    } else {
+      if (DOM.btnClearAllWeeklyDuties) DOM.btnClearAllWeeklyDuties.style.display = 'inline-flex';
+      if (DOM.btnDownloadWeeklyDutyDocx) {
+        DOM.btnDownloadWeeklyDutyDocx.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download Extra Duties (.docx)
+        `;
+      }
+    }
+
+    targetTeachers.forEach(teacher => {
       const teacherDuties = state.weeklyDuties[teacher] || {};
       let teacherCount = 0;
 
@@ -3627,7 +3738,7 @@
         <td>
           <div class="duty-teacher-cell">
             <span class="duty-teacher-avatar">${escapeHtml(avatarInitial)}</span>
-            <span class="duty-teacher-name">${escapeHtml(teacher)}</span>
+            <span class="duty-teacher-name">${escapeHtml(teacher)}${isTeacher ? ' (You)' : ''}</span>
           </div>
         </td>`;
 
@@ -3642,13 +3753,13 @@
           const badgeClass = getDutyBadgeClass(cleanDuty);
 
           rowHtml += `<td>
-            <button type="button" class="duty-cell-btn" data-teacher="${escapeHtml(teacher)}" data-day="${escapeHtml(day)}" title="Click to configure duty">
+            <button type="button" class="duty-cell-btn" data-teacher="${escapeHtml(teacher)}" data-day="${escapeHtml(day)}" title="${isTeacher ? 'Assigned Supervision Duty' : 'Click to configure duty'}" style="${isTeacher ? 'cursor: default;' : ''}">
               <span class="duty-badge ${badgeClass}">${escapeHtml(cleanDuty)}</span>
             </button>
           </td>`;
         } else {
           rowHtml += `<td>
-            <button type="button" class="duty-cell-btn" data-teacher="${escapeHtml(teacher)}" data-day="${escapeHtml(day)}" title="Click to assign duty">
+            <button type="button" class="duty-cell-btn" data-teacher="${escapeHtml(teacher)}" data-day="${escapeHtml(day)}" title="${isTeacher ? 'No duty assigned' : 'Click to assign duty'}" style="${isTeacher ? 'cursor: default;' : ''}">
               <span class="duty-badge-empty">--</span>
             </button>
           </td>`;
@@ -3664,9 +3775,13 @@
 
     DOM.weeklyDutyTbody.innerHTML = tbodyHtml;
 
-    // Attach click handlers to all duty cell buttons
+    // Attach click handlers to duty cell buttons
     DOM.weeklyDutyTbody.querySelectorAll('.duty-cell-btn').forEach(btn => {
       btn.onclick = () => {
+        if (isTeacher) {
+          showToast('Faculty extra duty allocations are administered by School Management.', 'info');
+          return;
+        }
         const teacher = btn.getAttribute('data-teacher');
         const day = btn.getAttribute('data-day');
         openDutyCellModal(teacher, day);
@@ -3675,7 +3790,11 @@
 
     // Update Grand Total Badge
     if (DOM.weeklyDutyTotalBadge) {
-      DOM.weeklyDutyTotalBadge.textContent = `Total Assigned: ${grandTotal} Duties`;
+      if (isTeacher) {
+        DOM.weeklyDutyTotalBadge.textContent = `Your Assigned Duties: ${grandTotal} ${grandTotal === 1 ? 'Duty' : 'Duties'}`;
+      } else {
+        DOM.weeklyDutyTotalBadge.textContent = `Total Assigned: ${grandTotal} Duties`;
+      }
     }
 
     // Render Notebook Tally breakdown
@@ -3684,7 +3803,7 @@
       if (tallyKeys.length === 0) {
         DOM.weeklyDutySummaryContainer.innerHTML = `
           <div style="grid-column: 1 / -1; padding: 12px; color: var(--text-muted); font-size: 13px; text-align: center;">
-            No extra duties assigned yet. Click any cell in the matrix above or choose from presets to assign.
+            ${isTeacher ? 'No extra duties scheduled for you this week.' : 'No extra duties assigned yet. Click any cell in the matrix above or choose from presets to assign.'}
           </div>`;
       } else {
         // Sort for consistent display
@@ -4688,14 +4807,25 @@
       DOM.btnDownloadAllDays.textContent = "Download Full Week (.docx)";
       DOM.btnDownloadAllDays.onclick = downloadAllDaysDocx;
     } else if (state.activeView === 'teacher-view') {
-      DOM.exportBarTitle.textContent = "Export Individual Faculty Timetables";
-      DOM.exportBarDesc.textContent = "Outputs individual 1-page weekly schedules for each staff member.";
-      DOM.btnDownloadSingleDay.style.display = 'none';
-      DOM.btnDownloadAllDays.textContent = "Download All Staff Schedules (.docx)";
-      DOM.btnDownloadAllDays.onclick = () => {
-        state.activeView = 'teacher-view';
-        downloadAllDaysDocx();
-      };
+      const curUser = (state.auth && state.auth.currentUser) || null;
+      const isTeacher = curUser && (curUser.role === 'Teacher');
+
+      if (isTeacher) {
+        DOM.exportBarTitle.textContent = "Export Personal Faculty Timetable";
+        DOM.exportBarDesc.textContent = "Outputs your official weekly teaching schedule document (.docx).";
+        DOM.btnDownloadSingleDay.style.display = 'none';
+        DOM.btnDownloadAllDays.textContent = "Download My Schedule (.docx)";
+        DOM.btnDownloadAllDays.onclick = downloadTeacherDocx;
+      } else {
+        DOM.exportBarTitle.textContent = "Export Individual Faculty Timetables";
+        DOM.exportBarDesc.textContent = "Outputs individual 1-page weekly schedules for each staff member.";
+        DOM.btnDownloadSingleDay.style.display = 'none';
+        DOM.btnDownloadAllDays.textContent = "Download All Staff Schedules (.docx)";
+        DOM.btnDownloadAllDays.onclick = () => {
+          state.activeView = 'teacher-view';
+          downloadAllDaysDocx();
+        };
+      }
     } else if (state.activeView === 'duty-view') {
       DOM.exportBarTitle.textContent = "Export Faculty Extra Duties Matrix";
       DOM.exportBarDesc.textContent = "Outputs standalone official faculty extra duty matrix with subject & grade tally breakdown (.docx).";
@@ -7281,10 +7411,254 @@
       };
     }
 
-    // Print Daily Briefing
+    // Print Daily Faculty Schedule Slip (Official Format)
     if (DOM.btnPrintEssPortal) {
-      DOM.btnPrintEssPortal.onclick = () => window.print();
+      DOM.btnPrintEssPortal.onclick = () => {
+        const curUser = (state.auth && state.auth.currentUser) || null;
+        let teacher = state.selectedESSTeacher;
+        if (curUser && curUser.role === 'Teacher') {
+          teacher = curUser.name;
+        }
+        if (!teacher) teacher = 'Priya Ma\'am';
+        const day = state.currentDay || 'Monday';
+
+        if (DOM.essDailySlipPrintout) {
+          DOM.essDailySlipPrintout.innerHTML = generateFacultyDailySlipHtml(teacher, day);
+        }
+
+        document.body.classList.add('printing-daily-slip');
+        window.print();
+        setTimeout(() => {
+          document.body.classList.remove('printing-daily-slip');
+        }, 1000);
+      };
     }
+  }
+
+  function generateFacultyDailySlipHtml(teacherName, day) {
+    const schoolProfile = state.schoolProfile || {};
+    const schoolName = (schoolProfile.schoolName || 'FUNLAND ENGLISH MEDIUM SCHOOL').toUpperCase();
+    const schoolTag = schoolProfile.tagline || 'Affiliated to Gujarat Secondary and Higher Secondary Education Board (GSEB) • Academic ERP';
+    const profile = (state.teacherProfiles && state.teacherProfiles[teacherName]) || {};
+    const ctDuty = (state.classTeacherDuties || []).find(c => c.teacher === teacherName);
+    let designation = profile.designation || 'Subject Faculty Specialist';
+    if (ctDuty) {
+      const stdObj = (state.standards || []).find(s => s.id === ctDuty.standardId);
+      const stdName = stdObj ? stdObj.name.replace('Standard: ', 'Std ') : 'Std 3rd';
+      designation = `Class Teacher • ${stdName}`;
+    }
+    const primarySubjects = profile.subjects ? profile.subjects.join(', ') : (ctDuty ? ctDuty.subject : 'Core Academic Subjects');
+    const shiftLabel = state.currentShift === 'morning' ? 'Morning Shift (7:30 AM – 12:15 PM)' : 'Afternoon Shift (1:00 PM – 5:50 PM)';
+    const staffId = profile.email || (teacherName.toLowerCase().replace(/[^a-z0-9]/g, '') + '@funland.edu');
+    const todayFormatted = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    // 1. Chronological Lecture Schedule
+    const dSched = (state.schedules && state.schedules[day]) || {};
+    let assignedCount = 0;
+    let freeCount = 0;
+    let tableRows = '';
+
+    (state.periods || []).forEach((period, pIdx) => {
+      if (pIdx === 3) {
+        tableRows += `
+          <tr class="recess-row">
+            <td colspan="6">RECESS / MID-DAY BREAK (30 MINUTES)</td>
+          </tr>`;
+      }
+
+      const pSlots = dSched[period.id] || {};
+      let slotFound = null;
+      (state.standards || []).forEach(std => {
+        const slot = pSlots[std.id];
+        if (slot && slot.teacher && slot.teacher.trim().toLowerCase() === teacherName.trim().toLowerCase()) {
+          slotFound = {
+            standardName: std.name.replace('Standard: ', 'Std '),
+            subject: slot.subject || 'Assigned Lecture',
+            room: slot.room || std.room || 'Designated Class'
+          };
+        }
+      });
+
+      if (slotFound) {
+        assignedCount++;
+        tableRows += `
+          <tr>
+            <td style="font-weight: 800;">${escapeHtml(period.label || 'Period ' + (pIdx + 1))}</td>
+            <td style="font-weight: 600; color: #334155;">${escapeHtml(period.time || '')}</td>
+            <td style="font-weight: 800; color: #0f172a;">${escapeHtml(slotFound.standardName)}</td>
+            <td style="font-weight: 700;">${escapeHtml(slotFound.subject)}</td>
+            <td>${escapeHtml(slotFound.room)}</td>
+            <td><span class="slip-duty-tag" style="background:#e0f2fe; color:#0369a1; border: 1px solid #bae6fd;">Teaching Class</span></td>
+          </tr>`;
+      } else {
+        freeCount++;
+        tableRows += `
+          <tr>
+            <td style="font-weight: 700; color: #64748b;">${escapeHtml(period.label || 'Period ' + (pIdx + 1))}</td>
+            <td style="color: #64748b;">${escapeHtml(period.time || '')}</td>
+            <td style="color: #64748b; font-style: italic;">—</td>
+            <td style="font-weight: 600; color: #475569;">Free / Prep Period</td>
+            <td style="color: #64748b;">Staff Room / Library</td>
+            <td><span class="slip-duty-tag" style="background:#f1f5f9; color:#475569; border: 1px solid #cbd5e1;">Lesson Planning &amp; Checking</span></td>
+          </tr>`;
+      }
+    });
+
+    // 2. Extra Supervision & Assembly Duties
+    const weeklyDuties = (state.weeklyDuties && state.weeklyDuties[teacherName]) || {};
+    const extraDutyToday = weeklyDuties[day] || '';
+    const attDutyToday = (state.attendanceDuties || []).filter(d => d.teacher === teacherName && (d.day === day || d.day === 'all'));
+    const genDutyToday = (state.generalDuties || []).filter(d => d.allocations && d.allocations[day] === teacherName);
+    
+    let dutyHtml = '';
+    let dutyCount = 0;
+    if (extraDutyToday && extraDutyToday.trim()) {
+      dutyCount++;
+      dutyHtml += `<div>• <strong>Campus Supervision:</strong> ${escapeHtml(extraDutyToday)} (Designated Corridor / Floor)</div>`;
+    }
+    attDutyToday.forEach(ad => {
+      dutyCount++;
+      dutyHtml += `<div>• <strong>${escapeHtml(ad.title || 'Attendance Duty')}:</strong> ${escapeHtml(ad.location || 'Campus Gate')} (${escapeHtml(ad.time || 'Entry')})</div>`;
+    });
+    genDutyToday.forEach(gd => {
+      dutyCount++;
+      dutyHtml += `<div>• <strong>${escapeHtml(gd.dutyName || 'Assembly Duty')}:</strong> ${escapeHtml(gd.location || 'Assembly Ground')} (${escapeHtml(gd.time || 'Morning')})</div>`;
+    });
+    if (!dutyHtml) {
+      dutyHtml = `<div style="color: #64748b; font-style: italic;">No extra supervision or assembly duties scheduled for today.</div>`;
+    }
+
+    // 3. Proxy & Substitution Classes
+    const daySubsObj = (state.substitutions && state.substitutions[day]) || {};
+    const proxyList = [];
+    if (Array.isArray(daySubsObj)) {
+      daySubsObj.forEach(s => {
+        if (s.proxyTeacher === teacherName) proxyList.push(s);
+      });
+    } else if (daySubsObj && typeof daySubsObj === 'object') {
+      Object.entries(daySubsObj).forEach(([subKey, proxyTeacher]) => {
+        if (proxyTeacher === teacherName) {
+          const parts = subKey.split('_');
+          const pId = parts.length >= 2 ? `${parts[0]}_${parts[1]}` : parts[0];
+          const stdId = parts.slice(2).join('_');
+          const stdObj = (state.standards || []).find(s => s.id === stdId);
+          const origSlot = (dSched[pId] && dSched[pId][stdId]) || {};
+          proxyList.push({
+            periodId: pId,
+            stdName: stdObj ? stdObj.name.replace('Standard: ', 'Std ') : stdId,
+            absentTeacher: origSlot.teacher || 'Regular Faculty'
+          });
+        }
+      });
+    }
+
+    let proxyHtml = '';
+    if (proxyList.length > 0) {
+      proxyList.forEach(pr => {
+        const pObj = (state.periods || []).find(pe => pe.id === pr.periodId);
+        const pTime = pObj ? `${pObj.label} (${pObj.time})` : pr.periodId;
+        proxyHtml += `<div>• <strong>${escapeHtml(pTime)}:</strong> ${escapeHtml(pr.stdName || 'Class')} — Proxy for <em>${escapeHtml(pr.absentTeacher || 'Staff')}</em></div>`;
+      });
+    } else {
+      proxyHtml = `<div style="color: #64748b; font-style: italic;">No proxy or substitution duties assigned for today.</div>`;
+    }
+
+    const printTimestamp = new Date().toLocaleString();
+
+    return `
+      <div class="slip-document-container">
+        <div class="slip-header-brand">
+          <div class="slip-school-title">${escapeHtml(schoolName)}</div>
+          <div class="slip-school-subtitle">${escapeHtml(schoolTag)}</div>
+          <div class="slip-document-badge">FACULTY DAILY TEACHING &amp; DUTY SLIP</div>
+        </div>
+
+        <div class="slip-faculty-ribbon">
+          <div class="slip-ribbon-item">
+            <span class="slip-ribbon-label">FACULTY NAME</span>
+            <span class="slip-ribbon-val">${escapeHtml(teacherName)}</span>
+          </div>
+          <div class="slip-ribbon-item">
+            <span class="slip-ribbon-label">DESIGNATION / ROLE</span>
+            <span class="slip-ribbon-val">${escapeHtml(designation)}</span>
+          </div>
+          <div class="slip-ribbon-item">
+            <span class="slip-ribbon-label">ACADEMIC SHIFT</span>
+            <span class="slip-ribbon-val">${escapeHtml(shiftLabel)}</span>
+          </div>
+          <div class="slip-ribbon-item">
+            <span class="slip-ribbon-label">DATE &amp; DAY</span>
+            <span class="slip-ribbon-val">${escapeHtml(todayFormatted)}</span>
+          </div>
+        </div>
+
+        <div class="slip-section-heading">
+          <span>Today's Chronological Lecture Schedule</span>
+          <span style="font-size: 10px; color: #475569; font-weight: 700;">Teaching: ${assignedCount} Periods &bull; Free/Prep: ${freeCount} Periods</span>
+        </div>
+
+        <table class="slip-table">
+          <thead>
+            <tr>
+              <th style="width: 14%;">Period</th>
+              <th style="width: 18%;">Bell Timings</th>
+              <th style="width: 18%;">Class / Standard</th>
+              <th style="width: 20%;">Subject</th>
+              <th style="width: 15%;">Designated Room</th>
+              <th style="width: 15%;">Activity Nature</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+
+        <div class="slip-dual-box">
+          <div class="slip-panel-box">
+            <div class="slip-panel-title">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Today's Extra Supervision &amp; Campus Duties (${dutyCount})
+            </div>
+            <div class="slip-panel-body">
+              ${dutyHtml}
+            </div>
+          </div>
+
+          <div class="slip-panel-box">
+            <div class="slip-panel-title">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
+              Proxy &amp; Relief Coverages (${proxyList.length})
+            </div>
+            <div class="slip-panel-body">
+              ${proxyHtml}
+            </div>
+          </div>
+        </div>
+
+        <div class="slip-footer-signs">
+          <div class="slip-sign-col">
+            <div class="slip-sign-line"></div>
+            <div class="slip-sign-label">Teacher's Signature</div>
+            <div class="slip-sign-sub">${escapeHtml(teacherName)}</div>
+          </div>
+          <div class="slip-sign-col">
+            <div class="slip-sign-line"></div>
+            <div class="slip-sign-label">Supervisor / Shift Incharge</div>
+            <div class="slip-sign-sub">Verified &amp; Noted</div>
+          </div>
+          <div class="slip-sign-col">
+            <div class="slip-sign-line"></div>
+            <div class="slip-sign-label">Principal / Administrator</div>
+            <div class="slip-sign-sub">Official Academic Endorsement</div>
+          </div>
+        </div>
+
+        <div class="slip-bottom-meta">
+          <span>Official School Internal Record &bull; Staff ID: ${escapeHtml(staffId)}</span>
+          <span>Printed on: ${escapeHtml(printTimestamp)} &bull; Funland Academic ERP System</span>
+        </div>
+      </div>
+    `;
   }
 
   function renderTeacherESSView() {
