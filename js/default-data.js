@@ -1,5 +1,5 @@
 // Default presets for School Timetable Management System
-// Auto-synchronized from local edits on 2026-09-09T21:41:16.467Z
+// Auto-synchronized from local edits on 2026-09-09T21:52:07.425Z
 
 const DEFAULT_DATA = {
   "schoolProfile": {
@@ -163,7 +163,8 @@ const DEFAULT_DATA = {
     "Dolly Ma'am",
     "Yamin Ma'am",
     "Astha Ma'am",
-    "Khushi Ma'am"
+    "Khushi Ma'am",
+    "Kavita Ma'am"
   ],
   "teacherProfiles": {
     "Alpa Ma'am": {

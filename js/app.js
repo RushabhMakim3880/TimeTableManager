@@ -589,6 +589,24 @@
     btnCloseEssWeeklyFooter: document.getElementById('btn-close-ess-weekly-footer'),
     essWeeklyGridContainer: document.getElementById('ess-weekly-grid-container'),
 
+    // ESS Default Password Warning Banner & Change Password Modal
+    btnEssChangePassword: document.getElementById('btn-ess-change-password'),
+    essDefaultPwBanner: document.getElementById('ess-default-pw-banner'),
+    btnEssBannerChangePw: document.getElementById('btn-ess-banner-change-pw'),
+    essBannerDefaultPwCode: document.getElementById('ess-banner-default-pw-code'),
+    essChangePasswordModal: document.getElementById('ess-change-password-modal'),
+    btnCloseEssChangePw: document.getElementById('btn-close-ess-change-pw'),
+    btnCancelEssChangePw: document.getElementById('btn-cancel-ess-change-pw'),
+    btnSubmitEssChangePw: document.getElementById('btn-submit-ess-change-pw'),
+    essChangePwTeacher: document.getElementById('ess-change-pw-teacher'),
+    essChangePwCurrent: document.getElementById('ess-change-pw-current'),
+    essChangePwNew: document.getElementById('ess-change-pw-new'),
+    essChangePwConfirm: document.getElementById('ess-change-pw-confirm'),
+    essChangePwAlert: document.getElementById('ess-change-pw-alert'),
+    essChangePwAlertMsg: document.getElementById('ess-change-pw-alert-msg'),
+    essChangePwTitle: document.getElementById('ess-change-pw-title'),
+    essChangePwSubtitle: document.getElementById('ess-change-pw-subtitle'),
+
     // Toasts
     toastContainer: document.getElementById('toast-container')
   };
@@ -608,6 +626,9 @@
     renderSchoolProfile();
     window.switchView = switchView;
     window.state = state;
+    window.registerTeacherCredentials = registerTeacherCredentials;
+    window.getDefaultTeacherPassword = getDefaultTeacherPassword;
+    window.showChangePasswordModal = showChangePasswordModal;
 
     const validViews = ['dashboard-view', 'settings-view', 'class-timetable-view', 'attendance-duty-view', 'class-teacher-duty-view', 'syllabus-view', 'class-view', 'teacher-view', 'duty-view', 'general-duty-view', 'substitution-view', 'workload-view', 'exam-schedule-view', 'teacher-ess-view'];
     if (window.location.hash) {
@@ -972,6 +993,9 @@
     if (!state.examTerm) state.examTerm = 'mid_term_2026';
     if (!state.selectedESSTeacher) state.selectedESSTeacher = 'Priya Ma\'am';
     if (!state.activeSectionFilter) state.activeSectionFilter = 'all';
+
+    // Synchronize default credentials for all faculty members
+    syncAllTeacherCredentials();
   }
 
   function resetToDefaults() {
@@ -1010,6 +1034,8 @@
     state.periods = JSON.parse(JSON.stringify(DEFAULT_DATA.periods));
     state.teachers = JSON.parse(JSON.stringify(DEFAULT_DATA.teachers));
     state.teacherProfiles = JSON.parse(JSON.stringify(DEFAULT_DATA.teacherProfiles || {}));
+    state.teacherCredentials = {};
+    syncAllTeacherCredentials();
     state.subjects = JSON.parse(JSON.stringify(DEFAULT_DATA.subjects));
     state.subjectDetails = JSON.parse(JSON.stringify(DEFAULT_DATA.subjectDetails || {}));
     state.days = JSON.parse(JSON.stringify(DEFAULT_DATA.days));
@@ -1375,6 +1401,205 @@
   // ==========================================================================
   // MODULE 1: AUTHENTICATION & MULTI-ROLE ACCESS CONTROL
   // ==========================================================================
+
+  // Helper: Derive canonical default password for any faculty member: <name>123
+  function getDefaultTeacherPassword(teacherName) {
+    if (!teacherName) return 'teacher123';
+    const firstName = teacherName.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+    return `${firstName || 'teacher'}123`;
+  }
+
+  // Helper: Register or retrieve teacher credentials record in state
+  function registerTeacherCredentials(teacherName, customPassword = null) {
+    if (!state.teacherCredentials) state.teacherCredentials = {};
+    if (!teacherName) return null;
+
+    if (!state.teacherCredentials[teacherName]) {
+      const defaultPw = getDefaultTeacherPassword(teacherName);
+      state.teacherCredentials[teacherName] = {
+        password: customPassword || defaultPw,
+        isDefaultPassword: !customPassword,
+        mustChangePassword: !customPassword,
+        hasLoggedIn: false,
+        loginCount: 0,
+        lastPasswordChange: null
+      };
+    }
+    return state.teacherCredentials[teacherName];
+  }
+
+  // Helper: Synchronize all existing teachers into state.teacherCredentials
+  function syncAllTeacherCredentials() {
+    if (!state.teacherCredentials) state.teacherCredentials = {};
+    const allTeachers = state.teachers || (typeof DEFAULT_DATA !== 'undefined' ? DEFAULT_DATA.teachers : []);
+    allTeachers.forEach(tName => {
+      registerTeacherCredentials(tName);
+    });
+  }
+
+  // Helper: Display Change Password modal (prompts on first-time login)
+  function showChangePasswordModal(teacherName, isFirstLogin = false) {
+    const cred = registerTeacherCredentials(teacherName);
+    const modal = DOM.essChangePasswordModal || document.getElementById('ess-change-password-modal');
+    if (!modal) return;
+
+    if (DOM.essChangePwTeacher) DOM.essChangePwTeacher.value = teacherName;
+    if (DOM.essChangePwCurrent) {
+      DOM.essChangePwCurrent.value = cred ? cred.password : getDefaultTeacherPassword(teacherName);
+    }
+    if (DOM.essChangePwNew) DOM.essChangePwNew.value = '';
+    if (DOM.essChangePwConfirm) DOM.essChangePwConfirm.value = '';
+    if (DOM.essChangePwAlert) DOM.essChangePwAlert.style.display = 'none';
+
+    if (DOM.essChangePwTitle) {
+      DOM.essChangePwTitle.textContent = isFirstLogin ? 'First-Time Sign In: Set Your Password' : 'Update Account Password';
+    }
+    if (DOM.essChangePwSubtitle) {
+      DOM.essChangePwSubtitle.textContent = isFirstLogin
+        ? 'Welcome to your Faculty Portal! Please replace your temporary default password with a private password.'
+        : 'Update your confidential personal password for academic portal access.';
+    }
+
+    modal.style.display = 'flex';
+    showToast('⚠️ Security Notice: Please update your default password to secure your account.', 'warning');
+  }
+
+  function initChangePasswordModal() {
+    const modal = DOM.essChangePasswordModal || document.getElementById('ess-change-password-modal');
+    if (!modal) return;
+
+    // Top action bar button trigger
+    if (DOM.btnEssChangePassword) {
+      DOM.btnEssChangePassword.onclick = () => {
+        const teacher = state.selectedESSTeacher || (state.auth && state.auth.currentUser && state.auth.currentUser.name) || 'Faculty Member';
+        showChangePasswordModal(teacher, false);
+      };
+    }
+
+    // Banner change password button trigger
+    if (DOM.btnEssBannerChangePw) {
+      DOM.btnEssBannerChangePw.onclick = () => {
+        const teacher = state.selectedESSTeacher || (state.auth && state.auth.currentUser && state.auth.currentUser.name) || 'Faculty Member';
+        showChangePasswordModal(teacher, false);
+      };
+    }
+
+    // Close buttons
+    if (DOM.btnCloseEssChangePw) {
+      DOM.btnCloseEssChangePw.onclick = () => {
+        modal.style.display = 'none';
+      };
+    }
+    if (DOM.btnCancelEssChangePw) {
+      DOM.btnCancelEssChangePw.onclick = () => {
+        modal.style.display = 'none';
+        showToast('Password change postponed. You can update it anytime from the top command bar.', 'info');
+      };
+    }
+
+    // Password visibility eye toggles inside modal
+    modal.querySelectorAll('.pw-toggle-btn').forEach(btn => {
+      btn.onclick = () => {
+        const targetId = btn.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        if (input) {
+          const isPw = input.type === 'password';
+          input.type = isPw ? 'text' : 'password';
+          btn.innerHTML = isPw
+            ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>'
+            : '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        }
+      };
+    });
+
+    // Form submission
+    if (DOM.btnSubmitEssChangePw) {
+      DOM.btnSubmitEssChangePw.onclick = () => {
+        const teacher = (DOM.essChangePwTeacher ? DOM.essChangePwTeacher.value : '') || state.selectedESSTeacher;
+        const currentPw = DOM.essChangePwCurrent ? DOM.essChangePwCurrent.value.trim() : '';
+        const newPw = DOM.essChangePwNew ? DOM.essChangePwNew.value.trim() : '';
+        const confirmPw = DOM.essChangePwConfirm ? DOM.essChangePwConfirm.value.trim() : '';
+        const alertBox = DOM.essChangePwAlert || document.getElementById('ess-change-pw-alert');
+        const alertMsg = DOM.essChangePwAlertMsg || document.getElementById('ess-change-pw-alert-msg');
+
+        const showError = (msg) => {
+          if (alertMsg) alertMsg.textContent = msg;
+          if (alertBox) alertBox.style.display = 'flex';
+        };
+
+        const cred = registerTeacherCredentials(teacher);
+        const defaultPw = getDefaultTeacherPassword(teacher);
+
+        if (!currentPw) {
+          showError('Please enter your current password.');
+          return;
+        }
+
+        // Verify current password
+        const isCurrentValid = (currentPw === cred.password) ||
+                              (cred.isDefaultPassword && (currentPw.toLowerCase() === defaultPw.toLowerCase() || currentPw === 'teacher123'));
+        if (!isCurrentValid) {
+          showError('Current password is incorrect. Please verify and try again.');
+          return;
+        }
+
+        if (!newPw) {
+          showError('Please enter a new confidential password.');
+          return;
+        }
+
+        if (newPw.length < 6) {
+          showError('Password must be at least 6 characters long.');
+          return;
+        }
+
+        if (newPw === defaultPw || newPw === 'teacher123' || newPw.toLowerCase() === defaultPw.toLowerCase()) {
+          showError('New password cannot be the same as the default password. Please choose a private password.');
+          return;
+        }
+
+        if (newPw !== confirmPw) {
+          showError('New password and confirmation do not match.');
+          return;
+        }
+
+        // Save password update
+        cred.password = newPw;
+        cred.isDefaultPassword = false;
+        cred.mustChangePassword = false;
+        cred.lastPasswordChange = new Date().toISOString();
+
+        saveState();
+
+        if (alertBox) alertBox.style.display = 'none';
+        modal.style.display = 'none';
+
+        if (DOM.essDefaultPwBanner) {
+          DOM.essDefaultPwBanner.style.display = 'none';
+        }
+
+        showToast(`Password successfully updated for ${teacher}! Please use your new password on future logins.`, 'success');
+      };
+    }
+  }
+
+  // Admin utility to reset any teacher password back to default
+  window.resetTeacherPassword = function(teacherName) {
+    if (!teacherName) return;
+    const defaultPw = getDefaultTeacherPassword(teacherName);
+    if (!state.teacherCredentials) state.teacherCredentials = {};
+    state.teacherCredentials[teacherName] = {
+      password: defaultPw,
+      isDefaultPassword: true,
+      mustChangePassword: true,
+      hasLoggedIn: false,
+      loginCount: 0,
+      lastPasswordChange: null
+    };
+    saveState();
+    showToast(`Password for ${teacherName} reset to default: ${defaultPw}`, 'info');
+  };
+
   const DEMO_USERS = {
     Admin: {
       email: "admin@funland.edu",
@@ -1394,7 +1619,7 @@
     },
     Teacher: {
       email: "priya@funland.edu",
-      password: "teacher123",
+      password: "priya123",
       role: "Teacher",
       name: "Priya Ma'am",
       avatar: "👩‍🏫",
@@ -1411,8 +1636,10 @@
   };
 
   function initAuth() {
+    syncAllTeacherCredentials();
     renderUserProfileBadge();
     applyRolePermissions();
+    initChangePasswordModal();
 
     // Check auth status: show full-page sign-in screen immediately if not logged in
     if (!state.auth || !state.auth.isAuthenticated) {
@@ -1588,7 +1815,18 @@
     for (const key of Object.keys(DEMO_USERS)) {
       const u = DEMO_USERS[key];
       if (u.email.toLowerCase() === emailInput || u.role.toLowerCase() === emailInput || key.toLowerCase() === emailInput) {
-        if (password === u.password || (u.role === 'Teacher' && (password === 'priya123' || password === 'teacher123'))) {
+        let isMatch = (password === u.password);
+        if (u.role === 'Teacher') {
+          const cred = registerTeacherCredentials(u.name);
+          const defaultPw = getDefaultTeacherPassword(u.name);
+          const activePw = cred ? cred.password : defaultPw;
+          if (cred && !cred.isDefaultPassword) {
+            isMatch = (password === activePw);
+          } else {
+            isMatch = (password === activePw) || (password.toLowerCase() === defaultPw.toLowerCase()) || (password === 'teacher123') || (password === 'admin123');
+          }
+        }
+        if (isMatch) {
           matchedUser = u;
         }
         break;
@@ -1599,16 +1837,30 @@
     if (!matchedUser) {
       const allTeachers = state.teachers || (typeof DEFAULT_DATA !== 'undefined' ? DEFAULT_DATA.teachers : []);
       for (const tName of allTeachers) {
-        const cleanName = tName.toLowerCase().replace(/[^a-z]/g, '');
-        const firstName = tName.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
+        const cleanName = tName.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const firstName = tName.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
         const teacherEmail = `${firstName}@funland.edu`;
         const fullTeacherEmail = `${cleanName}@funland.edu`;
 
         if (emailInput === teacherEmail || emailInput === fullTeacherEmail || emailInput === cleanName || emailInput === firstName || emailInput === tName.toLowerCase()) {
-          if (password === `${firstName}123` || password === 'teacher123' || password === 'admin123') {
+          const cred = registerTeacherCredentials(tName);
+          const defaultPw = getDefaultTeacherPassword(tName);
+          const activePw = cred ? cred.password : defaultPw;
+
+          let isPwMatch = false;
+          if (cred && !cred.isDefaultPassword) {
+            isPwMatch = (password === activePw);
+          } else {
+            isPwMatch = (password === activePw) ||
+                        (password.toLowerCase() === defaultPw.toLowerCase()) ||
+                        (password.toLowerCase() === `${cleanName}123`.toLowerCase()) ||
+                        (password === 'teacher123') ||
+                        (password === 'admin123');
+          }
+
+          if (isPwMatch) {
             matchedUser = {
               email: teacherEmail,
-              password: password,
               role: "Teacher",
               name: tName,
               avatar: "👩‍🏫",
@@ -1657,7 +1909,20 @@
     showToast(`Welcome, ${safeUser.name}! Signed in as ${safeUser.roleLabel}.`, 'success');
     if (safeUser.role === 'Teacher') {
       state.selectedESSTeacher = safeUser.name;
+      const cred = registerTeacherCredentials(safeUser.name);
+      const isFirstLogin = !cred.hasLoggedIn;
+      cred.hasLoggedIn = true;
+      cred.loginCount = (cred.loginCount || 0) + 1;
+      saveState();
+
       switchView('teacher-ess-view');
+
+      // Prompt to update default password on first login or if still using default
+      if (cred.mustChangePassword) {
+        setTimeout(() => {
+          showChangePasswordModal(safeUser.name, isFirstLogin);
+        }, 500);
+      }
     } else {
       switchView(state.activeView && state.activeView !== 'teacher-ess-view' ? state.activeView : 'dashboard-view');
     }
@@ -4631,7 +4896,10 @@
     const customTeacher = DOM.modalCustomTeacher.value.trim();
     if (customTeacher) {
       editingCell.teacher = customTeacher;
-      if (!state.teachers.includes(customTeacher)) state.teachers.push(customTeacher);
+      if (!state.teachers.includes(customTeacher)) {
+        state.teachers.push(customTeacher);
+        registerTeacherCredentials(customTeacher);
+      }
     }
 
     if (!state.schedules[editingCell.day]) state.schedules[editingCell.day] = {};
@@ -4835,11 +5103,13 @@
     const name = DOM.settingsNewTeacher.value.trim();
     if (!name || state.teachers.includes(name)) return;
     state.teachers.push(name);
+    registerTeacherCredentials(name);
     DOM.settingsNewTeacher.value = '';
     saveState();
     renderSettingsLists();
     renderAll();
-    showToast(`Added ${name} to roster`, 'success');
+    const defaultPw = getDefaultTeacherPassword(name);
+    showToast(`Added ${name} to roster (Default password: ${defaultPw})`, 'success');
   }
 
   function addSubject() {
@@ -5545,6 +5815,7 @@
 
     if (!state.teachers) state.teachers = [];
     state.teachers.push(name);
+    registerTeacherCredentials(name);
 
     if (!state.teacherProfiles) state.teacherProfiles = {};
     state.teacherProfiles[name] = {
@@ -5559,7 +5830,8 @@
     saveState();
     renderFacultySettingsPanel();
     renderAll();
-    showToast(`Added ${name} to Faculty Roster`, 'success');
+    const defaultPw = getDefaultTeacherPassword(name);
+    showToast(`Added ${name} to Faculty Roster (Default password: ${defaultPw})`, 'success');
   }
 
   window.removeFacultyMember = function(teacherName) {
@@ -6213,6 +6485,7 @@
 
       if (!state.teachers) state.teachers = [];
       state.teachers.push(name);
+      registerTeacherCredentials(name);
 
       if (!state.teacherProfiles) state.teacherProfiles = {};
       state.teacherProfiles[name] = {
@@ -6225,7 +6498,8 @@
 
       if (nameInp) nameInp.value = '';
       createdValue = name;
-      showToast(`Added teacher "${name}" to roster`, 'success');
+      const defaultPw = getDefaultTeacherPassword(name);
+      showToast(`Added teacher "${name}" to roster (Default password: ${defaultPw})`, 'success');
 
     } else if (type === 'class') {
       const nameInp = DOM.quickClassName || document.getElementById('quick-class-name');
@@ -7037,6 +7311,21 @@
     }
     if (DOM.essTeacherShift) {
       DOM.essTeacherShift.textContent = state.currentShift === 'morning' ? 'Morning Shift (7:30 AM – 12:15 PM)' : 'Afternoon Shift (1:00 PM – 5:50 PM)';
+    }
+
+    // Default password security alert check
+    const cred = registerTeacherCredentials(teacher);
+    const bannerEl = DOM.essDefaultPwBanner || document.getElementById('ess-default-pw-banner');
+    if (bannerEl) {
+      if (cred && cred.mustChangePassword) {
+        bannerEl.style.display = 'flex';
+        const bannerCode = document.getElementById('ess-banner-default-pw-code');
+        if (bannerCode) {
+          bannerCode.textContent = cred.password || getDefaultTeacherPassword(teacher);
+        }
+      } else {
+        bannerEl.style.display = 'none';
+      }
     }
 
     // Determine subject specialization from schedule
