@@ -290,6 +290,9 @@
     btnAuthSubmit: document.getElementById('btn-auth-submit'),
     authErrorBanner: document.getElementById('auth-error-banner'),
     authRoleChips: document.querySelectorAll('.auth-role-chip'),
+    btnCloseAuthModal: document.getElementById('btn-close-auth-modal'),
+    btnTogglePassword: document.getElementById('btn-toggle-password'),
+    pwEyeIcon: document.getElementById('pw-eye-icon'),
 
     // Dashboard View Elements
     dashLiveDateStr: document.getElementById('dash-live-date-str'),
@@ -1197,6 +1200,7 @@
   const DEMO_USERS = {
     Admin: {
       email: "admin@funland.edu",
+      password: "admin123",
       role: "Admin",
       name: "Admin User",
       avatar: "👑",
@@ -1204,6 +1208,7 @@
     },
     Principal: {
       email: "principal@funland.edu",
+      password: "principal123",
       role: "Principal",
       name: "Principal Sharma",
       avatar: "🎓",
@@ -1211,6 +1216,7 @@
     },
     Teacher: {
       email: "priya@funland.edu",
+      password: "teacher123",
       role: "Teacher",
       name: "Priya Ma'am",
       avatar: "👩‍🏫",
@@ -1218,6 +1224,7 @@
     },
     Staff: {
       email: "supervision@funland.edu",
+      password: "staff123",
       role: "Staff",
       name: "Office Staff",
       avatar: "📋",
@@ -1227,6 +1234,11 @@
 
   function initAuth() {
     renderUserProfileBadge();
+
+    // If user previously logged out, present the sign-in modal
+    if (state.auth && state.auth.isAuthenticated === false) {
+      showLoginOverlay();
+    }
 
     // 1-Click Role switcher chips in login overlay
     if (DOM.authRoleChips) {
@@ -1238,12 +1250,49 @@
       });
     }
 
+    // Submit button
     if (DOM.btnAuthSubmit) {
       DOM.btnAuthSubmit.addEventListener('click', handleLogin);
     }
+
+    // Enter key submits login
+    if (DOM.authEmail) {
+      DOM.authEmail.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleLogin();
+      });
+    }
+    if (DOM.authPassword) {
+      DOM.authPassword.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleLogin();
+      });
+    }
+
+    // Password visibility eye toggle
+    if (DOM.btnTogglePassword && DOM.authPassword) {
+      DOM.btnTogglePassword.addEventListener('click', () => {
+        const isPw = DOM.authPassword.type === 'password';
+        DOM.authPassword.type = isPw ? 'text' : 'password';
+        if (DOM.pwEyeIcon) {
+          DOM.pwEyeIcon.innerHTML = isPw
+            ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>'
+            : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        }
+      });
+    }
+
+    // Close modal (dismiss button)
+    if (DOM.btnCloseAuthModal) {
+      DOM.btnCloseAuthModal.addEventListener('click', () => {
+        hideLoginOverlay();
+      });
+    }
+
+    // Logout button in sidebar user card
     if (DOM.btnLogout) {
       DOM.btnLogout.addEventListener('click', handleLogout);
     }
+
+    // Clicking sidebar user badge opens switch role modal
     if (DOM.headerUserBadge) {
       DOM.headerUserBadge.addEventListener('click', (e) => {
         if (e.target.closest('#btn-logout')) return;
@@ -1257,24 +1306,25 @@
     if (DOM.headerUserAvatar) DOM.headerUserAvatar.textContent = cur.avatar || "👑";
     if (DOM.headerUserName) DOM.headerUserName.textContent = cur.name || "Admin User";
     if (DOM.headerUserRole) {
-      DOM.headerUserRole.textContent = cur.role || "Administrator";
+      DOM.headerUserRole.textContent = cur.roleLabel || cur.role || "Administrator";
       DOM.headerUserRole.className = `user-role-tag role-${(cur.role || 'Admin').toLowerCase()}`;
     }
   }
 
-  function switchDemoRole(role) {
+  window.switchDemoRole = function(role) {
     if (!DEMO_USERS[role]) return;
     const user = DEMO_USERS[role];
     if (DOM.authEmail) DOM.authEmail.value = user.email;
-    if (DOM.authPassword) DOM.authPassword.value = "admin123";
+    if (DOM.authPassword) DOM.authPassword.value = user.password;
     if (DOM.authRoleChips) {
       DOM.authRoleChips.forEach(c => c.classList.toggle('active', c.getAttribute('data-role') === role));
     }
     if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
-  }
+  };
 
   function handleLogin() {
     const email = DOM.authEmail ? DOM.authEmail.value.trim().toLowerCase() : '';
+    const password = DOM.authPassword ? DOM.authPassword.value.trim() : '';
     let matchedUser = null;
 
     for (const key of Object.keys(DEMO_USERS)) {
@@ -1284,10 +1334,30 @@
       }
     }
 
+    // Fallback search by role name
     if (!matchedUser) {
-      const activeChip = document.querySelector('.auth-role-chip.active');
-      const role = activeChip ? activeChip.getAttribute('data-role') : 'Admin';
-      matchedUser = DEMO_USERS[role] || DEMO_USERS.Admin;
+      for (const key of Object.keys(DEMO_USERS)) {
+        if (DEMO_USERS[key].role.toLowerCase() === email) {
+          matchedUser = DEMO_USERS[key];
+          break;
+        }
+      }
+    }
+
+    if (!matchedUser) {
+      if (DOM.authErrorBanner) {
+        DOM.authErrorBanner.textContent = 'Account not found. Select one of the 4 roles above or enter a valid email.';
+        DOM.authErrorBanner.style.display = 'block';
+      }
+      return;
+    }
+
+    if (password && password !== matchedUser.password && password !== 'admin123') {
+      if (DOM.authErrorBanner) {
+        DOM.authErrorBanner.textContent = `Incorrect password. Note: password for ${matchedUser.role} is "${matchedUser.password}".`;
+        DOM.authErrorBanner.style.display = 'block';
+      }
+      return;
     }
 
     state.auth = {
@@ -1298,12 +1368,17 @@
     saveState();
     renderUserProfileBadge();
     hideLoginOverlay();
-    showToast(`Signed in as ${matchedUser.name} (${matchedUser.role})`, 'success');
+    if (DOM.authErrorBanner) DOM.authErrorBanner.style.display = 'none';
+    showToast(`Signed in successfully as ${matchedUser.name} (${matchedUser.roleLabel})`, 'success');
   }
 
   function handleLogout() {
+    if (!state.auth) state.auth = {};
+    state.auth.isAuthenticated = false;
+    saveState();
+    renderUserProfileBadge();
     showLoginOverlay();
-    showToast('Select a demo profile or sign in to continue', 'info');
+    showToast('Signed out successfully. Choose a role or sign in.', 'info');
   }
 
   function showLoginOverlay() {

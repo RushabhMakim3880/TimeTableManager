@@ -4332,11 +4332,13 @@ html, body {
 .syl-check-pending { background: #fef3c7; color: #92400e; }
 
 /* 7. Auth Login Modal Overlay */
-.auth-login-overlay {
+/* 7. Auth Login Modal Overlay */
+.auth-login-overlay,
+.auth-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(6px);
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(8px);
   z-index: 9999;
   display: none;
   align-items: center;
@@ -4344,56 +4346,48 @@ html, body {
   padding: 20px;
 }
 
-.auth-login-overlay.active {
-  display: flex;
+.auth-login-overlay.active,
+.auth-overlay.active {
+  display: flex !important;
 }
 
 .auth-card {
   background: #ffffff;
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-lg, 14px);
   width: 100%;
-  max-width: 440px;
-  padding: 28px 32px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  max-width: 480px;
+  padding: 26px 30px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  position: relative;
+  max-height: 94vh;
+  overflow-y: auto;
 }
 
-.auth-header {
+.auth-card-header {
   text-align: center;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
 .auth-brand-icon {
-  width: 54px;
-  height: 54px;
-  background: var(--primary-navy, #1e3a8a);
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1e40af, #1e3a8a);
   color: #ffffff;
   border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3);
-}
-
-.auth-header h2 {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--text-primary, #0f172a);
-}
-
-.auth-header p {
-  font-size: 13px;
-  color: var(--text-muted, #64748b);
-  margin-top: 2px;
+  font-size: 24px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.35);
 }
 
 .auth-role-chips {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 6px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .auth-role-chip {
@@ -4403,7 +4397,7 @@ html, body {
   padding: 7px 4px;
   font-family: inherit;
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-secondary, #334155);
   cursor: pointer;
   text-align: center;
@@ -4411,73 +4405,159 @@ html, body {
 }
 
 .auth-role-chip:hover {
-  border-color: var(--primary-navy, #1e3a8a);
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
 .auth-role-chip.active {
-  background: var(--primary-navy, #1e3a8a);
+  background: #1e40af;
   color: #ffffff;
-  border-color: var(--primary-navy, #1e3a8a);
+  border-color: #1e40af;
+  box-shadow: 0 2px 6px rgba(30, 64, 175, 0.25);
 }
 
 .auth-form-group {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .auth-form-group label {
   display: block;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-secondary, #334155);
+  color: #475569;
   margin-bottom: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
 }
 
-.auth-input {
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.auth-input-wrap .auth-input {
   width: 100%;
-  padding: 9px 12px;
+  padding: 9px 38px 9px 34px;
   font-family: inherit;
   font-size: 13px;
-  border: 1px solid var(--border-color, #cbd5e1);
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   background: #ffffff;
-  transition: border-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
-.auth-input:focus {
+.auth-input-wrap .auth-input:focus {
   outline: none;
-  border-color: var(--primary-navy, #1e3a8a);
-  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.12);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-.btn-auth-submit {
+.auth-pw-toggle-btn {
+  position: absolute;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.auth-pw-toggle-btn:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+.auth-submit-btn {
   width: 100%;
   padding: 10px;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
-  background: var(--primary-navy, #1e3a8a);
+  border-radius: 6px;
+  background: #1e40af;
   color: #ffffff;
   border: none;
-  border-radius: 6px;
   cursor: pointer;
-  transition: background 0.15s ease;
-  margin-top: 6px;
+  transition: all 0.15s ease;
 }
 
-.btn-auth-submit:hover {
-  background: var(--primary-hover, #1d4ed8);
+.auth-submit-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 3px 8px rgba(30, 64, 175, 0.3);
 }
 
-.auth-hint {
-  font-size: 11.5px;
-  color: var(--text-muted, #64748b);
-  text-align: center;
-  margin-top: 14px;
+/* Demo Credentials Directory Table */
+.auth-creds-card {
+  margin-top: 16px;
   background: #f8fafc;
-  border-radius: 6px;
-  padding: 8px;
-  border: 1px dashed var(--border-color, #cbd5e1);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.auth-creds-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-creds-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.auth-creds-table th {
+  text-align: left;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 6px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.auth-creds-table td {
+  padding: 5px 6px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.auth-creds-table tr:hover td {
+  background: #eff6ff;
+}
+
+.auth-creds-table tr:last-child td {
+  border-bottom: none;
+}
+
+.auth-creds-table code {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-family: monospace;
+  font-size: 10.5px;
+  color: #1e40af;
 }
 
 /* Responsive Mobile & Tablet Drawer */
