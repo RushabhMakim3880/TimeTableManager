@@ -1716,29 +1716,16 @@ html, body {
   background: #f8fafc;
 }
 
-/* Docked Bottom Export Action Bar (Strictly scoped to Academic Timetable views) */
-.sticky-export-bar {
-  height: 60px;
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border-color);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.03);
-  padding: 0 32px;
-  display: none; /* Hidden by default; only shown by updateExportBar for timetable views */
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  z-index: 30;
-  transition: all 0.2s ease;
-}
-
-/* STRICT RULE: Timetable Export Bar must NEVER show for Admin, Principal, or Teacher portals */
-body.role-admin #sticky-export-bar,
-body.role-principal #sticky-export-bar,
-body.role-teacher #sticky-export-bar,
-.role-admin #sticky-export-bar,
-.role-principal #sticky-export-bar,
-.role-teacher #sticky-export-bar {
+/* Docked Bottom Export Action Bar - Permanently Disabled and Removed from Admin, Principal, and all views */
+.sticky-export-bar,
+#sticky-export-bar {
   display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
 }
 
 .sticky-export-container {

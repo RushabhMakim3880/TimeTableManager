@@ -5108,7 +5108,7 @@
     });
 
     DOM.displayDayName.textContent = state.currentDay;
-    DOM.btnDownloadDayName.textContent = state.currentDay;
+    if (DOM.btnDownloadDayName) DOM.btnDownloadDayName.textContent = state.currentDay;
   }
 
   function renderAttendance() {
@@ -6531,83 +6531,7 @@
 
   // --- Dynamic Export Bar Updates (Strictly Scoped to Timetable Export Views) ---
   function updateExportBar() {
-    if (!DOM.stickyExportBar) return;
-
-    const cur = (state.auth && state.auth.currentUser) || null;
-    const isPrincipal = cur && ((cur.roles && cur.roles.includes('PRINCIPAL')) || cur.role === 'Principal');
-    const isAdmin = cur && ((cur.roles && (cur.roles.includes('ADMIN_HEAD') || cur.roles.includes('ACCOUNTANT'))) || cur.role === 'Admin');
-    const isTeacher = cur && (cur.role === 'Teacher' || (cur.roles && cur.roles.includes('TEACHER')));
-
-    // NEVER display Timetable Export Bar for Principal, Admin, or Teacher portals
-    if (isPrincipal || isAdmin || isTeacher || state.activeWorkspace !== 'ACADEMIC') {
-      DOM.stickyExportBar.style.display = 'none';
-      return;
-    }
-
-    // Only allow export bar on explicit timetable schedule views that generate document files
-    const exportableTimetableViews = [
-      'class-timetable-view',
-      'class-view',
-      'teacher-view',
-      'duty-view',
-      'general-duty-view',
-      'substitution-view'
-    ];
-
-    if (!exportableTimetableViews.includes(state.activeView)) {
-      DOM.stickyExportBar.style.display = 'none';
-      return;
-    }
-
-    // Explicitly show for permitted timetable scheduling views
-    DOM.stickyExportBar.style.display = 'flex';
-
-    if (state.activeView === 'class-timetable-view') {
-      const std = (state.standards || []).find(s => s.id === state.selectedClassStd);
-      const stdName = std ? std.name : 'Selected Standard';
-      DOM.exportBarTitle.textContent = `Export ${stdName} Timetable`;
-      DOM.exportBarDesc.textContent = "Generates official Word (.docx) timetable document with school letterhead and class teacher sign-off.";
-      DOM.btnDownloadSingleDay.style.display = 'inline-flex';
-      DOM.btnDownloadDayName.textContent = stdName;
-      DOM.btnDownloadSingleDay.onclick = downloadSelectedClassDocx;
-      DOM.btnDownloadAllDays.textContent = "Export All Standards (.docx)";
-      DOM.btnDownloadAllDays.onclick = downloadAllDaysDocx;
-    } else if (state.activeView === 'class-view') {
-      DOM.exportBarTitle.textContent = "Export Official Class Timetables";
-      DOM.exportBarDesc.textContent = `Generates formatted Word (.docx) for ${state.currentDay} or full week with school letterhead.`;
-      DOM.btnDownloadSingleDay.style.display = 'inline-flex';
-      DOM.btnDownloadDayName.textContent = state.currentDay;
-      DOM.btnDownloadSingleDay.onclick = downloadSingleDayDocx;
-      DOM.btnDownloadAllDays.textContent = "Download Full Week (.docx)";
-      DOM.btnDownloadAllDays.onclick = downloadAllDaysDocx;
-    } else if (state.activeView === 'teacher-view') {
-      DOM.exportBarTitle.textContent = "Export Individual Faculty Timetables";
-      DOM.exportBarDesc.textContent = "Outputs individual 1-page weekly schedules for each staff member.";
-      DOM.btnDownloadSingleDay.style.display = 'none';
-      DOM.btnDownloadAllDays.textContent = "Download All Staff Schedules (.docx)";
-      DOM.btnDownloadAllDays.onclick = () => {
-        state.activeView = 'teacher-view';
-        downloadAllDaysDocx();
-      };
-    } else if (state.activeView === 'duty-view') {
-      DOM.exportBarTitle.textContent = "Export Faculty Extra Duties Matrix";
-      DOM.exportBarDesc.textContent = "Outputs standalone official faculty extra duty matrix with subject & grade tally breakdown (.docx).";
-      DOM.btnDownloadSingleDay.style.display = 'none';
-      DOM.btnDownloadAllDays.textContent = "Download Extra Duties (.docx)";
-      DOM.btnDownloadAllDays.onclick = downloadWeeklyDutyDocx;
-    } else if (state.activeView === 'general-duty-view') {
-      DOM.exportBarTitle.textContent = "Export School & Assembly Duties Roster";
-      DOM.exportBarDesc.textContent = "Outputs official faculty special & assembly duties roster with administrative guidelines (.docx).";
-      DOM.btnDownloadSingleDay.style.display = 'none';
-      DOM.btnDownloadAllDays.textContent = "Download Duty Roster (.docx)";
-      DOM.btnDownloadAllDays.onclick = exportGeneralDutiesDocx;
-    } else if (state.activeView === 'substitution-view') {
-      DOM.exportBarTitle.textContent = "Export Daily Substitution Notice";
-      DOM.exportBarDesc.textContent = "Outputs formal administrative duty notice for staff room notice boards.";
-      DOM.btnDownloadSingleDay.style.display = 'none';
-      DOM.btnDownloadAllDays.textContent = "Download Substitution Notice (.docx)";
-      DOM.btnDownloadAllDays.onclick = downloadSubstitutionDocx;
-    } else {
+    if (DOM.stickyExportBar) {
       DOM.stickyExportBar.style.display = 'none';
     }
   }
@@ -9960,16 +9884,16 @@
     if (DOM.inputLogoFile) DOM.inputLogoFile.onchange = handleLogoUpload;
     if (DOM.btnRemoveLogo) DOM.btnRemoveLogo.onclick = removeLogo;
 
-    // Export Bar
-    DOM.btnDownloadSingleDay.onclick = downloadSingleDayDocx;
-    DOM.btnDownloadAllDays.onclick = downloadAllDaysDocx;
-    DOM.btnDownloadTeacherDocx.onclick = downloadSingleTeacherDocx;
-    DOM.btnDownloadAllTeachersDocx.onclick = () => {
+    // Export Bar (null-guarded)
+    if (DOM.btnDownloadSingleDay) DOM.btnDownloadSingleDay.onclick = downloadSingleDayDocx;
+    if (DOM.btnDownloadAllDays) DOM.btnDownloadAllDays.onclick = downloadAllDaysDocx;
+    if (DOM.btnDownloadTeacherDocx) DOM.btnDownloadTeacherDocx.onclick = downloadSingleTeacherDocx;
+    if (DOM.btnDownloadAllTeachersDocx) DOM.btnDownloadAllTeachersDocx.onclick = () => {
       state.activeView = 'teacher-view';
       downloadAllDaysDocx();
     };
-    DOM.btnDownloadSubstitutionDocx.onclick = downloadSubstitutionDocx;
-    DOM.btnPrintView.onclick = () => window.print();
+    if (DOM.btnDownloadSubstitutionDocx) DOM.btnDownloadSubstitutionDocx.onclick = downloadSubstitutionDocx;
+    if (DOM.btnPrintView) DOM.btnPrintView.onclick = () => window.print();
 
     // Day Actions
     DOM.btnOpenCopyModal.onclick = openCopyModal;
