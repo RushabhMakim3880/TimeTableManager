@@ -270,6 +270,7 @@
     fbInputRawSnippet: document.getElementById('fb-input-rawSnippet'),
 
     // Academic Shift Selector
+    btnTopbarQuickCreate: document.getElementById('btn-topbar-quick-create'),
     headerShiftSelector: document.getElementById('header-shift-selector'),
     btnShiftMorning: document.getElementById('btn-shift-morning'),
     btnShiftAfternoon: document.getElementById('btn-shift-afternoon'),
@@ -6031,6 +6032,7 @@
     if (DOM.newSubjectName) DOM.newSubjectName.onkeydown = (e) => { if (e.key === 'Enter') addNewSubjectConfig(); };
 
     // Quick-Add Trigger Buttons
+    if (DOM.btnTopbarQuickCreate) DOM.btnTopbarQuickCreate.onclick = () => openQuickAddModal('subject');
     if (DOM.btnQuickNewSubjectFaculty) DOM.btnQuickNewSubjectFaculty.onclick = () => openQuickAddModal('subject', DOM.newFacultySubject);
     if (DOM.btnQuickNewSubjectSlot) DOM.btnQuickNewSubjectSlot.onclick = () => openQuickAddModal('subject', DOM.classCellSubject);
     if (DOM.btnQuickNewTeacherSlot) DOM.btnQuickNewTeacherSlot.onclick = () => openQuickAddModal('teacher', DOM.classCellTeacher);
