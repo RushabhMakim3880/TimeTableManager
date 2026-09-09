@@ -1,0 +1,45 @@
+now that we have moved forward and we have received so many good feedbacks, lets convert this simple application to a fully functional saas product for school like a school management system, 
+to achieve this lets add, a login panel, a proper dashboard, and below features:
+
+1. Class wise time table
+2. Attendance duty
+3. Class teacher duty
+4. we have added time tables for the afternoon shift right now, now we also need to add the timetable creation for the Morning shift too
+5. Syllabus table Standard wise which will include: 
+- No of chapter, poem, grammar in Sem 1 exam
+- Completed course 
+- Pending course 
+- syllabus checked ( included Textbooks & ClassWork)
+- checking pending ( included Textbooks & ClassWork)
+
+
+Role		Email				Password
+Admin		admin@funland.edu		admin123
+Principal	principal@funland.edu		principal123
+Teacher		priya@funland.edu		teacher123
+Staff		supervision@funland.edu		staff123
+
+
+
+
+🔐 *ERP LOGIN CREDENTIALS*
+
+👑 *Administrator*
+• User ID: `admin@funland.edu` / `admin`
+• Password: `admin123`
+• Access: Full ERP access — master timetables, schedule edits, room/teacher allocation, conflict guard & system settings.
+
+🎓 *Principal*
+• User ID: `principal@funland.edu` / `principal`
+• Password: `principal123`
+• Access: Executive oversight — institutional schedules, workload monitoring, substitutions & syllabus progress.
+
+👩‍🏫 *Faculty Member*
+• User ID: `priya@funland.edu` / `teacher`
+• Password: `teacher123`
+• Access: Teacher portal — personal schedule, class lectures, duty rosters, substitutions & syllabus scope.
+
+📋 *Supervision Staff*
+• User ID: `supervision@funland.edu` / `staff`
+• Password: `staff123`
+• Access: Operations — morning/afternoon assembly duties, special supervision grids & daily schedule matrix.
