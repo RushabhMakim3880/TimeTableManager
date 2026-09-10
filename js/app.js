@@ -3879,6 +3879,7 @@
   function showLoginOverlay() {
     if (DOM.authLoginOverlay) {
       DOM.authLoginOverlay.classList.add('active');
+      DOM.authLoginOverlay.style.display = 'flex';
     }
     if (DOM.appShell) {
       DOM.appShell.style.display = 'none';
@@ -3888,14 +3889,38 @@
   }
 
   function hideLoginOverlay() {
+    // Anti-Blank Screen Security Guard: Never allow hiding if not authenticated!
+    if (!state.auth || !state.auth.isAuthenticated) {
+      showLoginOverlay();
+      return;
+    }
     if (DOM.authLoginOverlay) {
       DOM.authLoginOverlay.classList.remove('active');
+      DOM.authLoginOverlay.style.display = 'none';
     }
     if (DOM.appShell) {
-      DOM.appShell.style.display = '';
+      DOM.appShell.style.display = 'flex';
     }
     document.body.classList.remove('unauthenticated-screen');
   }
+
+  window.quickDemoLogin = function(role) {
+    if (!DOM.authEmail || !DOM.authPassword) return;
+    if (role === 'admin') {
+      DOM.authEmail.value = 'admin';
+      DOM.authPassword.value = 'admin123';
+    } else if (role === 'principal') {
+      DOM.authEmail.value = 'principal';
+      DOM.authPassword.value = 'principal123';
+    } else if (role === 'academic') {
+      DOM.authEmail.value = 'principal';
+      DOM.authPassword.value = 'principal123';
+    } else if (role === 'teacher') {
+      DOM.authEmail.value = 'payalmaam';
+      DOM.authPassword.value = 'payal123';
+    }
+    handleLogin();
+  };
 
   // ==========================================================================
   // MODULE 2: ACADEMIC SHIFT MANAGEMENT (MORNING VS AFTERNOON)
@@ -10251,8 +10276,8 @@
       };
     }
 
-    // Close Modals on background click
-    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal, DOM.cloudDbModal, DOM.classCellModal, DOM.attendanceDutyModal, DOM.classTeacherModal, DOM.syllabusModal, DOM.authLoginOverlay, DOM.autoSchedulerModal, DOM.addSectionModal, DOM.addExamSlotModal, DOM.essWeeklyModal, DOM.essLeaveModal, DOM.essChangePasswordModal].forEach(m => {
+    // Close Modals on background click (standard non-security dialogs)
+    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal, DOM.cloudDbModal, DOM.classCellModal, DOM.attendanceDutyModal, DOM.classTeacherModal, DOM.syllabusModal, DOM.autoSchedulerModal, DOM.addSectionModal, DOM.addExamSlotModal, DOM.essWeeklyModal, DOM.essLeaveModal, DOM.essChangePasswordModal].forEach(m => {
       if (m) m.onclick = (e) => { 
         if (e.target === m) {
           m.classList.remove('active'); 
@@ -10260,6 +10285,28 @@
         }
       };
     });
+
+    // Dedicated Authentication Gateway Backdrop Protection (Strict Anti-Blank Screen Guard)
+    if (DOM.authLoginOverlay) {
+      DOM.authLoginOverlay.onclick = (e) => {
+        if (e.target === DOM.authLoginOverlay) {
+          if (state.auth && state.auth.isAuthenticated) {
+            // Already signed in: safe to dismiss switch-user popup
+            hideLoginOverlay();
+          } else {
+            // Unauthenticated: MUST NOT dismiss to blank screen!
+            const authCard = DOM.authLoginOverlay.querySelector('.auth-container') || DOM.authLoginOverlay.querySelector('.auth-form-card');
+            if (authCard) {
+              authCard.classList.remove('auth-shake');
+              void authCard.offsetWidth; // force reflow for re-animation
+              authCard.classList.add('auth-shake');
+            }
+            if (DOM.authEmail) DOM.authEmail.focus();
+            showToast('🔒 Please sign in with your institutional credentials to access the ERP portal.', 'info');
+          }
+        }
+      };
+    }
 
     // ESC Key
     document.onkeydown = (e) => {
@@ -10275,7 +10322,18 @@
         if (DOM.attendanceDutyModal) DOM.attendanceDutyModal.classList.remove('active');
         if (DOM.classTeacherModal) DOM.classTeacherModal.classList.remove('active');
         if (DOM.syllabusModal) DOM.syllabusModal.classList.remove('active');
-        if (DOM.authLoginOverlay) DOM.authLoginOverlay.classList.remove('active');
+        if (DOM.authLoginOverlay) {
+          if (state.auth && state.auth.isAuthenticated) {
+            hideLoginOverlay();
+          } else {
+            const authCard = DOM.authLoginOverlay.querySelector('.auth-container') || DOM.authLoginOverlay.querySelector('.auth-form-card');
+            if (authCard) {
+              authCard.classList.remove('auth-shake');
+              void authCard.offsetWidth;
+              authCard.classList.add('auth-shake');
+            }
+          }
+        }
         if (DOM.autoSchedulerModal) DOM.autoSchedulerModal.style.display = 'none';
         if (DOM.addSectionModal) DOM.addSectionModal.style.display = 'none';
         if (DOM.addExamSlotModal) DOM.addExamSlotModal.style.display = 'none';
