@@ -1088,7 +1088,17 @@ const DocxGenerator = (function() {
     const shiftKey = std.shift || 'afternoon';
     const shiftsConfig = shifts || (typeof DEFAULT_DATA !== 'undefined' ? DEFAULT_DATA.shifts : null) || {};
     const shiftInfo = shiftsConfig[shiftKey] || {};
-    const classPeriods = (shiftInfo.periods && shiftInfo.periods.length > 0) ? shiftInfo.periods : periods;
+    const defaultMorningPeriods = [
+      { id: 'p1', number: 1, label: 'Lecture 1', time: '7:30 to 8:15' },
+      { id: 'p2', number: 2, label: 'Lecture 2', time: '8:15 to 9:00' },
+      { id: 'p3', number: 3, label: 'Lecture 3', time: '9:00 to 9:45' },
+      { id: 'p4', number: 4, label: 'Lecture 4', time: '10:15 to 11:00' },
+      { id: 'p5', number: 5, label: 'Lecture 5', time: '11:00 to 11:45' },
+      { id: 'p6', number: 6, label: 'Lecture 6', time: '11:45 to 12:30' }
+    ];
+    const classPeriods = (shiftInfo.periods && shiftInfo.periods.length > 0) 
+      ? shiftInfo.periods 
+      : (shiftKey === 'morning' ? defaultMorningPeriods : periods);
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     const subTitle = `CLASS TIMETABLE: ${std.name.toUpperCase()} • CLASS TEACHER: ${classTeacherName || 'UNASSIGNED'} • ROOM: ${std.room || 'CLASSROOM'}`;

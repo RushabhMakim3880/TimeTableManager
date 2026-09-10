@@ -412,15 +412,24 @@
     if (!state.shifts || Object.keys(state.shifts).length === 0) {
       state.shifts = JSON.parse(JSON.stringify(DEFAULT_DATA.shifts || {}));
     } else {
-      if (!state.shifts.morning || !state.shifts.morning.periods || state.shifts.morning.periods.length === 0) {
-        if (DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.morning) {
-          state.shifts.morning = JSON.parse(JSON.stringify(DEFAULT_DATA.shifts.morning));
-        }
+      if (!state.shifts.morning) state.shifts.morning = {};
+      if (!state.shifts.morning.periods || state.shifts.morning.periods.length === 0) {
+        state.shifts.morning.periods = (DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.morning && DEFAULT_DATA.shifts.morning.periods && DEFAULT_DATA.shifts.morning.periods.length > 0)
+          ? JSON.parse(JSON.stringify(DEFAULT_DATA.shifts.morning.periods))
+          : [
+              { id: 'p1', number: 1, label: 'Lecture 1', time: '7:30 to 8:15' },
+              { id: 'p2', number: 2, label: 'Lecture 2', time: '8:15 to 9:00' },
+              { id: 'p3', number: 3, label: 'Lecture 3', time: '9:00 to 9:45' },
+              { id: 'p4', number: 4, label: 'Lecture 4', time: '10:15 to 11:00' },
+              { id: 'p5', number: 5, label: 'Lecture 5', time: '11:00 to 11:45' },
+              { id: 'p6', number: 6, label: 'Lecture 6', time: '11:45 to 12:30' }
+            ];
       }
-      if (!state.shifts.afternoon || !state.shifts.afternoon.periods || state.shifts.afternoon.periods.length === 0) {
-        if (DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.afternoon) {
-          state.shifts.afternoon = JSON.parse(JSON.stringify(DEFAULT_DATA.shifts.afternoon));
-        }
+      if (!state.shifts.afternoon) state.shifts.afternoon = {};
+      if (!state.shifts.afternoon.periods || state.shifts.afternoon.periods.length === 0) {
+        state.shifts.afternoon.periods = (DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.afternoon && DEFAULT_DATA.shifts.afternoon.periods && DEFAULT_DATA.shifts.afternoon.periods.length > 0)
+          ? JSON.parse(JSON.stringify(DEFAULT_DATA.shifts.afternoon.periods))
+          : (DEFAULT_DATA.periods ? JSON.parse(JSON.stringify(DEFAULT_DATA.periods)) : []);
       }
     }
 
