@@ -9,56 +9,58 @@
   --bg-surface: #ffffff;
   --bg-subtle: #f1f5f9;
   --bg-hover: #f8fafc;
-  
+
   --border-color: #cbd5e1;
   --border-light: #e2e8f0;
   --border-dark: #94a3b8;
-  
+
   --text-primary: #0f172a;
   --text-secondary: #334155;
   --text-muted: #64748b;
   --text-dim: #94a3b8;
-  
+
   /* Primary Executive Navy */
   --primary-navy: #1e3a8a;
   --primary-hover: #1d4ed8;
   --primary-light: #eff6ff;
   --primary-border: #bfdbfe;
-  
+
   /* Official Word Brand Blue */
   --word-blue: #185abd;
   --word-hover: #10438c;
   --word-light: #eff6ff;
-  
+
   /* Status Colors */
   --status-success: #15803d;
   --status-success-bg: #f0fdf4;
   --status-success-border: #bbf7d0;
-  
+
   --status-warning: #b45309;
   --status-warning-bg: #fffbeb;
   --status-warning-border: #fde68a;
-  
+
   --status-danger: #b91c1c;
   --status-danger-bg: #fef2f2;
   --status-danger-border: #fecaca;
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  
+
   /* Radius & Shadows */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  
+
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-popover: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
   --shadow-dropdown: 0 4px 12px rgba(15, 23, 42, 0.08);
 }
 
 /* Reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -188,6 +190,7 @@ body {
   color: #065f46;
   border-color: #a7f3d0;
 }
+
 .status-pill.cloud-synced .dot {
   background: #10b981;
 }
@@ -197,6 +200,7 @@ body {
   color: #1e40af;
   border-color: #bfdbfe;
 }
+
 .status-pill.cloud-syncing .dot {
   background: #3b82f6;
   animation: pulse-dot 1s infinite;
@@ -207,6 +211,7 @@ body {
   color: #92400e;
   border-color: #fde68a;
 }
+
 .status-pill.cloud-offline .dot {
   background: #f59e0b;
 }
@@ -216,14 +221,26 @@ body {
   color: #475569;
   border-color: #cbd5e1;
 }
+
 .status-pill.cloud-unconfigured .dot {
   background: #94a3b8;
 }
 
 @keyframes pulse-dot {
-  0% { opacity: 0.4; transform: scale(0.9); }
-  50% { opacity: 1; transform: scale(1.2); }
-  100% { opacity: 0.4; transform: scale(0.9); }
+  0% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  100% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
 }
 
 /* Cloud Status Card in Modal */
@@ -233,18 +250,22 @@ body {
   background: var(--bg-subtle, #f8fafc);
   border: 1px solid var(--border-color, #e2e8f0);
 }
+
 .cloud-status-box.connected {
   background: #f0fdf4;
   border-color: #bbf7d0;
 }
+
 .cloud-status-box.unconfigured {
   background: #f8fafc;
   border-color: #e2e8f0;
 }
+
 .cloud-status-box.error {
   background: #fef2f2;
   border-color: #fecaca;
 }
+
 .cloud-status-box.offline {
   background: #fffbeb;
   border-color: #fde68a;
@@ -258,15 +279,19 @@ body {
   display: inline-block;
   flex-shrink: 0;
 }
+
 .cloud-status-box.connected .cloud-status-indicator {
   background: #10b981;
 }
+
 .cloud-status-box.unconfigured .cloud-status-indicator {
   background: #94a3b8;
 }
+
 .cloud-status-box.error .cloud-status-indicator {
   background: #ef4444;
 }
+
 .cloud-status-box.offline .cloud-status-indicator {
   background: #f59e0b;
 }
@@ -656,9 +681,18 @@ body {
   padding: 10px 4px;
 }
 
-.col-lecture-w { width: 10.5%; }
-.col-std-w { width: 12.6%; }
-.col-free-w { width: 13.9%; background: #fcfdfd !important; }
+.col-lecture-w {
+  width: 10.5%;
+}
+
+.col-std-w {
+  width: 12.6%;
+}
+
+.col-free-w {
+  width: 13.9%;
+  background: #fcfdfd !important;
+}
 
 .period-header-cell {
   background: #fafafa;
@@ -1707,12 +1741,24 @@ body {
   opacity: 1;
 }
 
-.toast-msg.success { border-left-color: var(--status-success); }
-.toast-msg.error { border-left-color: var(--status-danger); }
+.toast-msg.success {
+  border-left-color: var(--status-success);
+}
+
+.toast-msg.error {
+  border-left-color: var(--status-danger);
+}
 
 @keyframes popoverFadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Duty & Supervision Allocation Roster */
@@ -1990,7 +2036,7 @@ body {
 .duty-summary-card:hover {
   background: #ffffff;
   border-color: var(--border-dark);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .duty-summary-label {
@@ -2103,7 +2149,7 @@ body {
   font-weight: 600;
   white-space: nowrap;
   max-width: 100%;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .duty-day-teacher-chip .chip-avatar {
@@ -2155,6 +2201,8 @@ body {
   background: #fee2e2;
   border-color: #fca5a5;
   color: #dc2626;
+}
+
 /* ==========================================================================
    Shift Selector & Class-Wise Timetable Controls
    ========================================================================== */
@@ -2182,7 +2230,8 @@ body {
   margin-right: 4px;
 }
 
-.shift-pill-group, .mode-segmented-group {
+.shift-pill-group,
+.mode-segmented-group {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -2337,7 +2386,8 @@ body {
   color: var(--text-primary);
 }
 
-.class-room-badge, .class-lecture-badge {
+.class-room-badge,
+.class-lecture-badge {
   background: #ffffff;
   padding: 4px 10px;
   border-radius: 6px;
@@ -2353,18 +2403,84 @@ body {
 }
 
 @media print {
-  body { background: #ffffff !important; padding-bottom: 0 !important; }
-  .app-header, .view-switcher-bar, .day-nav-bar, .attendance-strip, .teacher-filter-bar, .sticky-export-bar, .period-popover-overlay, .enterprise-modal-overlay, .toast-area, #btn-print-workload, .btn-duty-action, .general-duty-table th:last-child, .general-duty-table td:last-child {
+  body {
+    background: #ffffff !important;
+    padding-bottom: 0 !important;
+  }
+
+  .app-header,
+  .view-switcher-bar,
+  .day-nav-bar,
+  .attendance-strip,
+  .teacher-filter-bar,
+  .sticky-export-bar,
+  .period-popover-overlay,
+  .enterprise-modal-overlay,
+  .toast-area,
+  #btn-print-workload,
+  .btn-duty-action,
+  .general-duty-table th:last-child,
+  .general-duty-table td:last-child {
     display: none !important;
   }
-  .main-wrapper { margin: 0 !important; padding: 0 !important; max-width: 100% !important; }
-  .timetable-document-sheet, .substitution-panel { border: none !important; box-shadow: none !important; padding: 0 !important; }
-  .official-grid-table { border: 1px solid #000000 !important; }
-  .official-grid-table th, .official-grid-table td { border: 1px solid #000000 !important; color: #000000 !important; }
-  .workload-kpi-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
-  .workload-main-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
-  .workload-panel, .workload-kpi-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; page-break-inside: avoid; }
-  .btn-remove-free-teacher, .btn-restore-free-teacher { display: none !important; }
-  .free-staff-item { border: none !important; background: transparent !important; padding: 0 !important; width: 100% !important; justify-content: center !important; }
-  .free-staff-name { text-align: center !important; font-size: 11px !important; }
+
+  .main-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .timetable-document-sheet,
+  .substitution-panel {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .official-grid-table {
+    border: 1px solid #000000 !important;
+  }
+
+  .official-grid-table th,
+  .official-grid-table td {
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+  }
+
+  .workload-kpi-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .workload-main-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 15px !important;
+  }
+
+  .workload-panel,
+  .workload-kpi-card {
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+    page-break-inside: avoid;
+  }
+
+  .btn-remove-free-teacher,
+  .btn-restore-free-teacher {
+    display: none !important;
+  }
+
+  .free-staff-item {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .free-staff-name {
+    text-align: center !important;
+    font-size: 11px !important;
+  }
 }
