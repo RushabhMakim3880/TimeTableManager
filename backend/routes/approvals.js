@@ -34,38 +34,62 @@ db.db.exec(`
   );
 `);
 
-// Seed default initial approval requests if empty
-const count = db.get('SELECT COUNT(*) as c FROM approvals');
-if (count && count.c === 0) {
-  const insert = db.db.prepare(`
-    INSERT INTO approvals (category, department, requester_name, requester_role, title, details, urgency_level, target_approver_role, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDING')
-  `);
+// Seed default initial approval requests idempotently
+const ensureApproval = (category, department, requester_name, requester_role, title, details, urgency_level, target_approver_role, status = 'PENDING', decision_by = null, decision_notes = null) => {
+  try {
+    const existing = db.get('SELECT id FROM approvals WHERE title = ?', [title]);
+    if (!existing) {
+      db.run(`
+        INSERT INTO approvals (category, department, requester_name, requester_role, title, details, urgency_level, target_approver_role, status, decision_by, decision_notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `, [category, department, requester_name, requester_role, title, details, urgency_level, target_approver_role, status, decision_by, decision_notes]);
+    }
+  } catch (err) {
+    console.warn('Approvals seed notice:', err.message);
+  }
+};
 
-  insert.run(
-    'ACADEMIC_LEAVE', 'ACADEMIC', 'Payal Ma\'am', 'Class Teacher (Std 3rd)',
-    'Medical Leave (1 Day)', 'Leave for medical check-up on Friday, 12th Sept. Nominated proxy teacher: Nisha Ma\'am.',
-    'NORMAL', 'ACADEMIC_HEAD'
-  );
+ensureApproval(
+  'ACADEMIC_LEAVE', 'ACADEMIC', 'Payal Ma\'am', 'Class Teacher (Std 3rd)',
+  'Medical Leave (1 Day)', 'Leave for medical check-up on Friday, 12th Sept. Nominated proxy teacher: Nisha Ma\'am.',
+  'NORMAL', 'ACADEMIC_HEAD', 'PENDING'
+);
 
-  insert.run(
-    'ACADEMIC_LEAVE', 'ACADEMIC', 'Kavita Ma\'am', 'Senior Faculty (Maths)',
-    'Casual Leave (2 Days)', 'Family function leave on 15th-16th Sept. Syllabus topics pre-recorded.',
-    'NORMAL', 'ACADEMIC_HEAD'
-  );
+ensureApproval(
+  'ACADEMIC_LEAVE', 'ACADEMIC', 'Kavita Ma\'am', 'Senior Faculty (Maths)',
+  'Casual Leave (2 Days)', 'Family function leave on 15th-16th Sept. Syllabus topics pre-recorded.',
+  'NORMAL', 'ACADEMIC_HEAD', 'PENDING'
+);
 
-  insert.run(
-    'ADMIN_SUBORDINATE', 'ADMIN', 'Ramesh Kumar', 'Campus Facilities Supervisor',
-    'Store Requisition: Examination Paper Bundles', 'Urgent replenishment of 20 rim paper bundles and printer cartridges for term test prep (₹6,800).',
-    'NORMAL', 'ADMIN_HEAD'
-  );
+ensureApproval(
+  'ADMIN_SUBORDINATE', 'ADMIN', 'Ramesh Kumar', 'Campus Facilities Supervisor',
+  'Store Requisition: Examination Paper Bundles', 'Urgent replenishment of 20 rim paper bundles and printer cartridges for term test prep (₹6,800).',
+  'NORMAL', 'ADMIN_HEAD', 'APPROVED', 'System Administrator', 'Approved for upcoming term assessments.'
+);
 
-  insert.run(
-    'URGENT_ESCALATION', 'ACADEMIC', 'Academic Head', 'Academic Head',
-    'GSEB District Inspection: Class 8th Science Lab Certification', 'District Education Officer inspection scheduled for next Tuesday. Requires Principal executive approval for urgent safety equipment procurement.',
-    'URGENT', 'PRINCIPAL'
-  );
-}
+ensureApproval(
+  'ADMIN_SUBORDINATE', 'ADMIN', 'Pravin Solanki', 'Gate Security Head',
+  'CCTV Camera Replacement - North Gate', 'Urgent repair & weather-sealing of perimeter dome camera near student bus entrance gate (₹3,200).',
+  'URGENT', 'ADMIN_HEAD', 'PENDING'
+);
+
+ensureApproval(
+  'ADMIN_SUBORDINATE', 'ADMIN', 'Rekhabehn Parmar', 'Library In-Charge',
+  'Reference Books Re-binding & Digital Catalog Barcodes', 'Specialist archival binding of 120 board exam reference texts and thermal barcode tags (₹4,150).',
+  'NORMAL', 'ADMIN_HEAD', 'PENDING'
+);
+
+ensureApproval(
+  'ADMIN_SUBORDINATE', 'ADMIN', 'Suresh Patil', 'Sanitation Lead',
+  'Water Tank Disinfection & RO Filter Cartridges', 'Certified semi-annual disinfection of campus overhead tanks and replacement of 6 primary RO membrane filters (₹5,400).',
+  'NORMAL', 'ADMIN_HEAD', 'APPROVED', 'System Administrator', 'Completed per annual campus health audit standards.'
+);
+
+ensureApproval(
+  'URGENT_ESCALATION', 'ACADEMIC', 'Academic Head', 'Academic Head',
+  'GSEB District Inspection: Class 8th Science Lab Certification', 'District Education Officer inspection scheduled for next Tuesday. Requires Principal executive approval for urgent safety equipment procurement.',
+  'URGENT', 'PRINCIPAL', 'APPROVED', 'Principal / Trustee', 'Executive sign-off granted. Purchase authorized immediately.'
+);
 
 /**
  * GET /api/approvals/academic

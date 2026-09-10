@@ -2589,12 +2589,13 @@
       // Netlify / Offline fallback
       if (approvals.length === 0 && (!token || window.location.hostname.includes('netlify'))) {
         approvals = [
-          { id: 1, category: 'ACADEMIC_LEAVE', department: 'Primary Wing', requester_name: "Payal Ma'am", requester_role: 'Class Teacher - Std 3rd', title: 'Casual Leave (2 Days)', details: 'Medical appointment & fever recovery. Proxy relief allocated to Manali Ma\'am for Periods 2 & 4.', urgency: 'NORMAL', status: 'PENDING' },
-          { id: 2, category: 'ACADEMIC_LEAVE', department: 'Secondary Wing', requester_name: "Kavita Ma'am", requester_role: 'Senior Maths Teacher', title: 'Medical Leave (Emergency)', details: 'Orthopedic procedure and post-op rest. Grade 8 Maths substitution assigned to Sakina Ma\'am.', urgency: 'URGENT', status: 'PENDING' },
-          { id: 5, category: 'ACADEMIC_LEAVE', department: 'Secondary Wing', requester_name: "Manali Ma'am", requester_role: 'Senior Hindi Teacher', title: 'Duty Leave (District Workshop)', details: 'Attending GSEB Curriculum Alignment Workshop at DIET center.', urgency: 'NORMAL', status: 'APPROVED', decision_by: 'Academic Head' }
+          { id: 1, category: 'ACADEMIC_LEAVE', department: 'Academic', requester_name: 'Payal Ma\'am', requester_role: 'Class Teacher (Std 3rd)', title: 'Medical Leave (1 Day)', details: 'Leave for medical check-up on Friday, 12th Sept. Nominated proxy teacher: Nisha Ma\'am.', urgency: 'NORMAL', status: 'PENDING' },
+          { id: 2, category: 'ACADEMIC_LEAVE', department: 'Academic', requester_name: 'Kavita Ma\'am', requester_role: 'Senior Faculty (Maths)', title: 'Casual Leave (2 Days)', details: 'Family function leave on 15th-16th Sept. Syllabus topics pre-recorded.', urgency: 'NORMAL', status: 'PENDING' },
+          { id: 5, category: 'ACADEMIC_LEAVE', department: 'Academic', requester_name: 'Meena Ma\'am', requester_role: 'Science Faculty', title: 'GSEB Curriculum Workshop', details: 'Official duty leave for District Education Officer workshop on experiential STEM learning.', urgency: 'NORMAL', status: 'APPROVED', decision_by: 'Academic Head', decision_notes: 'Duty leave approved with certificates required.' }
         ];
       }
 
+      window._rawAcademicApprovals = approvals;
       const total = approvals.length;
       const pending = approvals.filter(a => a.status === 'PENDING').length;
       const approved = approvals.filter(a => a.status === 'APPROVED').length;
@@ -2613,69 +2614,154 @@
       if (DOM.academicPendingBadge) DOM.academicPendingBadge.textContent = `${pending} Pending`;
       if (DOM.badgeAcademicPending) DOM.badgeAcademicPending.textContent = `${pending} Leaves`;
 
-      if (tbody) {
-        if (approvals.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:32px; color:#64748b;">No faculty leave applications found. All teaching faculty present on duty.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = approvals.map(a => {
-          const isPending = a.status === 'PENDING';
-          const statusBadge = a.status === 'APPROVED'
-            ? '<span class="approval-status-pill status-approved">✓ APPROVED</span>'
-            : a.status === 'REJECTED'
-            ? '<span class="approval-status-pill status-rejected">✕ REJECTED</span>'
-            : a.status === 'ESCALATED'
-            ? '<span class="approval-status-pill status-escalated">🚨 ESCALATED TO PRINCIPAL</span>'
-            : '<span class="approval-status-pill status-pending">⏳ PENDING REVIEW</span>';
-
-          const urgencyBadge = a.urgency === 'URGENT'
-            ? '<span class="approval-urgency-pill urgency-high">URGENT</span>'
-            : '<span class="approval-urgency-pill urgency-normal">NORMAL</span>';
-
-          const actions = isPending ? `
-            <div class="approval-action-group">
-              <button class="btn-appr-approve" onclick="window.decideApprovalRecord(${a.id}, 'APPROVED', 'academic')">
-                ✓ Approve
-              </button>
-              <button class="btn-appr-reject" onclick="window.decideApprovalRecord(${a.id}, 'REJECTED', 'academic')">
-                ✕ Reject
-              </button>
-              <button class="btn-appr-escalate" onclick="window.promptEscalateRecord(${a.id}, 'academic')">
-                🚨 Escalate (Urgent)
-              </button>
-            </div>
-          ` : `
-            <div style="font-size: 12px; color: #64748b;">
-              Decided by: <strong>${a.decision_by || 'Academic Head'}</strong> ${a.decision_notes ? `• "${a.decision_notes}"` : ''}
-            </div>
-          `;
-
-          return `
-            <tr>
-              <td><span class="approval-id-pill">#LV-${String(a.id).padStart(3, '0')}</span></td>
-              <td>
-                <div style="font-weight: 700; color: #0f172a; font-size: 13.5px;">${a.requester_name}</div>
-                <div style="font-size: 11.5px; color: #64748b;">${a.requester_role}</div>
-              </td>
-              <td>
-                <span class="badge" style="background:#eff6ff; color:#1e40af; font-weight:700; font-size:11px; padding:3px 8px; border-radius:6px;">${a.department}</span>
-              </td>
-              <td>
-                <div style="font-weight: 700; color: #1e293b; margin-bottom: 2px;">${a.title}</div>
-                <div style="font-size: 12px; color: #475569; line-height: 1.4;">${a.details || 'Leave application'}</div>
-              </td>
-              <td>${urgencyBadge}</td>
-              <td>${statusBadge}</td>
-              <td>${actions}</td>
-            </tr>
-          `;
-        }).join('');
-      }
+      renderAcademicApprovalsTable();
+      initAcademicApprovalsControls();
     } catch (e) {
       if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:#dc2626;">Failed to load academic leaves.</td></tr>';
     }
   }
+
+  let currentAcademicFilter = 'ALL';
+  let currentAcademicSearch = '';
+
+  function renderAcademicApprovalsTable() {
+    const tbody = document.getElementById('academic-approvals-tbody');
+    if (!tbody) return;
+
+    const list = window._rawAcademicApprovals || [];
+    let filtered = list.slice();
+
+    if (currentAcademicFilter === 'PENDING') filtered = filtered.filter(a => a.status === 'PENDING');
+    else if (currentAcademicFilter === 'APPROVED') filtered = filtered.filter(a => a.status === 'APPROVED');
+    else if (currentAcademicFilter === 'URGENT') filtered = filtered.filter(a => a.urgency === 'URGENT' || a.urgency_level === 'URGENT');
+
+    if (currentAcademicSearch.trim()) {
+      const q = currentAcademicSearch.toLowerCase();
+      filtered = filtered.filter(a =>
+        (a.requester_name && a.requester_name.toLowerCase().includes(q)) ||
+        (a.title && a.title.toLowerCase().includes(q)) ||
+        (a.details && a.details.toLowerCase().includes(q))
+      );
+    }
+
+    const cAll = document.getElementById('academic-count-all');
+    const cPen = document.getElementById('academic-count-pending');
+    const cApp = document.getElementById('academic-count-approved');
+    const cUrg = document.getElementById('academic-count-urgent');
+    if (cAll) cAll.textContent = list.length;
+    if (cPen) cPen.textContent = list.filter(a => a.status === 'PENDING').length;
+    if (cApp) cApp.textContent = list.filter(a => a.status === 'APPROVED').length;
+    if (cUrg) cUrg.textContent = list.filter(a => a.urgency === 'URGENT' || a.urgency_level === 'URGENT').length;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center; padding:48px 24px; color:#64748b;">
+            <div style="font-size:32px; margin-bottom:8px;">📋</div>
+            <div style="font-weight:700; font-size:15px; color:#1e293b; margin-bottom:4px;">No Faculty Leaves Found</div>
+            <div style="font-size:12.5px; color:#64748b;">No leave records match the selected filter or search term.</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const avatarColors = [
+      { bg: '#eff6ff', border: '#bfdbfe', text: '#1e40af' },
+      { bg: '#ecfdf5', border: '#a7f3d0', text: '#065f46' },
+      { bg: '#fffbeb', border: '#fde68a', text: '#92400e' },
+      { bg: '#fdf2f8', border: '#fbcfe8', text: '#9d174d' },
+      { bg: '#f5f3ff', border: '#ddd6fe', text: '#5b21b6' },
+    ];
+
+    tbody.innerHTML = filtered.map(a => {
+      const isPending = a.status === 'PENDING';
+      const statusBadge = a.status === 'APPROVED'
+        ? '<span class="approval-status-pill status-approved">✓ APPROVED</span>'
+        : a.status === 'REJECTED'
+        ? '<span class="approval-status-pill status-rejected">✕ REJECTED</span>'
+        : a.status === 'ESCALATED'
+        ? '<span class="approval-status-pill status-escalated">🚨 ESCALATED TO PRINCIPAL</span>'
+        : '<span class="approval-status-pill status-pending">⏳ PENDING REVIEW</span>';
+
+      const isUrgent = a.urgency === 'URGENT' || a.urgency_level === 'URGENT';
+      const urgencyBadge = isUrgent
+        ? '<span class="approval-urgency-pill urgency-high">URGENT</span>'
+        : '<span class="approval-urgency-pill urgency-normal">NORMAL</span>';
+
+      const actions = isPending ? `
+        <div class="approval-action-group">
+          <button class="btn-appr-approve" onclick="window.decideApprovalRecord(${a.id}, 'APPROVED', 'academic')">
+            ✓ Approve
+          </button>
+          <button class="btn-appr-reject" onclick="window.decideApprovalRecord(${a.id}, 'REJECTED', 'academic')">
+            ✕ Reject
+          </button>
+          <button class="btn-appr-escalate" onclick="window.promptEscalateRecord(${a.id}, 'academic')">
+            🚨 Escalate
+          </button>
+        </div>
+      ` : `
+        <div style="font-size: 12px; color: #475569; line-height: 1.4;">
+          <span style="color: #059669; font-weight: 700;">✓ Authorized</span> by <strong>${a.decision_by || 'Academic Head'}</strong>
+          ${a.decision_notes ? `<div style="font-size: 11px; color: #64748b; font-style: italic; margin-top: 2px;">"${a.decision_notes}"</div>` : ''}
+        </div>
+      `;
+
+      const initials = a.requester_name ? a.requester_name.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() : 'FC';
+      const col = avatarColors[(a.id || 1) % avatarColors.length];
+
+      return `
+        <tr>
+          <td><span class="approval-id-pill">#LV-${String(a.id).padStart(3, '0')}</span></td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="approval-avatar-box" style="background: ${col.bg}; border: 1px solid ${col.border}; color: ${col.text};">
+                ${initials}
+              </div>
+              <div>
+                <div style="font-weight: 700; color: #0f172a; font-size: 13.5px;">${a.requester_name}</div>
+                <div style="font-size: 11.5px; color: #64748b;">${a.requester_role}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge" style="background:#eff6ff; color:#1e40af; font-weight:700; font-size:11px; padding:3px 8px; border-radius:6px;">${a.department}</span>
+          </td>
+          <td>
+            <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px; font-size: 13px;">${a.title}</div>
+            <div style="font-size: 12px; color: #475569; line-height: 1.45;">${a.details || 'Leave application'}</div>
+          </td>
+          <td>${urgencyBadge}</td>
+          <td>${statusBadge}</td>
+          <td>${actions}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function initAcademicApprovalsControls() {
+    const pills = document.querySelectorAll('#section-academic-approvals-view .approval-filter-pill');
+    pills.forEach(btn => {
+      btn.onclick = () => {
+        pills.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentAcademicFilter = btn.dataset.filter || 'ALL';
+        renderAcademicApprovalsTable();
+      };
+    });
+
+    const searchInput = document.getElementById('academic-approvals-search');
+    if (searchInput) {
+      searchInput.oninput = (e) => {
+        currentAcademicSearch = e.target.value;
+        renderAcademicApprovalsTable();
+      };
+    }
+  }
+
+  let currentAdminFilter = 'ALL';
+  let currentAdminSearch = '';
 
   async function loadAdminApprovals() {
     const tbody = document.getElementById('admin-approvals-tbody');
@@ -2699,12 +2785,14 @@
       // Netlify / Offline fallback
       if (approvals.length === 0 && (!token || window.location.hostname.includes('netlify'))) {
         approvals = [
-          { id: 3, category: 'ADMIN_SUBORDINATE', department: 'Campus Facilities', requester_name: 'Ramesh Kumar', requester_role: 'Campus Facilities Supervisor', title: 'Store Requisition: Examination Paper Bundles', details: 'Urgent replenishment of 20 rim paper bundles and printer cartridges for term test prep (₹6,800).', urgency: 'NORMAL', status: 'PENDING' },
-          { id: 4, category: 'ADMIN_SUBORDINATE', department: 'Security & Logistics', requester_name: 'Pravin Solanki', requester_role: 'Gate Security Head', title: 'CCTV Camera Replacement - North Gate', details: 'Repair of weather-damaged dome camera near bus entrance gate (₹3,200).', urgency: 'URGENT', status: 'PENDING' },
-          { id: 6, category: 'ADMIN_SUBORDINATE', department: 'Sanitation', requester_name: 'Suresh Patil', requester_role: 'Sanitation Lead', title: 'Water Tank Disinfection & Filter Cartridges', details: 'Semi-annual certified tank cleaning and replacement of RO filters across wings (₹4,500).', urgency: 'NORMAL', status: 'APPROVED', decision_by: 'Admin Head' }
+          { id: 3, category: 'ADMIN_SUBORDINATE', department: 'Campus Facilities', requester_name: 'Ramesh Kumar', requester_role: 'Campus Facilities Supervisor', title: 'Store Requisition: Examination Paper Bundles', details: 'Urgent replenishment of 20 rim paper bundles and printer cartridges for term test prep (₹6,800).', urgency: 'NORMAL', status: 'APPROVED', decision_by: 'System Administrator', decision_notes: 'Approved for upcoming term assessments.' },
+          { id: 4, category: 'ADMIN_SUBORDINATE', department: 'Security & Logistics', requester_name: 'Pravin Solanki', requester_role: 'Gate Security Head', title: 'CCTV Camera Replacement - North Gate', details: 'Urgent repair & weather-sealing of perimeter dome camera near student bus entrance gate (₹3,200).', urgency: 'URGENT', status: 'PENDING' },
+          { id: 5, category: 'ADMIN_SUBORDINATE', department: 'Library', requester_name: 'Rekhabehn Parmar', requester_role: 'Library In-Charge', title: 'Reference Books Re-binding & Digital Catalog Barcodes', details: 'Specialist archival binding of 120 board exam reference texts and thermal barcode tags (₹4,150).', urgency: 'NORMAL', status: 'PENDING' },
+          { id: 6, category: 'ADMIN_SUBORDINATE', department: 'Sanitation', requester_name: 'Suresh Patil', requester_role: 'Sanitation Lead', title: 'Water Tank Disinfection & RO Filter Cartridges', details: 'Certified semi-annual disinfection of campus overhead tanks and replacement of 6 primary RO membrane filters (₹5,400).', urgency: 'NORMAL', status: 'APPROVED', decision_by: 'System Administrator', decision_notes: 'Completed per annual campus health audit standards.' }
         ];
       }
 
+      window._rawAdminApprovals = approvals;
       const total = approvals.length;
       const pending = approvals.filter(a => a.status === 'PENDING').length;
       const approved = approvals.filter(a => a.status === 'APPROVED').length;
@@ -2723,67 +2811,148 @@
       if (DOM.adminPendingBadge) DOM.adminPendingBadge.textContent = `${pending} Pending`;
       if (DOM.badgeAdminPending) DOM.badgeAdminPending.textContent = `${pending} Requests`;
 
-      if (tbody) {
-        if (approvals.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:32px; color:#64748b;">No pending campus administrative requisitions.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = approvals.map(a => {
-          const isPending = a.status === 'PENDING';
-          const statusBadge = a.status === 'APPROVED'
-            ? '<span class="approval-status-pill status-approved">✓ APPROVED</span>'
-            : a.status === 'REJECTED'
-            ? '<span class="approval-status-pill status-rejected">✕ REJECTED</span>'
-            : a.status === 'ESCALATED'
-            ? '<span class="approval-status-pill status-escalated">🚨 ESCALATED TO PRINCIPAL</span>'
-            : '<span class="approval-status-pill status-pending">⏳ PENDING REVIEW</span>';
-
-          const urgencyBadge = a.urgency === 'URGENT'
-            ? '<span class="approval-urgency-pill urgency-high">URGENT</span>'
-            : '<span class="approval-urgency-pill urgency-normal">NORMAL</span>';
-
-          const actions = isPending ? `
-            <div class="approval-action-group">
-              <button class="btn-appr-approve" onclick="window.decideApprovalRecord(${a.id}, 'APPROVED', 'admin')">
-                ✓ Approve
-              </button>
-              <button class="btn-appr-reject" onclick="window.decideApprovalRecord(${a.id}, 'REJECTED', 'admin')">
-                ✕ Reject
-              </button>
-              <button class="btn-appr-escalate" onclick="window.promptEscalateRecord(${a.id}, 'admin')">
-                🚨 Escalate (Urgent)
-              </button>
-            </div>
-          ` : `
-            <div style="font-size: 12px; color: #64748b;">
-              Decided by: <strong>${a.decision_by || 'Admin Head'}</strong> ${a.decision_notes ? `• "${a.decision_notes}"` : ''}
-            </div>
-          `;
-
-          return `
-            <tr>
-              <td><span class="approval-id-pill">#REQ-${String(a.id).padStart(3, '0')}</span></td>
-              <td>
-                <div style="font-weight: 700; color: #0f172a; font-size: 13.5px;">${a.requester_name}</div>
-                <div style="font-size: 11.5px; color: #64748b;">${a.requester_role}</div>
-              </td>
-              <td>
-                <span class="badge" style="background:#ecfdf5; color:#047857; font-weight:700; font-size:11px; padding:3px 8px; border-radius:6px;">${a.department}</span>
-              </td>
-              <td>
-                <div style="font-weight: 700; color: #1e293b; margin-bottom: 2px;">${a.title}</div>
-                <div style="font-size: 12px; color: #475569; line-height: 1.4;">${a.details || 'Campus Requisition'}</div>
-              </td>
-              <td>${urgencyBadge}</td>
-              <td>${statusBadge}</td>
-              <td>${actions}</td>
-            </tr>
-          `;
-        }).join('');
-      }
+      renderAdminApprovalsTable();
+      initAdminApprovalsControls();
     } catch (e) {
       if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:#dc2626;">Failed to load admin requisitions.</td></tr>';
+    }
+  }
+
+  function renderAdminApprovalsTable() {
+    const tbody = document.getElementById('admin-approvals-tbody');
+    if (!tbody) return;
+
+    const list = window._rawAdminApprovals || [];
+    let filtered = list.slice();
+
+    if (currentAdminFilter === 'PENDING') filtered = filtered.filter(a => a.status === 'PENDING');
+    else if (currentAdminFilter === 'APPROVED') filtered = filtered.filter(a => a.status === 'APPROVED');
+    else if (currentAdminFilter === 'URGENT') filtered = filtered.filter(a => a.urgency === 'URGENT' || a.urgency_level === 'URGENT');
+
+    if (currentAdminSearch.trim()) {
+      const q = currentAdminSearch.toLowerCase();
+      filtered = filtered.filter(a =>
+        (a.requester_name && a.requester_name.toLowerCase().includes(q)) ||
+        (a.title && a.title.toLowerCase().includes(q)) ||
+        (a.details && a.details.toLowerCase().includes(q)) ||
+        (a.department && a.department.toLowerCase().includes(q))
+      );
+    }
+
+    const cAll = document.getElementById('admin-count-all');
+    const cPen = document.getElementById('admin-count-pending');
+    const cApp = document.getElementById('admin-count-approved');
+    const cUrg = document.getElementById('admin-count-urgent');
+    if (cAll) cAll.textContent = list.length;
+    if (cPen) cPen.textContent = list.filter(a => a.status === 'PENDING').length;
+    if (cApp) cApp.textContent = list.filter(a => a.status === 'APPROVED').length;
+    if (cUrg) cUrg.textContent = list.filter(a => a.urgency === 'URGENT' || a.urgency_level === 'URGENT').length;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 48px 24px; color: #64748b;">
+            <div style="font-size: 32px; margin-bottom: 8px;">📦</div>
+            <div style="font-weight: 700; font-size: 15px; color: #1e293b; margin-bottom: 4px;">No Requisitions Found</div>
+            <div style="font-size: 12.5px; color: #64748b;">No campus requisitions match the selected filter or search keyword.</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const avatarColors = [
+      { bg: '#eff6ff', border: '#bfdbfe', text: '#1e40af' },
+      { bg: '#ecfdf5', border: '#a7f3d0', text: '#065f46' },
+      { bg: '#fffbeb', border: '#fde68a', text: '#92400e' },
+      { bg: '#fdf2f8', border: '#fbcfe8', text: '#9d174d' },
+      { bg: '#f5f3ff', border: '#ddd6fe', text: '#5b21b6' },
+    ];
+
+    tbody.innerHTML = filtered.map(a => {
+      const isPending = a.status === 'PENDING';
+      const statusBadge = a.status === 'APPROVED'
+        ? '<span class="approval-status-pill status-approved">✓ APPROVED</span>'
+        : a.status === 'REJECTED'
+        ? '<span class="approval-status-pill status-rejected">✕ REJECTED</span>'
+        : a.status === 'ESCALATED'
+        ? '<span class="approval-status-pill status-escalated">🚨 ESCALATED TO PRINCIPAL</span>'
+        : '<span class="approval-status-pill status-pending">⏳ PENDING REVIEW</span>';
+
+      const isUrgent = a.urgency === 'URGENT' || a.urgency_level === 'URGENT';
+      const urgencyBadge = isUrgent
+        ? '<span class="approval-urgency-pill urgency-high">URGENT</span>'
+        : '<span class="approval-urgency-pill urgency-normal">NORMAL</span>';
+
+      const actions = isPending ? `
+        <div class="approval-action-group">
+          <button class="btn-appr-approve" onclick="window.decideApprovalRecord(${a.id}, 'APPROVED', 'admin')">
+            ✓ Approve
+          </button>
+          <button class="btn-appr-reject" onclick="window.decideApprovalRecord(${a.id}, 'REJECTED', 'admin')">
+            ✕ Reject
+          </button>
+          <button class="btn-appr-escalate" onclick="window.promptEscalateRecord(${a.id}, 'admin')">
+            🚨 Escalate
+          </button>
+        </div>
+      ` : `
+        <div style="font-size: 12px; color: #475569; line-height: 1.4;">
+          <span style="color: #059669; font-weight: 700;">✓ Authorized</span> by <strong>${a.decision_by || 'System Administrator'}</strong>
+          ${a.decision_notes ? `<div style="font-size: 11px; color: #64748b; font-style: italic; margin-top: 2px;">"${a.decision_notes}"</div>` : ''}
+        </div>
+      `;
+
+      const initials = a.requester_name ? a.requester_name.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() : 'ST';
+      const col = avatarColors[(a.id || 1) % avatarColors.length];
+      const formattedDetails = (a.details || '').replace(/\(₹([0-9,]+)\)/g, '<span class="approval-amount-badge">₹$1</span>');
+
+      return `
+        <tr>
+          <td><span class="approval-id-pill">#REQ-${String(a.id).padStart(3, '0')}</span></td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="approval-avatar-box" style="background: ${col.bg}; border: 1px solid ${col.border}; color: ${col.text};">
+                ${initials}
+              </div>
+              <div>
+                <div style="font-weight: 700; color: #0f172a; font-size: 13.5px;">${a.requester_name}</div>
+                <div style="font-size: 11.5px; color: #64748b;">${a.requester_role}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge" style="background:#ecfdf5; color:#047857; font-weight:700; font-size:11px; padding:3px 8px; border-radius:6px;">${a.department}</span>
+          </td>
+          <td>
+            <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px; font-size: 13px;">${a.title}</div>
+            <div style="font-size: 12px; color: #475569; line-height: 1.45;">${formattedDetails || 'Campus Requisition'}</div>
+          </td>
+          <td>${urgencyBadge}</td>
+          <td>${statusBadge}</td>
+          <td>${actions}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function initAdminApprovalsControls() {
+    const pills = document.querySelectorAll('#section-admin-approvals-view .approval-filter-pill');
+    pills.forEach(btn => {
+      btn.onclick = () => {
+        pills.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentAdminFilter = btn.dataset.filter || 'ALL';
+        renderAdminApprovalsTable();
+      };
+    });
+
+    const searchInput = document.getElementById('admin-approvals-search');
+    if (searchInput) {
+      searchInput.oninput = (e) => {
+        currentAdminSearch = e.target.value;
+        renderAdminApprovalsTable();
+      };
     }
   }
 
