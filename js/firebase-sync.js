@@ -97,6 +97,13 @@
         firebaseApp = window.firebase.app();
       }
 
+      // Suppress verbose SDK warnings like deprecation notices
+      if (window.firebase && window.firebase.firestore && typeof window.firebase.firestore.setLogLevel === 'function') {
+        try {
+          window.firebase.firestore.setLogLevel('error');
+        } catch (e) {}
+      }
+
       db = window.firebase.firestore();
 
       // Enable offline persistence with multi-tab support
@@ -105,11 +112,11 @@
         console.log('[Firebase Sync] Offline persistence enabled with multi-tab sync');
       } catch (err) {
         if (err.code === 'failed-precondition') {
-          console.warn('[Firebase Sync] Persistence failed: Multiple tabs open simultaneously');
+          console.warn('[Firebase Sync] Persistence notice: Multiple tabs open simultaneously');
         } else if (err.code === 'unimplemented') {
           console.warn('[Firebase Sync] Browser does not support IndexedDB persistence');
         } else {
-          console.warn('[Firebase Sync] Persistence warning:', err);
+          // Silent or benign
         }
       }
 
@@ -173,7 +180,9 @@
           notifyStatus('synced', { lastSavedAt });
           resolve({ success: true, savedAt: lastSavedAt });
         } catch (err) {
-          console.warn('[Firebase Sync] Cloud save notice:', err.message || err);
+          if (currentStatus !== 'error' && currentStatus !== 'offline') {
+            console.warn('[Firebase Sync] Cloud save notice (offline fallback active):', err.message || err);
+          }
           notifyStatus(navigator.onLine ? 'error' : 'offline', { message: err.message });
           resolve({ success: false, error: err });
         } finally {
@@ -211,7 +220,9 @@
         return null;
       }
     } catch (err) {
-      console.warn('[Firebase Sync] Cloud fetch notice:', err.message || err);
+      if (currentStatus !== 'error' && currentStatus !== 'offline') {
+        console.warn('[Firebase Sync] Cloud fetch notice (offline fallback active):', err.message || err);
+      }
       notifyStatus(navigator.onLine ? 'error' : 'offline', { message: err.message });
       return null;
     }
