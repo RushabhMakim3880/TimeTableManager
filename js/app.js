@@ -510,24 +510,87 @@
     normalizeStateStandards(state);
   }
 
+  const CANONICAL_STANDARDS_ORDER = {
+    'std_fg': 1,
+    'std_nursery': 1,
+    'std_lkg': 2,
+    'std_jr_kg': 2,
+    'std_hkg': 3,
+    'std_sr_kg': 3,
+    'std_1': 4,
+    'std_2': 5,
+    'std_3': 6,
+    'std_4': 7,
+    'std_5': 8,
+    'std_6': 9,
+    'std_7': 10,
+    'std_8': 11
+  };
+
+  const CANONICAL_STANDARDS_INFO = {
+    'std_fg': { id: 'std_fg', name: 'FG', baseName: 'FG', sup: '', shift: 'morning', room: 'Pre-Primary Hall' },
+    'std_nursery': { id: 'std_fg', name: 'FG', baseName: 'FG', sup: '', shift: 'morning', room: 'Pre-Primary Hall' },
+    'std_lkg': { id: 'std_lkg', name: 'LKG', baseName: 'LKG', sup: '', shift: 'morning', room: 'Room KG-1' },
+    'std_jr_kg': { id: 'std_lkg', name: 'LKG', baseName: 'LKG', sup: '', shift: 'morning', room: 'Room KG-1' },
+    'std_hkg': { id: 'std_hkg', name: 'HKG', baseName: 'HKG', sup: '', shift: 'morning', room: 'Room KG-2' },
+    'std_sr_kg': { id: 'std_hkg', name: 'HKG', baseName: 'HKG', sup: '', shift: 'morning', room: 'Room KG-2' },
+    'std_1': { id: 'std_1', name: 'Standard: 1st', baseName: 'Standard: 1', sup: 'st', shift: 'morning', room: 'Room 001' },
+    'std_2': { id: 'std_2', name: 'Standard: 2nd', baseName: 'Standard: 2', sup: 'nd', shift: 'morning', room: 'Room 002' },
+    'std_3': { id: 'std_3', name: 'Standard: 3rd', baseName: 'Standard: 3', sup: 'rd', shift: 'afternoon', room: 'Room 101' },
+    'std_4': { id: 'std_4', name: 'Standard: 4th', baseName: 'Standard: 4', sup: 'th', shift: 'afternoon', room: 'Room 102' },
+    'std_5': { id: 'std_5', name: 'Standard: 5th', baseName: 'Standard: 5', sup: 'th', shift: 'afternoon', room: 'Room 103' },
+    'std_6': { id: 'std_6', name: 'Standard: 6th', baseName: 'Standard: 6', sup: 'th', shift: 'afternoon', room: 'Room 201' },
+    'std_7': { id: 'std_7', name: 'Standard: 7th', baseName: 'Standard: 7', sup: 'th', shift: 'afternoon', room: 'Room 202' },
+    'std_8': { id: 'std_8', name: 'Standard: 8th', baseName: 'Standard: 8', sup: 'th', shift: 'afternoon', room: 'Room 203' }
+  };
+
+  function sortStandardsIncrementally(standards) {
+    if (!Array.isArray(standards)) return standards;
+    return standards.sort((a, b) => {
+      const orderA = CANONICAL_STANDARDS_ORDER[a.id] !== undefined ? CANONICAL_STANDARDS_ORDER[a.id] : 99;
+      const orderB = CANONICAL_STANDARDS_ORDER[b.id] !== undefined ? CANONICAL_STANDARDS_ORDER[b.id] : 99;
+      return orderA - orderB;
+    });
+  }
+
   function normalizeStateStandards(s) {
     if (!s) return;
     if (s.standards && Array.isArray(s.standards)) {
+      const seen = new Set();
+      const cleaned = [];
+
       s.standards.forEach(std => {
-        if (std.id === 'std_nursery') {
-          std.id = 'std_fg';
-          std.name = 'FG';
-          std.baseName = 'FG';
-        } else if (std.id === 'std_jr_kg') {
-          std.id = 'std_lkg';
-          std.name = 'LKG';
-          std.baseName = 'LKG';
-        } else if (std.id === 'std_sr_kg') {
-          std.id = 'std_hkg';
-          std.name = 'HKG';
-          std.baseName = 'HKG';
+        let key = std.id;
+        if (std.name === 'Nursery' || std.baseName === 'Nursery') key = 'std_fg';
+        else if (std.name === 'Jr. KG' || std.baseName === 'Jr. KG') key = 'std_lkg';
+        else if (std.name === 'Sr. KG' || std.baseName === 'Sr. KG') key = 'std_hkg';
+
+        const info = CANONICAL_STANDARDS_INFO[key] || CANONICAL_STANDARDS_INFO[std.id];
+        if (info) {
+          std.id = info.id;
+          std.name = info.name;
+          std.baseName = info.baseName;
+          std.sup = info.sup;
+          std.shift = info.shift;
+          if (!std.room) std.room = info.room;
+        }
+        if (!seen.has(std.id)) {
+          seen.add(std.id);
+          cleaned.push(std);
         }
       });
+
+      // Ensure all 11 default standards exist in state
+      if (DEFAULT_DATA.standards && Array.isArray(DEFAULT_DATA.standards)) {
+        DEFAULT_DATA.standards.forEach(defStd => {
+          if (!seen.has(defStd.id)) {
+            seen.add(defStd.id);
+            cleaned.push(JSON.parse(JSON.stringify(defStd)));
+          }
+        });
+      }
+
+      s.standards = sortStandardsIncrementally(cleaned);
     }
     if (s.schedules) {
       Object.keys(s.schedules).forEach(day => {
@@ -851,6 +914,7 @@
     const cloudData = await window.FirebaseSync.fetch();
     if (cloudData && cloudData.schedules) {
       state = Object.assign({}, state, cloudData);
+      normalizeStateStandards(state);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       renderSchoolProfile();
       renderAll();
@@ -1010,6 +1074,7 @@
       visibleStds = state.standards.filter(s => s.shift === 'afternoon');
     }
     if (visibleStds.length === 0) visibleStds = state.standards;
+    visibleStds = sortStandardsIncrementally(visibleStds.slice());
 
     const shiftPeriods = getShiftPeriods(state.activeShift);
 
@@ -1086,6 +1151,7 @@
       visibleStandards = state.standards.filter(s => s.shift === 'afternoon');
     }
     if (visibleStandards.length === 0) visibleStandards = state.standards;
+    visibleStandards = sortStandardsIncrementally(visibleStandards.slice());
 
     const displayPeriods = getShiftPeriods(state.activeShift);
 
@@ -1290,6 +1356,7 @@
       availableStds = state.standards.filter(s => s.shift === 'afternoon');
     }
     if (availableStds.length === 0) availableStds = state.standards;
+    availableStds = sortStandardsIncrementally(availableStds.slice());
 
     // Validate selectedClassStandard
     if (!availableStds.some(s => s.id === state.selectedClassStandard)) {
@@ -2982,8 +3049,11 @@
   }
 
   function getShiftStandards(shiftKey) {
-    if (!shiftKey || shiftKey === 'all') return state.standards;
-    return state.standards.filter(s => (s.shift || 'afternoon') === shiftKey);
+    let stds = state.standards;
+    if (shiftKey && shiftKey !== 'all') {
+      stds = state.standards.filter(s => (s.shift || 'afternoon') === shiftKey);
+    }
+    return sortStandardsIncrementally(stds.slice());
   }
 
   let activeClearAction = null;
@@ -3334,7 +3404,8 @@
     // Class Teacher Duty Assignment (Assign Class In-Charge for Each Standard)
     if (DOM.settingsClassTeacherMapping) {
       DOM.settingsClassTeacherMapping.innerHTML = '';
-      state.standards.forEach(std => {
+      const sortedStds = sortStandardsIncrementally(state.standards.slice());
+      sortedStds.forEach(std => {
         const row = document.createElement('div');
         row.className = 'teacher-subject-row';
         const currentTeacher = (state.classTeachers && state.classTeachers[std.id]) || '';
