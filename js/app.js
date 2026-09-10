@@ -3904,24 +3904,6 @@
     document.body.classList.remove('unauthenticated-screen');
   }
 
-  window.quickDemoLogin = function(role) {
-    if (!DOM.authEmail || !DOM.authPassword) return;
-    if (role === 'admin') {
-      DOM.authEmail.value = 'admin';
-      DOM.authPassword.value = 'admin123';
-    } else if (role === 'principal') {
-      DOM.authEmail.value = 'principal';
-      DOM.authPassword.value = 'principal123';
-    } else if (role === 'academic') {
-      DOM.authEmail.value = 'principal';
-      DOM.authPassword.value = 'principal123';
-    } else if (role === 'teacher') {
-      DOM.authEmail.value = 'payalmaam';
-      DOM.authPassword.value = 'payal123';
-    }
-    handleLogin();
-  };
-
   // ==========================================================================
   // MODULE 2: ACADEMIC SHIFT MANAGEMENT (MORNING VS AFTERNOON)
   // ==========================================================================
