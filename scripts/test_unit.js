@@ -4,6 +4,7 @@ global.JSZip = JSZip;
 const DOCX_TEMPLATE_ASSETS = require('../js/template-assets.js');
 global.DOCX_TEMPLATE_ASSETS = DOCX_TEMPLATE_ASSETS;
 const DEFAULT_DATA = require('../js/default-data.js');
+global.DEFAULT_DATA = DEFAULT_DATA;
 const DocxGenerator = require('../js/docx-generator.js');
 
 async function runTests() {
@@ -14,6 +15,8 @@ async function runTests() {
     schedules: DEFAULT_DATA.initialSchedules,
     standards: DEFAULT_DATA.standards,
     periods: DEFAULT_DATA.periods,
+    shifts: DEFAULT_DATA.shifts,
+    classTeachers: DEFAULT_DATA.classTeachers,
     teachers: DEFAULT_DATA.teachers,
     days: DEFAULT_DATA.days,
     leaves: {}
@@ -134,6 +137,44 @@ async function runTests() {
   assert(generalDutiesBlob.size > 1000, 'Docx blob must be a valid non-empty zip archive');
   fs.writeFileSync('test_output_general_duties.docx', Buffer.from(await generalDutiesBlob.arrayBuffer()));
   console.log('✓ Test 8: School & Assembly General Duties Roster Docx generation passes');
+
+  // Test 9: Class-Wise Weekly Timetable Docx for Afternoon Shift (e.g. Standard 3rd)
+  state.classTeachers = DEFAULT_DATA.classTeachers;
+  const classWeeklyXml3 = DocxGenerator.generateClassWeeklyXml('std_3', state, true);
+  assert(classWeeklyXml3.toUpperCase().includes("STANDARD: 3RD"), 'Must include standard 3rd in header');
+  assert(classWeeklyXml3.toUpperCase().includes("CLASS TEACHER:"), 'Must include Class Teacher header label');
+  assert(classWeeklyXml3.includes("Priya Ma&apos;am") || classWeeklyXml3.includes("Priya Ma'am"), 'Must include Class Teacher Priya Ma\'am');
+  assert(classWeeklyXml3.includes("RECESS BREAK • 3:15 PM"), 'Must include Afternoon Recess Break timing');
+  assert(classWeeklyXml3.includes("Monday") && classWeeklyXml3.includes("Saturday"), 'Must include Monday to Saturday columns');
+  
+  const classWeeklyBlob3 = await DocxGenerator.generateClassTimetablesDocxBlob(['std_3'], state);
+  assert(classWeeklyBlob3, 'Class weekly docx blob must be generated');
+  assert(classWeeklyBlob3.size > 1000, 'Class weekly docx blob must be valid zip');
+  fs.writeFileSync('test_output_class_weekly_std3.docx', Buffer.from(await classWeeklyBlob3.arrayBuffer()));
+  console.log('✓ Test 9: Class-Wise Weekly Timetable (Afternoon - Std 3rd) Docx generation passes');
+
+  // Test 10: Class-Wise Weekly Timetable Docx for Morning Shift (e.g. LKG & 1st)
+  const classWeeklyXmlLkg = DocxGenerator.generateClassWeeklyXml('std_lkg', state, true);
+  assert(classWeeklyXmlLkg.toUpperCase().includes("LKG"), 'Must include LKG in header');
+  assert(classWeeklyXmlLkg.includes("RECESS BREAK • 9:45 AM"), 'Must include Morning Recess Break timing');
+  assert(classWeeklyXmlLkg.includes("7:30"), 'Must include morning period timing');
+
+  const classWeeklyBlobMorning = await DocxGenerator.generateClassTimetablesDocxBlob(['std_lkg', 'std_1'], state);
+  assert(classWeeklyBlobMorning && classWeeklyBlobMorning.size > 1000, 'Morning class timetables blob must be valid');
+  fs.writeFileSync('test_output_class_weekly_morning.docx', Buffer.from(await classWeeklyBlobMorning.arrayBuffer()));
+  console.log('✓ Test 10: Class-Wise Weekly Timetable (Morning - LKG & 1st) Docx generation passes');
+
+  // Test 11: Dedicated Attendance Duty & Roll-Call Roster (.docx)
+  state.attendanceDuties = DEFAULT_DATA.attendanceDuties;
+  const attendanceDutiesXml = DocxGenerator.generateAttendanceDutiesXml(state);
+  assert(attendanceDutiesXml.includes("ATTENDANCE"), 'Must include attendance duty title');
+  assert(attendanceDutiesXml.includes("Morning Shift Attendance") || attendanceDutiesXml.includes("Morning"), 'Must include morning shift duty');
+  assert(attendanceDutiesXml.includes("Payal Ma&apos;am") || attendanceDutiesXml.includes("Payal Ma'am"), 'Must include assigned teacher Payal Ma\'am');
+
+  const attendanceDutiesBlob = await DocxGenerator.generateAttendanceDutiesDocxBlob(state);
+  assert(attendanceDutiesBlob && attendanceDutiesBlob.size > 1000, 'Attendance duty docx blob must be valid');
+  fs.writeFileSync('test_output_attendance_duties.docx', Buffer.from(await attendanceDutiesBlob.arrayBuffer()));
+  console.log('✓ Test 11: Dedicated Daily Attendance Duty Roster Docx generation passes');
 
   console.log('--- All Enterprise Unit Tests Passed! ---');
 }

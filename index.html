@@ -101,59 +101,133 @@
          ==================================================================== -->
     <section class="view-section active" id="section-class-view">
 
-      <!-- Day Navigation Toolbar -->
-      <div class="day-nav-bar">
-        <div class="day-segmented-control" id="day-tabs-container">
-          <!-- Rendered in app.js -->
-        </div>
-
-        <div class="day-nav-actions">
-          <button id="btn-open-copy-modal" class="btn btn-secondary btn-sm" title="Duplicate schedule to other days">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-            Duplicate Schedule...
+      <!-- Shift & View Mode Control Bar -->
+      <div class="class-control-panel">
+        <div class="shift-pill-group" id="shift-selector-group">
+          <span class="control-panel-label">Academic Shift:</span>
+          <button type="button" class="shift-pill-btn" data-shift="morning" id="btn-shift-morning">
+            <span class="shift-icon">☀️</span> Morning Shift (FG – 2nd)
           </button>
-          <button id="btn-clear-current-day" class="btn btn-danger-outline btn-sm" title="Clear periods for this day">
-            Clear Day
+          <button type="button" class="shift-pill-btn active" data-shift="afternoon" id="btn-shift-afternoon">
+            <span class="shift-icon">🌙</span> Afternoon Shift (3rd – 8th)
+          </button>
+          <button type="button" class="shift-pill-btn" data-shift="all" id="btn-shift-all">
+            <span class="shift-icon">🌐</span> All Classes
+          </button>
+        </div>
+
+        <div class="mode-segmented-group" id="class-mode-toggle">
+          <span class="control-panel-label">Format:</span>
+          <button type="button" class="mode-btn active" data-mode="day-grid" id="btn-mode-day-grid">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3V3zm16 16V5H5v14h14z"/></svg>
+            Daily Master Grid
+          </button>
+          <button type="button" class="mode-btn" data-mode="class-weekly" id="btn-mode-class-weekly">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+            Class-Wise Timetable
           </button>
         </div>
       </div>
 
-      <!-- Staff Attendance Strip -->
-      <div class="attendance-strip">
-        <div class="attendance-strip-header">
-          <span class="attendance-strip-title">Staff Attendance & Duty Status</span>
-          <span class="attendance-strip-hint">Click a staff member to mark <strong>On Leave</strong> (auto-excluded from free teachers)</span>
-        </div>
-        <div class="teacher-badges-flow" id="attendance-chips-container">
-          <!-- Rendered dynamically -->
-        </div>
-      </div>
-
-      <!-- Conflict Callout Banner -->
-      <div class="conflict-callout" id="conflict-banner">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-        <div id="conflict-message">
-          <strong>Schedule Conflict Detected:</strong> Staff member double-booked in the same period.
-        </div>
-      </div>
-
-      <!-- Timetable Document Canvas -->
-      <div class="timetable-document-sheet">
-        <div class="sheet-header">
-          <div class="sheet-title-group">
-            <h2 id="display-day-name">Monday</h2>
-            <p id="display-sheet-sublabel">Academic Period Allocation & Free Staff Distribution</p>
+      <!-- Container 1: Daily Master Grid -->
+      <div id="day-grid-container">
+        <!-- Day Navigation Toolbar -->
+        <div class="day-nav-bar">
+          <div class="day-segmented-control" id="day-tabs-container">
+            <!-- Rendered in app.js -->
           </div>
-          <div class="sheet-meta-info">
-            <div style="font-weight: 600; color: var(--text-primary);" id="display-day-stats">Standards: 3rd to 8th • Lectures: 1 to 6</div>
-            <div style="color: var(--text-dim);">Click any cell to edit assignment</div>
+
+          <div class="day-nav-actions">
+            <button id="btn-open-copy-modal" class="btn btn-secondary btn-sm" title="Duplicate schedule to other days">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              Duplicate Schedule...
+            </button>
+            <button id="btn-clear-current-day" class="btn btn-danger-outline btn-sm" title="Clear periods for this day">
+              Clear Day
+            </button>
           </div>
         </div>
 
-        <table class="official-grid-table" id="timetable-table">
-          <thead id="timetable-thead"></thead>
-          <tbody id="timetable-tbody"></tbody>
-        </table>
+        <!-- Staff Attendance Strip -->
+        <div class="attendance-strip">
+          <div class="attendance-strip-header">
+            <span class="attendance-strip-title">Staff Attendance & Duty Status</span>
+            <span class="attendance-strip-hint">Click a staff member to mark <strong>On Leave</strong> (auto-excluded from free teachers)</span>
+          </div>
+          <div class="teacher-badges-flow" id="attendance-chips-container">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Conflict Callout Banner -->
+        <div class="conflict-callout" id="conflict-banner">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          <div id="conflict-message">
+            <strong>Schedule Conflict Detected:</strong> Staff member double-booked in the same period.
+          </div>
+        </div>
+
+        <!-- Timetable Document Canvas -->
+        <div class="timetable-document-sheet">
+          <div class="sheet-header">
+            <div class="sheet-title-group">
+              <h2 id="display-day-name">Monday</h2>
+              <p id="display-sheet-sublabel">Academic Period Allocation & Free Staff Distribution</p>
+            </div>
+            <div class="sheet-meta-info">
+              <div style="font-weight: 600; color: var(--text-primary);" id="display-day-stats">Standards: 3rd to 8th • Lectures: 1 to 6</div>
+              <div style="color: var(--text-dim);">Click any cell to edit assignment</div>
+            </div>
+          </div>
+
+          <table class="official-grid-table" id="timetable-table">
+            <thead id="timetable-thead"></thead>
+            <tbody id="timetable-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Container 2: Class-Wise Weekly Timetable Matrix -->
+      <div id="class-weekly-container" style="display: none;">
+        <!-- Standard selector navigation -->
+        <div class="class-selector-nav">
+          <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-right: 8px;">Select Class:</label>
+          <div class="class-pill-tabs" id="class-weekly-std-tabs"></div>
+        </div>
+
+        <!-- Class Header & Meta Card -->
+        <div class="class-header-card" id="class-header-card">
+          <div class="class-header-main">
+            <span class="shift-badge-pill" id="class-weekly-shift-badge">Afternoon Shift</span>
+            <h2 id="class-weekly-title" style="margin: 4px 0; font-size: 20px; color: var(--primary-navy);">Standard: 3rd Weekly Schedule</h2>
+            <div class="class-meta-row">
+              <span class="class-teacher-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--primary-navy)"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>Class Teacher: <strong id="class-weekly-teacher-name">Priya Ma'am</strong></span>
+              </span>
+              <span class="class-room-badge" id="class-weekly-room">Room 103</span>
+              <span class="class-lecture-badge" id="class-weekly-lecture-count">30 Lectures / Week</span>
+            </div>
+          </div>
+          <div class="class-header-actions">
+            <button id="btn-export-class-docx" class="btn btn-primary btn-sm" title="Export Class Weekly Timetable to Word (.docx)">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Export Class Word (.docx)
+            </button>
+            <button id="btn-print-class" class="btn btn-secondary btn-sm" title="Print Class Timetable">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+              Print
+            </button>
+          </div>
+        </div>
+
+        <!-- Weekly Grid Table -->
+        <div class="timetable-document-sheet" style="margin-top: 14px;">
+          <table class="official-grid-table" id="class-weekly-table">
+            <thead id="class-weekly-thead"></thead>
+            <tbody id="class-weekly-tbody"></tbody>
+          </table>
+        </div>
       </div>
 
     </section>
@@ -356,6 +430,46 @@
             </thead>
             <tbody id="general-duty-tbody">
               <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Dedicated Attendance Duty & Roll-Call Roster Sheet -->
+      <div class="timetable-document-sheet" style="margin-top: 24px;">
+        <div class="sheet-header">
+          <div class="sheet-title-group">
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary-navy);"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Daily Attendance &amp; Student Roll-Call Duty Roster
+            </h3>
+            <p style="font-size: 12.5px; color: var(--text-muted);">
+              Faculty members designated for morning and afternoon student attendance, roll count, and registry verification.
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="btn-download-attendance-duties-docx" class="btn btn-primary btn-sm" title="Export Attendance Duty Roster to Word (.docx)">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              Export Attendance Duty (.docx)
+            </button>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto; padding: 0 4px 16px 4px;">
+          <table class="official-grid-table" id="attendance-duty-table">
+            <thead>
+              <tr>
+                <th style="width: 22%;">Shift &amp; Duty Details</th>
+                <th style="width: 13%;">Monday</th>
+                <th style="width: 13%;">Tuesday</th>
+                <th style="width: 13%;">Wednesday</th>
+                <th style="width: 13%;">Thursday</th>
+                <th style="width: 13%;">Friday</th>
+                <th style="width: 13%;">Saturday</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-duty-tbody">
+              <!-- Rendered dynamically in app.js -->
             </tbody>
           </table>
         </div>
@@ -902,6 +1016,16 @@
             Sets each teacher's default subject to enable instant 1-click period scheduling.
           </div>
           <div id="settings-teacher-subject-mapping" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 190px; overflow-y: auto; padding: 8px; border: 1px solid var(--border-light); border-radius: 4px; background: var(--bg-subtle);"></div>
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">
+            CLASS TEACHER DUTY (ASSIGN CLASS IN-CHARGE FOR EACH STANDARD)
+          </label>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 8px;">
+            Designates the primary Class Teacher for morning and afternoon divisions. Appears on official timetables, student printouts, and Word exports.
+          </div>
+          <div id="settings-class-teacher-mapping" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 200px; overflow-y: auto; padding: 8px; border: 1px solid var(--border-light); border-radius: 4px; background: var(--bg-subtle);"></div>
         </div>
       </div>
       <div class="modal-actions-bar">

@@ -1078,6 +1078,226 @@ const DocxGenerator = (function() {
   }
 
   /**
+   * Generates a 1-page individual weekly timetable for a specific class.
+   * Shows school header, Class & Class Teacher, and the 6-day x 6-period table.
+   */
+  function generateClassWeeklyXml(stdId, state, isLastClass) {
+    const { standards, periods, schedules, schoolProfile, classTeachers, shifts } = state;
+    const std = (standards || []).find(s => s.id === stdId) || { id: stdId, name: stdId };
+    const classTeacherName = (classTeachers && classTeachers[stdId]) || '';
+    const shiftKey = std.shift || 'afternoon';
+    const shiftsConfig = shifts || (typeof DEFAULT_DATA !== 'undefined' ? DEFAULT_DATA.shifts : null) || {};
+    const shiftInfo = shiftsConfig[shiftKey] || {};
+    const classPeriods = (shiftInfo.periods && shiftInfo.periods.length > 0) ? shiftInfo.periods : periods;
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    const subTitle = `CLASS TIMETABLE: ${std.name.toUpperCase()} • CLASS TEACHER: ${classTeacherName || 'UNASSIGNED'} • ROOM: ${std.room || 'CLASSROOM'}`;
+    let xml = generateSchoolHeaderXml(schoolProfile, subTitle);
+
+    xml += `
+    <w:tbl>
+      <w:tblPr>
+        <w:tblW w:w="5000" w:type="pct"/>
+        <w:jc w:val="center"/>
+        <w:tblBorders>
+          <w:top w:val="single" w:sz="6" w:space="0" w:color="1E3A8A"/>
+          <w:bottom w:val="single" w:sz="6" w:space="0" w:color="1E3A8A"/>
+          <w:insideH w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
+          <w:insideV w:val="none"/>
+        </w:tblBorders>
+      </w:tblPr>
+      <w:tblGrid>
+        <w:gridCol w:w="1200"/>
+        <w:gridCol w:w="1500"/>
+        <w:gridCol w:w="1500"/>
+        <w:gridCol w:w="1500"/>
+        <w:gridCol w:w="1500"/>
+        <w:gridCol w:w="1500"/>
+        <w:gridCol w:w="1500"/>
+      </w:tblGrid>
+      <w:tr>
+        <w:tc>
+          <w:tcPr><w:tcW w:w="800" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr>
+          <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Period / Time</w:t></w:r></w:p>
+        </w:tc>`;
+
+    days.forEach(day => {
+      xml += `
+        <w:tc>
+          <w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr>
+          <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>${escapeXml(day)}</w:t></w:r></w:p>
+        </w:tc>`;
+    });
+    xml += `</w:tr>`;
+
+    classPeriods.forEach((period, pIdx) => {
+      if (pIdx === 3) {
+        const recessText = shiftKey === 'morning' ? 'RECESS BREAK • 9:45 AM TO 10:15 AM (30 MINUTES)' : 'RECESS BREAK • 3:15 PM TO 3:45 PM (30 MINUTES)';
+        xml += `
+        <w:tr>
+          <w:tc>
+            <w:tcPr><w:gridSpan w:val="7"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
+            <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="475569"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="475569"/></w:rPr><w:t>${escapeXml(recessText)}</w:t></w:r></w:p>
+          </w:tc>
+        </w:tr>`;
+      }
+
+      xml += `
+      <w:tr>
+        <w:tc>
+          <w:tcPr><w:tcW w:w="800" w:type="pct"/><w:vAlign w:val="center"/></w:tcPr>
+          <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/></w:rPr></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${escapeXml(period.label)}</w:t></w:r></w:p>
+          <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:sz w:val="16"/><w:color w:val="64748B"/></w:rPr></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:color w:val="64748B"/></w:rPr><w:t>${escapeXml(period.time)}</w:t></w:r></w:p>
+        </w:tc>`;
+
+      days.forEach(day => {
+        const daySchedule = (schedules && schedules[day]) || {};
+        const pSlots = daySchedule[period.id] || {};
+        const slot = pSlots[stdId] || { subject: '', teacher: '' };
+        const hasSubj = slot.subject && slot.subject.trim();
+        const hasTeacher = slot.teacher && slot.teacher.trim();
+
+        xml += `
+        <w:tc>
+          <w:tcPr><w:tcW w:w="700" w:type="pct"/><w:vAlign w:val="center"/></w:tcPr>
+          <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/></w:rPr></w:pPr>${hasSubj ? `<w:r><w:rPr><w:b/></w:rPr><w:t>${escapeXml(slot.subject)}</w:t></w:r>` : `<w:r><w:rPr><w:color w:val="94A3B8"/></w:rPr><w:t>-</w:t></w:r>`}</w:p>
+          ${hasTeacher ? `<w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:sz w:val="16"/><w:color w:val="475569"/></w:rPr></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:color w:val="475569"/></w:rPr><w:t>(${escapeXml(slot.teacher)})</w:t></w:r></w:p>` : ''}
+        </w:tc>`;
+      });
+
+      xml += `</w:tr>`;
+    });
+
+    xml += `</w:tbl>`;
+
+    xml += `
+    <w:p><w:pPr><w:spacing w:before="300" w:after="100"/></w:pPr></w:p>
+    <w:tbl>
+      <w:tblPr><w:tblW w:w="5000" w:type="pct"/><w:jc w:val="center"/><w:tblBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tblBorders></w:tblPr>
+      <w:tblGrid><w:gridCol w:w="3333"/><w:gridCol w:w="3333"/><w:gridCol w:w="3334"/></w:tblGrid>
+      <w:tr>
+        <w:tc><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:sz w:val="18"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Prepared by: Timetable In-Charge</w:t></w:r></w:p></w:tc>
+        <w:tc><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:sz w:val="18"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Class Teacher: ${escapeXml(classTeacherName || '____________')}</w:t></w:r></w:p></w:tc>
+        <w:tc><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:sz w:val="18"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/></w:rPr><w:t>Approved by: Principal</w:t></w:r></w:p></w:tc>
+      </w:tr>
+    </w:tbl>`;
+
+    if (!isLastClass) {
+      xml += `
+      <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:br w:type="page"/></w:r></w:p>`;
+    }
+
+    return xml;
+  }
+
+  async function generateClassTimetablesDocxBlob(stdIds, state) {
+    if (typeof JSZip === 'undefined') throw new Error('JSZip is required.');
+    const zip = new JSZip();
+
+    for (const [path, content] of Object.entries(DOCX_TEMPLATE_ASSETS)) {
+      zip.file(path, content);
+    }
+
+    let combinedXml = '';
+    const list = Array.isArray(stdIds) ? stdIds : [stdIds];
+    list.forEach((stdId, idx) => {
+      combinedXml += generateClassWeeklyXml(stdId, state, idx === list.length - 1);
+    });
+
+    zip.file('word/document.xml', wrapDocumentXml(combinedXml));
+
+    return await zip.generateAsync({
+      type: 'blob',
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 }
+    });
+  }
+
+  function generateAttendanceDutiesXml(state) {
+    const { attendanceDuties, schoolProfile } = state;
+    const subTitle = "FACULTY DAILY ATTENDANCE & ROLL CALL DUTY ROSTER";
+    let xml = generateSchoolHeaderXml(schoolProfile, subTitle);
+
+    xml += `
+    <w:tbl>
+      <w:tblPr>
+        <w:tblW w:w="5000" w:type="pct"/>
+        <w:jc w:val="center"/>
+        <w:tblBorders>
+          <w:top w:val="single" w:sz="6" w:space="0" w:color="1E3A8A"/>
+          <w:bottom w:val="single" w:sz="6" w:space="0" w:color="1E3A8A"/>
+          <w:insideH w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
+          <w:insideV w:val="none"/>
+        </w:tblBorders>
+      </w:tblPr>
+      <w:tblGrid>
+        <w:gridCol w:w="1200"/>
+        <w:gridCol w:w="1000"/>
+        <w:gridCol w:w="1000"/>
+        <w:gridCol w:w="1000"/>
+        <w:gridCol w:w="1000"/>
+        <w:gridCol w:w="1000"/>
+        <w:gridCol w:w="1000"/>
+      </w:tblGrid>
+      <w:tr>
+        <w:tc><w:tcPr><w:tcW w:w="800" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Duty Shift &amp; Title</w:t></w:r></w:p></w:tc>
+        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Monday</w:t></w:r></w:p></w:tc>
+        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Tuesday</w:t></w:r></w:p></w:tc>
+        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Wednesday</w:t></w:r></w:p></w:tc>
+        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Thursday</w:t></w:r></w:p></w:tc>
+        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Friday</w:t></w:r></w:p></w:tc>
+        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Saturday</w:t></w:r></w:p></w:tc>
+      </w:tr>`;
+
+    const duties = attendanceDuties || [];
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    duties.forEach(duty => {
+      xml += `
+      <w:tr>
+        <w:tc>
+          <w:tcPr><w:tcW w:w="800" w:type="pct"/><w:vAlign w:val="center"/></w:tcPr>
+          <w:p><w:pPr><w:jc w:val="left"/><w:rPr><w:b/></w:rPr></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${escapeXml(duty.title || duty.dutyName || 'Attendance Duty')}</w:t></w:r></w:p>
+          <w:p><w:pPr><w:jc w:val="left"/><w:rPr><w:sz w:val="16"/><w:color w:val="64748B"/></w:rPr></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:color w:val="64748B"/></w:rPr><w:t>${escapeXml(duty.time || '')}${duty.location ? ' • ' + escapeXml(duty.location) : ''}</w:t></w:r></w:p>
+        </w:tc>`;
+
+      days.forEach(d => {
+        const tName = (duty.allocations && duty.allocations[d]) || '-';
+        xml += `
+        <w:tc>
+          <w:tcPr><w:tcW w:w="700" w:type="pct"/><w:vAlign w:val="center"/></w:tcPr>
+          <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/></w:rPr></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${escapeXml(tName)}</w:t></w:r></w:p>
+        </w:tc>`;
+      });
+
+      xml += `</w:tr>`;
+    });
+
+    xml += `</w:tbl>`;
+    xml += generateSignOffBlockXml(schoolProfile);
+    return xml;
+  }
+
+  async function generateAttendanceDutiesDocxBlob(state) {
+    if (typeof JSZip === 'undefined') throw new Error('JSZip is required.');
+    const zip = new JSZip();
+
+    for (const [path, content] of Object.entries(DOCX_TEMPLATE_ASSETS)) {
+      zip.file(path, content);
+    }
+
+    const bodyXml = generateAttendanceDutiesXml(state);
+    zip.file('word/document.xml', wrapDocumentXml(bodyXml));
+
+    return await zip.generateAsync({
+      type: 'blob',
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 }
+    });
+  }
+
+  /**
    * Downloads a blob as a file in the browser
    */
   function triggerDownload(blob, filename) {
@@ -1103,6 +1323,10 @@ const DocxGenerator = (function() {
     generateWeeklyDutyDocxBlob,
     generateGeneralDutiesXml,
     generateGeneralDutiesDocxBlob,
+    generateClassWeeklyXml,
+    generateClassTimetablesDocxBlob,
+    generateAttendanceDutiesXml,
+    generateAttendanceDutiesDocxBlob,
     triggerDownload
   };
 
