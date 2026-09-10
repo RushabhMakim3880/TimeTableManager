@@ -114,6 +114,7 @@
     classWeeklyLectureCount: document.getElementById('class-weekly-lecture-count'),
     btnExportClassDocx: document.getElementById('btn-export-class-docx'),
     btnPrintClass: document.getElementById('btn-print-class'),
+    btnClearSingleClassWeekly: document.getElementById('btn-clear-single-class-weekly'),
     classWeeklyTable: document.getElementById('class-weekly-table'),
     classWeeklyThead: document.getElementById('class-weekly-thead'),
     classWeeklyTbody: document.getElementById('class-weekly-tbody'),
@@ -129,6 +130,7 @@
     timetableTbody: document.getElementById('timetable-tbody'),
     btnOpenCopyModal: document.getElementById('btn-open-copy-modal'),
     btnClearCurrentDay: document.getElementById('btn-clear-current-day'),
+    btnClearFullTimetable: document.getElementById('btn-clear-full-timetable'),
 
     // Teacher View
     selectTeacherFilter: document.getElementById('select-teacher-filter'),
@@ -1047,20 +1049,49 @@
       }
 
       const pSlots = dayData[period.id] || {};
-      const teacherAllocation = {};
+      const shiftTeacherAllocation = {
+        morning: {},
+        afternoon: {}
+      };
+
       state.standards.forEach(std => {
+        const stdShift = std.shift || 'afternoon';
         const slot = pSlots[std.id];
         if (slot && slot.teacher && slot.teacher.trim()) {
           const t = slot.teacher.trim();
-          if (!teacherAllocation[t]) teacherAllocation[t] = [];
-          teacherAllocation[t].push(std.name);
+          if (!shiftTeacherAllocation[stdShift]) shiftTeacherAllocation[stdShift] = {};
+          if (!shiftTeacherAllocation[stdShift][t]) shiftTeacherAllocation[stdShift][t] = [];
+          shiftTeacherAllocation[stdShift][t].push(std.name);
         }
       });
 
-      const busyTeachers = Object.keys(teacherAllocation);
-      busyTeachers.forEach(t => {
-        if (teacherAllocation[t].length > 1) {
-          allConflicts.push({ period: period.label, teacher: t, standards: teacherAllocation[t] });
+      // Free and busy teachers determined by the active shift perspective
+      let busyTeachers = [];
+      if (state.activeShift === 'morning') {
+        busyTeachers = Object.keys(shiftTeacherAllocation.morning);
+      } else if (state.activeShift === 'afternoon') {
+        busyTeachers = Object.keys(shiftTeacherAllocation.afternoon);
+      } else {
+        busyTeachers = Array.from(new Set([
+          ...Object.keys(shiftTeacherAllocation.morning),
+          ...Object.keys(shiftTeacherAllocation.afternoon)
+        ]));
+      }
+
+      // Check conflicts ONLY within the same shift (morning vs afternoon do not conflict)
+      ['morning', 'afternoon'].forEach(sh => {
+        if (state.activeShift === 'all' || state.activeShift === sh) {
+          const alloc = shiftTeacherAllocation[sh] || {};
+          Object.keys(alloc).forEach(t => {
+            if (alloc[t].length > 1) {
+              const shiftTitle = sh === 'morning' ? 'Morning Shift' : 'Afternoon Shift';
+              allConflicts.push({
+                period: state.activeShift === 'all' ? `${period.label} (${shiftTitle})` : period.label,
+                teacher: t,
+                standards: alloc[t]
+              });
+            }
+          });
         }
       });
 
@@ -1079,7 +1110,11 @@
       visibleStandards.forEach(std => {
         const slot = pSlots[std.id] || { subject: '', teacher: '' };
         const hasContent = slot.subject || slot.teacher;
-        const isConflict = slot.teacher && teacherAllocation[slot.teacher.trim()] && teacherAllocation[slot.teacher.trim()].length > 1;
+        const stdShift = std.shift || 'afternoon';
+        const isConflict = slot.teacher &&
+          shiftTeacherAllocation[stdShift] &&
+          shiftTeacherAllocation[stdShift][slot.teacher.trim()] &&
+          shiftTeacherAllocation[stdShift][slot.teacher.trim()].length > 1;
 
         tbodyHtml += `
           <td class="grid-period-cell ${isConflict ? 'has-conflict' : ''}" data-period="${period.id}" data-std="${std.id}">
@@ -2870,20 +2905,110 @@
     renderAll();
   }
 
+  function getShiftStandards(shiftKey) {
+    if (!shiftKey || shiftKey === 'all') return state.standards;
+    return state.standards.filter(s => (s.shift || 'afternoon') === shiftKey);
+  }
+
   function clearCurrentDay() {
-    if (confirm(`Clear all allocated periods for ${state.currentDay}?`)) {
-      state.schedules[state.currentDay] = {};
-      if (state.excludedFreeTeachers) {
-        Object.keys(state.excludedFreeTeachers).forEach(k => {
-          if (k.startsWith(`${state.currentDay}_`)) {
-            delete state.excludedFreeTeachers[k];
+    const shift = state.activeShift || 'afternoon';
+    let confirmMsg = '';
+    let toastMsg = '';
+
+    if (shift === 'morning') {
+      confirmMsg = `Clear Morning Shift periods for ${state.currentDay} (FG, LKG, HKG, 1st, 2nd)?\n\nNote: Afternoon Shift classes (3rd to 8th) will remain completely untouched.`;
+      toastMsg = `${state.currentDay} (Morning Shift) cleared`;
+    } else if (shift === 'afternoon') {
+      confirmMsg = `Clear Afternoon Shift periods for ${state.currentDay} (3rd to 8th)?\n\nNote: Morning Shift classes (FG to 2nd) will remain completely untouched.`;
+      toastMsg = `${state.currentDay} (Afternoon Shift) cleared`;
+    } else {
+      confirmMsg = `Clear all allocated periods for ${state.currentDay} (both Morning and Afternoon shifts)?`;
+      toastMsg = `${state.currentDay} timetable cleared`;
+    }
+
+    if (!confirm(confirmMsg)) return;
+
+    const stdsToClear = getShiftStandards(shift).map(s => s.id);
+    if (state.schedules && state.schedules[state.currentDay]) {
+      Object.keys(state.schedules[state.currentDay]).forEach(pId => {
+        if (state.schedules[state.currentDay][pId]) {
+          stdsToClear.forEach(sId => {
+            delete state.schedules[state.currentDay][pId][sId];
+          });
+        }
+      });
+    }
+
+    if (state.excludedFreeTeachers) {
+      Object.keys(state.excludedFreeTeachers).forEach(k => {
+        if (k.startsWith(`${state.currentDay}_`)) {
+          delete state.excludedFreeTeachers[k];
+        }
+      });
+    }
+
+    saveState();
+    renderAll();
+    showToast(toastMsg, 'info');
+  }
+
+  function clearFullTimetable() {
+    const shift = state.activeShift || 'afternoon';
+    let confirmMsg = '';
+    let toastMsg = '';
+
+    if (shift === 'morning') {
+      confirmMsg = `⚠️ ARE YOU SURE?\n\nThis will clear the entire weekly timetable for MORNING SHIFT (FG, LKG, HKG, 1st, 2nd) across all 6 days (Monday to Saturday).\n\nAfternoon Shift classes (3rd to 8th) will NOT be affected and will remain untouched.`;
+      toastMsg = `Morning Shift weekly timetable cleared`;
+    } else if (shift === 'afternoon') {
+      confirmMsg = `⚠️ ARE YOU SURE?\n\nThis will clear the entire weekly timetable for AFTERNOON SHIFT (3rd to 8th) across all 6 days (Monday to Saturday).\n\nMorning Shift classes (FG to 2nd) will NOT be affected and will remain untouched.`;
+      toastMsg = `Afternoon Shift weekly timetable cleared`;
+    } else {
+      confirmMsg = `⚠️ ARE YOU SURE?\n\nThis will clear the entire weekly timetable for ALL classes across the entire week (Monday to Saturday)?`;
+      toastMsg = `Entire school timetable cleared`;
+    }
+
+    if (!confirm(confirmMsg)) return;
+
+    const stdsToClear = getShiftStandards(shift).map(s => s.id);
+    state.days.forEach(day => {
+      if (state.schedules && state.schedules[day]) {
+        Object.keys(state.schedules[day]).forEach(pId => {
+          if (state.schedules[day][pId]) {
+            stdsToClear.forEach(sId => {
+              delete state.schedules[day][pId][sId];
+            });
           }
         });
       }
-      saveState();
-      renderAll();
-      showToast(`${state.currentDay} timetable cleared`, 'info');
-    }
+    });
+
+    state.excludedFreeTeachers = {};
+    saveState();
+    renderAll();
+    showToast(toastMsg, 'info');
+  }
+
+  function clearSingleClassWeekly() {
+    const stdId = state.selectedClassStandard;
+    const std = state.standards.find(s => s.id === stdId) || { name: stdId };
+    const stdName = std.name || stdId;
+
+    if (!confirm(`Clear all allocated periods for ${stdName} (Monday to Saturday)?\n\nAll other classes will remain untouched.`)) return;
+
+    state.days.forEach(day => {
+      if (state.schedules && state.schedules[day]) {
+        Object.keys(state.schedules[day]).forEach(pId => {
+          if (state.schedules[day][pId]) {
+            delete state.schedules[day][pId][stdId];
+          }
+        });
+      }
+    });
+
+    saveState();
+    renderAll();
+    showToast(`${stdName} weekly schedule cleared`, 'info');
   }
 
   // --- Settings & Roster Modal ---
@@ -3256,6 +3381,7 @@
     // Class-Wise Weekly View Actions
     if (DOM.btnExportClassDocx) DOM.btnExportClassDocx.onclick = exportCurrentClassWeeklyDocx;
     if (DOM.btnPrintClass) DOM.btnPrintClass.onclick = () => window.print();
+    if (DOM.btnClearSingleClassWeekly) DOM.btnClearSingleClassWeekly.onclick = clearSingleClassWeekly;
 
     // Dedicated Attendance Duty Actions
     if (DOM.btnDownloadAttendanceDutiesDocx) {
@@ -3283,6 +3409,7 @@
     // Day Actions
     DOM.btnOpenCopyModal.onclick = openCopyModal;
     DOM.btnClearCurrentDay.onclick = clearCurrentDay;
+    if (DOM.btnClearFullTimetable) DOM.btnClearFullTimetable.onclick = clearFullTimetable;
     DOM.btnCloseCopyModal.onclick = () => DOM.copyModal.classList.remove('active');
     DOM.btnCancelCopy.onclick = () => DOM.copyModal.classList.remove('active');
     DOM.btnConfirmCopy.onclick = executeCopySchedule;
