@@ -1229,7 +1229,10 @@
       window.FirebaseSync.init().then(async (res) => {
         if (res.success) {
           // Attempt to pull existing cloud document
-          const cloudData = await window.FirebaseSync.fetch();
+          const fetchRes = await window.FirebaseSync.fetch();
+          const cloudData = fetchRes && fetchRes.data ? fetchRes.data : (fetchRes && fetchRes.schedules ? fetchRes : null);
+          const isExplicitlyEmpty = fetchRes && fetchRes.empty === true;
+
           if (cloudData && cloudData.schedules) {
             console.log('[Firebase Sync] Hydrating timetable from Cloud Firestore');
             state = Object.assign({}, state, cloudData);
@@ -1237,10 +1240,12 @@
             renderSchoolProfile();
             renderAll();
             showToast('Loaded latest timetable from Cloud Firestore', 'success');
-          } else {
-            // First time connection: upload current timetable to Cloud
-            console.log('[Firebase Sync] Cloud empty. Seeding initial timetable to Firestore');
+          } else if (isExplicitlyEmpty) {
+            // First time connection: only seed if cloud document is explicitly confirmed non-existent
+            console.log('[Firebase Sync] Cloud confirmed empty. Seeding initial timetable to Firestore');
             window.FirebaseSync.save(state, { immediate: true });
+          } else {
+            console.log('[Firebase Sync] Cloud offline or unavailable. Running in local storage mode.');
           }
 
           // Start listening to real-time changes made on other devices
@@ -1830,7 +1835,8 @@
       const res = await fetch('/api/auth/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
         const data = await res.json();
         if (data.success && data.user) {
           const u = data.user;
@@ -2195,6 +2201,13 @@
         })
       });
 
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        // Static hosting mode (e.g. Netlify) without backend server
+        handleOfflineDemoLogin(emailInput, password, remember);
+        return;
+      }
+
       const data = await res.json();
 
       if (res.ok && data.success && data.user) {
@@ -2269,7 +2282,6 @@
         }
       }
     } catch (netErr) {
-      console.warn('Backend unavailable, falling back to offline demo login...', netErr);
       handleOfflineDemoLogin(emailInput, password, remember);
     } finally {
       if (DOM.btnAuthSubmit) {

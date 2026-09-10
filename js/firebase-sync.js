@@ -99,6 +99,18 @@
 
       db = window.firebase.firestore();
 
+      // Configure Firestore settings to use long polling so network proxies/VPNs/extensions do not hang WebChannel
+      try {
+        if (typeof db.settings === 'function') {
+          db.settings({
+            experimentalForceLongPolling: true,
+            merge: true
+          });
+        }
+      } catch (settingsErr) {
+        // Settings may already be locked if Firestore was already accessed
+      }
+
       // Enable offline persistence with multi-tab support (safely caught)
       try {
         if (typeof db.enablePersistence === 'function') {
@@ -185,10 +197,12 @@
             err.message.includes('PERMISSION_DENIED') ||
             err.message.includes('permission') ||
             err.message.includes('not been used in project') ||
-            err.message.includes('disabled')
+            err.message.includes('disabled') ||
+            err.message.includes('404') ||
+            err.message.includes('NOT_FOUND')
           );
           if (isConfigOrPermError) {
-            notifyStatus('error', { message: 'Firestore API not enabled in Firebase Console.' });
+            notifyStatus('error', { message: 'Firestore Database not created or disabled in Firebase Console.' });
           } else {
             notifyStatus('offline', { message: 'Cloud save queued locally' });
           }
@@ -211,7 +225,7 @@
    */
   async function fetchStateFromCloud() {
     if (!isInitialized || !db) {
-      return null;
+      return { success: false, error: 'not_initialized' };
     }
 
     try {
@@ -222,10 +236,10 @@
       if (snap && snap.exists) {
         lastSavedAt = snap.data().updatedAt ? new Date(snap.data().updatedAt) : new Date();
         notifyStatus('synced', { lastSavedAt });
-        return snap.data();
+        return { success: true, empty: false, data: snap.data() };
       } else {
         notifyStatus('connected', { message: 'Database ready. Ready to upload initial data.' });
-        return null;
+        return { success: true, empty: true, data: null };
       }
     } catch (err) {
       console.warn('[Firebase Sync] Cloud fetch error:', err.message || err);
@@ -233,14 +247,16 @@
         err.message.includes('PERMISSION_DENIED') ||
         err.message.includes('permission') ||
         err.message.includes('not been used in project') ||
-        err.message.includes('disabled')
+        err.message.includes('disabled') ||
+        err.message.includes('404') ||
+        err.message.includes('NOT_FOUND')
       );
       if (isConfigOrPermError) {
-        notifyStatus('error', { message: 'Firestore API disabled or permission denied in Firebase Console.' });
+        notifyStatus('error', { message: 'Firestore Database not created or disabled in Firebase Console.' });
       } else {
         notifyStatus('offline', { message: 'Cloud connection offline (saved locally)' });
       }
-      return null;
+      return { success: false, error: err };
     }
   }
 
