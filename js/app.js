@@ -259,6 +259,15 @@
     copySourceDay: document.getElementById('copy-source-day'),
     copyTargetDay: document.getElementById('copy-target-day'),
 
+    // Confirm Clear Modal
+    confirmClearModal: document.getElementById('confirm-clear-modal'),
+    confirmClearModalTitle: document.getElementById('confirm-clear-modal-title'),
+    confirmClearTitleText: document.getElementById('confirm-clear-title-text'),
+    confirmClearModalBody: document.getElementById('confirm-clear-modal-body'),
+    btnCloseClearModal: document.getElementById('btn-close-clear-modal'),
+    btnCancelClearModal: document.getElementById('btn-cancel-clear-modal'),
+    btnProceedClearModal: document.getElementById('btn-proceed-clear-modal'),
+
     // Settings Modal
     settingsModal: document.getElementById('settings-modal'),
     btnCloseSettingsModal: document.getElementById('btn-close-settings-modal'),
@@ -489,6 +498,62 @@
     if (!state.selectedTeacher && state.teachers.length > 0) {
       state.selectedTeacher = state.teachers[0];
     }
+    normalizeStateStandards(state);
+  }
+
+  function normalizeStateStandards(s) {
+    if (!s) return;
+    if (s.standards && Array.isArray(s.standards)) {
+      s.standards.forEach(std => {
+        if (std.id === 'std_nursery') {
+          std.id = 'std_fg';
+          std.name = 'FG';
+          std.baseName = 'FG';
+        } else if (std.id === 'std_jr_kg') {
+          std.id = 'std_lkg';
+          std.name = 'LKG';
+          std.baseName = 'LKG';
+        } else if (std.id === 'std_sr_kg') {
+          std.id = 'std_hkg';
+          std.name = 'HKG';
+          std.baseName = 'HKG';
+        }
+      });
+    }
+    if (s.schedules) {
+      Object.keys(s.schedules).forEach(day => {
+        const dObj = s.schedules[day] || {};
+        Object.keys(dObj).forEach(pId => {
+          const pSlot = dObj[pId] || {};
+          if (pSlot.std_nursery && !pSlot.std_fg) {
+            pSlot.std_fg = pSlot.std_nursery;
+            delete pSlot.std_nursery;
+          }
+          if (pSlot.std_jr_kg && !pSlot.std_lkg) {
+            pSlot.std_lkg = pSlot.std_jr_kg;
+            delete pSlot.std_jr_kg;
+          }
+          if (pSlot.std_sr_kg && !pSlot.std_hkg) {
+            pSlot.std_hkg = pSlot.std_sr_kg;
+            delete pSlot.std_sr_kg;
+          }
+        });
+      });
+    }
+    if (s.classTeachers) {
+      if (s.classTeachers.std_nursery && !s.classTeachers.std_fg) {
+        s.classTeachers.std_fg = s.classTeachers.std_nursery;
+        delete s.classTeachers.std_nursery;
+      }
+      if (s.classTeachers.std_jr_kg && !s.classTeachers.std_lkg) {
+        s.classTeachers.std_lkg = s.classTeachers.std_jr_kg;
+        delete s.classTeachers.std_jr_kg;
+      }
+      if (s.classTeachers.std_sr_kg && !s.classTeachers.std_hkg) {
+        s.classTeachers.std_hkg = s.classTeachers.std_sr_kg;
+        delete s.classTeachers.std_sr_kg;
+      }
+    }
   }
 
   function resetToDefaults() {
@@ -577,6 +642,7 @@
           if (cloudData && cloudData.schedules) {
             console.log('[Firebase Sync] Hydrating timetable from Cloud Firestore');
             state = Object.assign({}, state, cloudData);
+            normalizeStateStandards(state);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
             renderSchoolProfile();
             renderAll();
@@ -600,6 +666,7 @@
     if (!cloudData || !cloudData.schedules) return;
     console.log('[Firebase Sync] Remote timetable update received from another device');
     state = Object.assign({}, state, cloudData);
+    normalizeStateStandards(state);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     renderSchoolProfile();
     renderAll();
@@ -2910,25 +2977,179 @@
     return state.standards.filter(s => (s.shift || 'afternoon') === shiftKey);
   }
 
-  function clearCurrentDay() {
+  let activeClearAction = null;
+
+  function openClearModal(type) {
+    activeClearAction = type;
     const shift = state.activeShift || 'afternoon';
-    let confirmMsg = '';
+    const day = state.currentDay || 'Monday';
+
+    let titleText = 'Confirm Clear Schedule';
+    let bodyHtml = '';
+
+    if (type === 'day') {
+      titleText = `Clear ${escapeHtml(day)} Schedule`;
+      if (shift === 'morning') {
+        const morningStds = getShiftStandards('morning');
+        bodyHtml = `
+          <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;">
+            <div style="font-weight: 700; color: #991b1b; font-size: 13.5px; margin-bottom: 6px;">
+              ⚠️ Clear Morning Shift for ${escapeHtml(day)}?
+            </div>
+            <div style="color: #7f1d1d; font-size: 12.5px; margin-bottom: 10px;">
+              This will clear all periods for the <strong>Morning Shift</strong> classes on <strong>${escapeHtml(day)}</strong>:
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              ${morningStds.map(s => `<span style="background: #fee2e2; color: #991b1b; font-weight: 600; font-size: 11.5px; padding: 3px 8px; border-radius: 4px; border: 1px solid #fca5a5;">${escapeHtml(s.name)}</span>`).join('')}
+            </div>
+          </div>
+          <div style="background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 8px; padding: 12px 14px; color: #065f46; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px; line-height: 1;">✓</span>
+            <span><strong>Shift Isolation:</strong> Afternoon Shift classes (3rd to 8th) will remain 100% untouched and safe.</span>
+          </div>`;
+      } else if (shift === 'afternoon') {
+        const afternoonStds = getShiftStandards('afternoon');
+        bodyHtml = `
+          <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;">
+            <div style="font-weight: 700; color: #991b1b; font-size: 13.5px; margin-bottom: 6px;">
+              ⚠️ Clear Afternoon Shift for ${escapeHtml(day)}?
+            </div>
+            <div style="color: #7f1d1d; font-size: 12.5px; margin-bottom: 10px;">
+              This will clear all periods for the <strong>Afternoon Shift</strong> classes on <strong>${escapeHtml(day)}</strong>:
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              ${afternoonStds.map(s => `<span style="background: #fee2e2; color: #991b1b; font-weight: 600; font-size: 11.5px; padding: 3px 8px; border-radius: 4px; border: 1px solid #fca5a5;">${escapeHtml(s.name)}</span>`).join('')}
+            </div>
+          </div>
+          <div style="background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 8px; padding: 12px 14px; color: #065f46; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px; line-height: 1;">✓</span>
+            <span><strong>Shift Isolation:</strong> Morning Shift classes (FG, LKG, HKG, 1st, 2nd) will remain 100% untouched and safe.</span>
+          </div>`;
+      } else {
+        bodyHtml = `
+          <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 14px 16px;">
+            <div style="font-weight: 700; color: #991b1b; font-size: 13.5px; margin-bottom: 6px;">
+              ⚠️ Clear All Classes for ${escapeHtml(day)}?
+            </div>
+            <div style="color: #7f1d1d; font-size: 12.5px;">
+              You are currently in <strong>All Classes</strong> view. This will clear periods for both Morning and Afternoon shifts on <strong>${escapeHtml(day)}</strong>.
+            </div>
+          </div>`;
+      }
+    } else if (type === 'full') {
+      titleText = 'Clear Whole Weekly Timetable';
+      if (shift === 'morning') {
+        const morningStds = getShiftStandards('morning');
+        bodyHtml = `
+          <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;">
+            <div style="font-weight: 700; color: #991b1b; font-size: 13.5px; margin-bottom: 6px;">
+              ⚠️ Clear Whole Morning Shift Timetable?
+            </div>
+            <div style="color: #7f1d1d; font-size: 12.5px; margin-bottom: 10px;">
+              This will clear the entire weekly timetable across all 6 days (Monday to Saturday) for all <strong>Morning Shift</strong> classes:
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              ${morningStds.map(s => `<span style="background: #fee2e2; color: #991b1b; font-weight: 600; font-size: 11.5px; padding: 3px 8px; border-radius: 4px; border: 1px solid #fca5a5;">${escapeHtml(s.name)}</span>`).join('')}
+            </div>
+          </div>
+          <div style="background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 8px; padding: 12px 14px; color: #065f46; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px; line-height: 1;">✓</span>
+            <span><strong>Shift Isolation:</strong> Afternoon Shift classes (3rd to 8th) will NOT be affected and remain completely untouched.</span>
+          </div>`;
+      } else if (shift === 'afternoon') {
+        const afternoonStds = getShiftStandards('afternoon');
+        bodyHtml = `
+          <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;">
+            <div style="font-weight: 700; color: #991b1b; font-size: 13.5px; margin-bottom: 6px;">
+              ⚠️ Clear Whole Afternoon Shift Timetable?
+            </div>
+            <div style="color: #7f1d1d; font-size: 12.5px; margin-bottom: 10px;">
+              This will clear the entire weekly timetable across all 6 days (Monday to Saturday) for all <strong>Afternoon Shift</strong> classes:
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              ${afternoonStds.map(s => `<span style="background: #fee2e2; color: #991b1b; font-weight: 600; font-size: 11.5px; padding: 3px 8px; border-radius: 4px; border: 1px solid #fca5a5;">${escapeHtml(s.name)}</span>`).join('')}
+            </div>
+          </div>
+          <div style="background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 8px; padding: 12px 14px; color: #065f46; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px; line-height: 1;">✓</span>
+            <span><strong>Shift Isolation:</strong> Morning Shift classes (FG to 2nd) will NOT be affected and remain completely untouched.</span>
+          </div>`;
+      } else {
+        bodyHtml = `
+          <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 14px 16px;">
+            <div style="font-weight: 700; color: #991b1b; font-size: 13.5px; margin-bottom: 6px;">
+              ⚠️ Clear Entire School Timetable?
+            </div>
+            <div style="color: #7f1d1d; font-size: 12.5px;">
+              You are in <strong>All Classes</strong> view. This will clear the entire weekly timetable across all classes for Monday to Saturday.
+            </div>
+          </div>`;
+      }
+    } else if (type === 'class') {
+      const stdId = state.selectedClassStandard;
+      const std = state.standards.find(s => s.id === stdId) || { name: stdId };
+      const stdName = std.name || stdId;
+      titleText = `Clear ${escapeHtml(stdName)} Weekly Schedule`;
+      bodyHtml = `
+        <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;">
+          <div style="font-weight: 700; color: #991b1b; font-size: 13.5px; margin-bottom: 6px;">
+            ⚠️ Clear All Periods for ${escapeHtml(stdName)}?
+          </div>
+          <div style="color: #7f1d1d; font-size: 12.5px;">
+            This will clear all scheduled periods for <strong>${escapeHtml(stdName)}</strong> from Monday to Saturday.
+          </div>
+        </div>
+        <div style="background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 8px; padding: 12px 14px; color: #065f46; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 16px; line-height: 1;">✓</span>
+          <span><strong>Protection:</strong> All other classes across both shifts will remain completely untouched.</span>
+        </div>`;
+    }
+
+    if (DOM.confirmClearTitleText) DOM.confirmClearTitleText.textContent = titleText;
+    if (DOM.confirmClearModalBody) DOM.confirmClearModalBody.innerHTML = bodyHtml;
+    if (DOM.confirmClearModal) DOM.confirmClearModal.classList.add('active');
+  }
+
+  function closeClearModal() {
+    if (DOM.confirmClearModal) DOM.confirmClearModal.classList.remove('active');
+    activeClearAction = null;
+  }
+
+  function handleConfirmClearAction() {
+    const action = activeClearAction;
+    closeClearModal();
+    if (action === 'day') {
+      executeClearCurrentDay();
+    } else if (action === 'full') {
+      executeClearFullTimetable();
+    } else if (action === 'class') {
+      executeClearSingleClassWeekly();
+    }
+  }
+
+  function clearCurrentDay() {
+    openClearModal('day');
+  }
+
+  function executeClearCurrentDay() {
+    const shift = state.activeShift || 'afternoon';
     let toastMsg = '';
 
     if (shift === 'morning') {
-      confirmMsg = `Clear Morning Shift periods for ${state.currentDay} (FG, LKG, HKG, 1st, 2nd)?\n\nNote: Afternoon Shift classes (3rd to 8th) will remain completely untouched.`;
       toastMsg = `${state.currentDay} (Morning Shift) cleared`;
     } else if (shift === 'afternoon') {
-      confirmMsg = `Clear Afternoon Shift periods for ${state.currentDay} (3rd to 8th)?\n\nNote: Morning Shift classes (FG to 2nd) will remain completely untouched.`;
       toastMsg = `${state.currentDay} (Afternoon Shift) cleared`;
     } else {
-      confirmMsg = `Clear all allocated periods for ${state.currentDay} (both Morning and Afternoon shifts)?`;
       toastMsg = `${state.currentDay} timetable cleared`;
     }
 
-    if (!confirm(confirmMsg)) return;
-
     const stdsToClear = getShiftStandards(shift).map(s => s.id);
+    if (shift === 'morning') {
+      ['std_fg', 'std_lkg', 'std_hkg', 'std_1', 'std_2', 'std_nursery', 'std_jr_kg', 'std_sr_kg'].forEach(id => {
+        if (!stdsToClear.includes(id)) stdsToClear.push(id);
+      });
+    }
+
     if (state.schedules && state.schedules[state.currentDay]) {
       Object.keys(state.schedules[state.currentDay]).forEach(pId => {
         if (state.schedules[state.currentDay][pId]) {
@@ -2947,30 +3168,37 @@
       });
     }
 
-    saveState();
+    saveState(false);
+    if (window.FirebaseSync && window.FirebaseSync.isConfigured()) {
+      window.FirebaseSync.save(state, { immediate: true });
+    }
     renderAll();
     showToast(toastMsg, 'info');
   }
 
   function clearFullTimetable() {
+    openClearModal('full');
+  }
+
+  function executeClearFullTimetable() {
     const shift = state.activeShift || 'afternoon';
-    let confirmMsg = '';
     let toastMsg = '';
 
     if (shift === 'morning') {
-      confirmMsg = `⚠️ ARE YOU SURE?\n\nThis will clear the entire weekly timetable for MORNING SHIFT (FG, LKG, HKG, 1st, 2nd) across all 6 days (Monday to Saturday).\n\nAfternoon Shift classes (3rd to 8th) will NOT be affected and will remain untouched.`;
-      toastMsg = `Morning Shift weekly timetable cleared`;
+      toastMsg = 'Morning Shift weekly timetable cleared';
     } else if (shift === 'afternoon') {
-      confirmMsg = `⚠️ ARE YOU SURE?\n\nThis will clear the entire weekly timetable for AFTERNOON SHIFT (3rd to 8th) across all 6 days (Monday to Saturday).\n\nMorning Shift classes (FG to 2nd) will NOT be affected and will remain untouched.`;
-      toastMsg = `Afternoon Shift weekly timetable cleared`;
+      toastMsg = 'Afternoon Shift weekly timetable cleared';
     } else {
-      confirmMsg = `⚠️ ARE YOU SURE?\n\nThis will clear the entire weekly timetable for ALL classes across the entire week (Monday to Saturday)?`;
-      toastMsg = `Entire school timetable cleared`;
+      toastMsg = 'Entire school timetable cleared';
     }
 
-    if (!confirm(confirmMsg)) return;
-
     const stdsToClear = getShiftStandards(shift).map(s => s.id);
+    if (shift === 'morning') {
+      ['std_fg', 'std_lkg', 'std_hkg', 'std_1', 'std_2', 'std_nursery', 'std_jr_kg', 'std_sr_kg'].forEach(id => {
+        if (!stdsToClear.includes(id)) stdsToClear.push(id);
+      });
+    }
+
     state.days.forEach(day => {
       if (state.schedules && state.schedules[day]) {
         Object.keys(state.schedules[day]).forEach(pId => {
@@ -2984,17 +3212,22 @@
     });
 
     state.excludedFreeTeachers = {};
-    saveState();
+    saveState(false);
+    if (window.FirebaseSync && window.FirebaseSync.isConfigured()) {
+      window.FirebaseSync.save(state, { immediate: true });
+    }
     renderAll();
     showToast(toastMsg, 'info');
   }
 
   function clearSingleClassWeekly() {
+    openClearModal('class');
+  }
+
+  function executeClearSingleClassWeekly() {
     const stdId = state.selectedClassStandard;
     const std = state.standards.find(s => s.id === stdId) || { name: stdId };
     const stdName = std.name || stdId;
-
-    if (!confirm(`Clear all allocated periods for ${stdName} (Monday to Saturday)?\n\nAll other classes will remain untouched.`)) return;
 
     state.days.forEach(day => {
       if (state.schedules && state.schedules[day]) {
@@ -3006,7 +3239,10 @@
       }
     });
 
-    saveState();
+    saveState(false);
+    if (window.FirebaseSync && window.FirebaseSync.isConfigured()) {
+      window.FirebaseSync.save(state, { immediate: true });
+    }
     renderAll();
     showToast(`${stdName} weekly schedule cleared`, 'info');
   }
@@ -3414,6 +3650,11 @@
     DOM.btnCancelCopy.onclick = () => DOM.copyModal.classList.remove('active');
     DOM.btnConfirmCopy.onclick = executeCopySchedule;
 
+    // Confirm Clear Modal Actions
+    if (DOM.btnCloseClearModal) DOM.btnCloseClearModal.onclick = closeClearModal;
+    if (DOM.btnCancelClearModal) DOM.btnCancelClearModal.onclick = closeClearModal;
+    if (DOM.btnProceedClearModal) DOM.btnProceedClearModal.onclick = handleConfirmClearAction;
+
     // Weekly Duty View (Notebook Matrix) Actions
     if (DOM.btnDownloadWeeklyDutyDocx) DOM.btnDownloadWeeklyDutyDocx.onclick = downloadWeeklyDutyDocx;
     if (DOM.btnPrintDutyView) DOM.btnPrintDutyView.onclick = () => window.print();
@@ -3516,7 +3757,7 @@
     };
 
     // Close Modals on background click
-    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal, DOM.cloudDbModal].forEach(m => {
+    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal, DOM.cloudDbModal, DOM.confirmClearModal].forEach(m => {
       if (m) m.onclick = (e) => { if (e.target === m) m.classList.remove('active'); };
     });
 
@@ -3530,6 +3771,7 @@
         if (DOM.settingsModal) DOM.settingsModal.classList.remove('active');
         if (DOM.schoolProfileModal) DOM.schoolProfileModal.classList.remove('active');
         if (DOM.cloudDbModal) DOM.cloudDbModal.classList.remove('active');
+        if (DOM.confirmClearModal) DOM.confirmClearModal.classList.remove('active');
       }
     };
   }

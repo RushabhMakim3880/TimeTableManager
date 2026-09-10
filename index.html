@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="stylesheet" href="css/style.css?v=9">
 </head>
 <body>
 
@@ -987,6 +987,26 @@
     </div>
   </div>
 
+  <!-- Enterprise Modal: Confirm Clear Timetable (Shift Isolated) -->
+  <div class="enterprise-modal-overlay" id="confirm-clear-modal" style="z-index: 10000;">
+    <div class="enterprise-modal-card" style="max-width: 480px;">
+      <div class="modal-title-bar" style="background: #fef2f2; border-bottom: 1px solid #fee2e2;">
+        <h3 id="confirm-clear-modal-title" style="color: #991b1b; display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" style="flex-shrink: 0;"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-6 5v6m4-6v6"/></svg>
+          <span id="confirm-clear-title-text">Confirm Clear Timetable</span>
+        </h3>
+        <button class="popover-close-btn" id="btn-close-clear-modal">&times;</button>
+      </div>
+      <div class="modal-content-area" id="confirm-clear-modal-body" style="padding: 18px 22px; font-size: 13px; line-height: 1.6;">
+        <!-- Injected dynamically in app.js -->
+      </div>
+      <div class="modal-actions-bar" style="padding: 12px 22px; background: #fafafa; display: flex; justify-content: flex-end; gap: 10px;">
+        <button id="btn-cancel-clear-modal" class="btn btn-secondary btn-sm">Cancel</button>
+        <button id="btn-proceed-clear-modal" class="btn btn-danger btn-sm" style="background: #dc2626; color: #fff; border-color: #dc2626; font-weight: 600;">Clear Timetable</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Enterprise Modal: Manage Staff & Subjects Roster -->
   <div class="enterprise-modal-overlay" id="settings-modal">
     <div class="enterprise-modal-card" style="max-width: 620px;">
@@ -1138,12 +1158,12 @@
   <!-- Firebase SDK Compat via CDN -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=8"></script>
-  <script src="js/firebase-sync.js?v=8"></script>
-  <script src="js/template-assets.js?v=8"></script>
-  <script src="js/default-data.js?v=8"></script>
-  <script src="js/docx-generator.js?v=8"></script>
-  <script src="js/app.js?v=8"></script>
+  <script src="js/firebase-config.js?v=9"></script>
+  <script src="js/firebase-sync.js?v=9"></script>
+  <script src="js/template-assets.js?v=9"></script>
+  <script src="js/default-data.js?v=9"></script>
+  <script src="js/docx-generator.js?v=9"></script>
+  <script src="js/app.js?v=9"></script>
 
 </body>
 </html>

@@ -174,7 +174,7 @@
           };
 
           const docRef = db.collection(COLLECTION_NAME).doc(DOCUMENT_ID);
-          await withTimeout(docRef.set(payload, { merge: true }), 8000, 'Cloud save timed out');
+          await withTimeout(docRef.set(payload), 8000, 'Cloud save timed out');
 
           lastSavedAt = new Date();
           notifyStatus('synced', { lastSavedAt });
