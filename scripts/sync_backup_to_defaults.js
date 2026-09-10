@@ -33,14 +33,6 @@ try {
     schoolProfile: data.schoolProfile || currentDefaultData.schoolProfile,
     standards: data.standards || currentDefaultData.standards,
     periods: data.periods || currentDefaultData.periods,
-    morningPeriods: data.morningPeriods || currentDefaultData.morningPeriods || [
-      { id: 'm1', name: 'Period 1', time: '7:30 to 8:15', isRecess: false },
-      { id: 'm2', name: 'Period 2', time: '8:15 to 9:00', isRecess: false },
-      { id: 'm3', name: 'Period 3', time: '9:00 to 9:45', isRecess: false },
-      { id: 'm4', name: 'Period 4', time: '10:05 to 10:50', isRecess: false },
-      { id: 'm5', name: 'Period 5', time: '10:50 to 11:35', isRecess: false },
-      { id: 'm6', name: 'Period 6', time: '11:35 to 12:15', isRecess: false }
-    ],
     teachers: data.teachers || currentDefaultData.teachers,
     teacherProfiles: data.teacherProfiles || currentDefaultData.teacherProfiles,
     subjects: data.subjects || currentDefaultData.subjects,

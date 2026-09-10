@@ -99,34 +99,18 @@
 
       db = window.firebase.firestore();
 
-      // Configure Firestore settings to use long polling so network proxies/VPNs/extensions do not hang WebChannel
+      // Enable offline persistence with multi-tab support
       try {
-        if (typeof db.settings === 'function') {
-          db.settings({
-            experimentalForceLongPolling: true,
-            merge: true
-          });
-        }
-      } catch (settingsErr) {
-        // Settings may already be locked if Firestore was already accessed
-      }
-
-      // Enable offline persistence with multi-tab support (safely caught)
-      try {
-        if (typeof db.enablePersistence === 'function') {
-          await db.enablePersistence({ synchronizeTabs: true }).catch(err => {
-            if (err.code === 'failed-precondition') {
-              console.warn('[Firebase Sync] Persistence notice: multiple tabs open simultaneously');
-            } else if (err.code === 'unimplemented') {
-              console.warn('[Firebase Sync] Browser does not support IndexedDB persistence');
-            } else {
-              console.warn('[Firebase Sync] Persistence notice:', err.message || err);
-            }
-          });
-          console.log('[Firebase Sync] Offline persistence initialized with multi-tab sync');
-        }
+        await db.enablePersistence({ synchronizeTabs: true });
+        console.log('[Firebase Sync] Offline persistence enabled with multi-tab sync');
       } catch (err) {
-        console.warn('[Firebase Sync] Persistence initialization skipped:', err);
+        if (err.code === 'failed-precondition') {
+          console.warn('[Firebase Sync] Persistence failed: Multiple tabs open simultaneously');
+        } else if (err.code === 'unimplemented') {
+          console.warn('[Firebase Sync] Browser does not support IndexedDB persistence');
+        } else {
+          console.warn('[Firebase Sync] Persistence warning:', err);
+        }
       }
 
       isInitialized = true;
@@ -162,12 +146,9 @@
             schoolProfile: state.schoolProfile || {},
             standards: state.standards || [],
             periods: state.periods || [],
-            shifts: state.shifts || {},
-            shiftSettings: state.shiftSettings || {},
             teachers: state.teachers || [],
             teacherProfiles: state.teacherProfiles || {},
             subjects: state.subjects || [],
-            subjectDetails: state.subjectDetails || {},
             days: state.days || [],
             schedules: state.schedules || {},
             leaves: state.leaves || {},
@@ -176,13 +157,9 @@
             duties: state.duties || {},
             weeklyDuties: state.weeklyDuties || {},
             generalDuties: state.generalDuties || [],
-            classTeachers: state.classTeachers || [],
-            specialDuties: state.specialDuties || [],
-            assemblyDuties: state.assemblyDuties || [],
-            syllabusScope: state.syllabusScope || {},
             excludedFreeTeachers: state.excludedFreeTeachers || {},
             updatedAt: new Date().toISOString(),
-            clientVersion: 'v4.2'
+            clientVersion: 'v4.1'
           };
 
           const docRef = db.collection(COLLECTION_NAME).doc(DOCUMENT_ID);
@@ -193,19 +170,7 @@
           resolve({ success: true, savedAt: lastSavedAt });
         } catch (err) {
           console.warn('[Firebase Sync] Cloud save notice:', err.message || err);
-          const isConfigOrPermError = err.message && (
-            err.message.includes('PERMISSION_DENIED') ||
-            err.message.includes('permission') ||
-            err.message.includes('not been used in project') ||
-            err.message.includes('disabled') ||
-            err.message.includes('404') ||
-            err.message.includes('NOT_FOUND')
-          );
-          if (isConfigOrPermError) {
-            notifyStatus('error', { message: 'Firestore Database not created or disabled in Firebase Console.' });
-          } else {
-            notifyStatus('offline', { message: 'Cloud save queued locally' });
-          }
+          notifyStatus(navigator.onLine ? 'error' : 'offline', { message: err.message });
           resolve({ success: false, error: err });
         } finally {
           setTimeout(() => { isSavingLocally = false; }, 500);
@@ -225,7 +190,7 @@
    */
   async function fetchStateFromCloud() {
     if (!isInitialized || !db) {
-      return { success: false, error: 'not_initialized' };
+      return null;
     }
 
     try {
@@ -236,27 +201,15 @@
       if (snap && snap.exists) {
         lastSavedAt = snap.data().updatedAt ? new Date(snap.data().updatedAt) : new Date();
         notifyStatus('synced', { lastSavedAt });
-        return { success: true, empty: false, data: snap.data() };
+        return snap.data();
       } else {
-        notifyStatus('connected', { message: 'Database ready. Ready to upload initial data.' });
-        return { success: true, empty: true, data: null };
+        notifyStatus('connected', { message: 'Database empty. Ready to upload initial data.' });
+        return null;
       }
     } catch (err) {
-      console.warn('[Firebase Sync] Cloud fetch error:', err.message || err);
-      const isConfigOrPermError = err.message && (
-        err.message.includes('PERMISSION_DENIED') ||
-        err.message.includes('permission') ||
-        err.message.includes('not been used in project') ||
-        err.message.includes('disabled') ||
-        err.message.includes('404') ||
-        err.message.includes('NOT_FOUND')
-      );
-      if (isConfigOrPermError) {
-        notifyStatus('error', { message: 'Firestore Database not created or disabled in Firebase Console.' });
-      } else {
-        notifyStatus('offline', { message: 'Cloud connection offline (saved locally)' });
-      }
-      return { success: false, error: err };
+      console.warn('[Firebase Sync] Cloud fetch notice:', err.message || err);
+      notifyStatus(navigator.onLine ? 'error' : 'offline', { message: err.message });
+      return null;
     }
   }
 

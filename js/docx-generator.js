@@ -1077,113 +1077,6 @@ const DocxGenerator = (function() {
     });
   }
 
-  function generateClassTimetableXml(state, stdId) {
-    const std = (state.standards || []).find(s => s.id === stdId) || { id: stdId, name: stdId };
-    const ctDuty = (state.classTeacherDuties || []).find(c => c.standardId === stdId) || {};
-    const ctTeacher = ctDuty.teacher || "Not Designated";
-    const ctRoom = ctDuty.room || "Regular Classroom";
-    const shiftLabel = state.currentShift === 'morning' ? 'Morning Shift (7:30 AM – 12:15 PM)' : 'Afternoon Shift (1:00 PM – 5:50 PM)';
-
-    const subTitle = `OFFICIAL CLASS TIMETABLE — ${std.name.toUpperCase()}\nClass Teacher: ${ctTeacher} | Room: ${ctRoom} | ${shiftLabel}`;
-
-    let xml = generateSchoolHeaderXml(state.schoolProfile, subTitle);
-
-    xml += `
-    <w:tbl>
-      <w:tblPr>
-        <w:tblW w:w="15500" w:type="dxa"/>
-        <w:jc w:val="center"/>
-        <w:tblBorders>
-          <w:top w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
-          <w:left w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
-          <w:bottom w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
-          <w:right w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
-          <w:insideH w:val="single" w:sz="4" w:space="0" w:color="E2E8F0"/>
-          <w:insideV w:val="single" w:sz="4" w:space="0" w:color="E2E8F0"/>
-        </w:tblBorders>
-      </w:tblPr>
-      <w:tblGrid>
-        <w:gridCol w:w="2500"/>
-        <w:gridCol w:w="2600"/>
-        <w:gridCol w:w="2600"/>
-        <w:gridCol w:w="2600"/>
-        <w:gridCol w:w="2600"/>
-        <w:gridCol w:w="2600"/>
-      </w:tblGrid>`;
-
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-
-    // Header Row
-    xml += `
-      <w:tr>
-        <w:trPr><w:tblHeader/></w:trPr>
-        <w:tc>
-          <w:tcPr><w:vAlign w:val="center"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
-          <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="1E3A8A"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="1E3A8A"/></w:rPr><w:t>Period / Time</w:t></w:r></w:p>
-        </w:tc>`;
-    days.forEach(d => {
-      xml += `
-        <w:tc>
-          <w:tcPr><w:vAlign w:val="center"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
-          <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="1E3A8A"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="1E3A8A"/></w:rPr><w:t>${escapeXml(d)}</w:t></w:r></w:p>
-        </w:tc>`;
-    });
-    xml += `</w:tr>`;
-
-    // Periods
-    (state.periods || []).forEach(p => {
-      xml += `
-      <w:tr>
-        <w:tc>
-          <w:tcPr><w:vAlign w:val="center"/><w:shd w:val="clear" w:color="auto" w:fill="F8FAFC"/></w:tcPr>
-          <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="0F172A"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="0F172A"/></w:rPr><w:t>${escapeXml(p.label)}</w:t></w:r></w:p>
-          <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:sz w:val="16"/><w:color w:val="64748B"/></w:rPr></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:color w:val="64748B"/></w:rPr><w:t>${escapeXml(p.time)}</w:t></w:r></w:p>
-        </w:tc>`;
-
-      days.forEach(d => {
-        const dSched = (state.schedules || {})[d] || {};
-        const pSlots = dSched[p.id] || {};
-        const slot = pSlots[stdId] || {};
-
-        xml += `<w:tc><w:tcPr><w:vAlign w:val="center"/></w:tcPr>`;
-        if (slot.subject && slot.teacher) {
-          xml += `
-            <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="0F172A"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="0F172A"/></w:rPr><w:t>${escapeXml(slot.subject)}</w:t></w:r></w:p>
-            <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:sz w:val="16"/><w:color w:val="2563EB"/></w:rPr></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:color w:val="2563EB"/></w:rPr><w:t>${escapeXml(slot.teacher)}</w:t></w:r></w:p>`;
-        } else {
-          xml += `
-            <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:sz w:val="16"/><w:color w:val="CBD5E1"/></w:rPr></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:color w:val="CBD5E1"/></w:rPr><w:t>—</w:t></w:r></w:p>`;
-        }
-        xml += `</w:tc>`;
-      });
-
-      xml += `</w:tr>`;
-    });
-
-    xml += `</w:tbl>`;
-    xml += generateSignOffBlockXml(state.schoolProfile);
-    return xml;
-  }
-
-  async function generateClassTimetableDocxBlob(state, stdId) {
-    if (typeof JSZip === 'undefined') throw new Error('JSZip is required.');
-    const zip = new JSZip();
-
-    for (const [path, content] of Object.entries(DOCX_TEMPLATE_ASSETS)) {
-      zip.file(path, content);
-    }
-
-    const bodyXml = generateClassTimetableXml(state, stdId);
-    zip.file('word/document.xml', wrapDocumentXml(bodyXml));
-
-    return await zip.generateAsync({
-      type: 'blob',
-      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      compression: 'DEFLATE',
-      compressionOptions: { level: 6 }
-    });
-  }
-
   /**
    * Downloads a blob as a file in the browser
    */
@@ -1205,7 +1098,6 @@ const DocxGenerator = (function() {
     buildFullDocumentXml,
     generateDocxBlob,
     generateTeacherTimetablesDocxBlob,
-    generateClassTimetableDocxBlob,
     generateSubstitutionDocxBlob,
     generateWeeklyDutyXml,
     generateWeeklyDutyDocxBlob,

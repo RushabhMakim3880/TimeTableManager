@@ -26,7 +26,7 @@ if (missing === 0) {
 }
 
 // Check view-tab-btn data-view values
-const viewTabRegex = /class="[^"]*view-tab-btn[^"]*"[^>]*data-view="([^"]+)"/g;
+const viewTabRegex = /class="view-tab-btn[^"]*"[^>]*data-view="([^"]+)"/g;
 const viewsInHtml = [];
 while ((match = viewTabRegex.exec(html)) !== null) {
   viewsInHtml.push(match[1]);

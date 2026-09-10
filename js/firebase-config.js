@@ -12,11 +12,10 @@ const FIREBASE_CONFIG = {
   appId: "1:977468489678:web:43fec0b7fc8dbcb06b359f"
 };
 
+// Node.js module export support for tests/linters
 if (typeof window !== 'undefined') {
   window.FIREBASE_CONFIG = FIREBASE_CONFIG;
 }
-
-// Node.js module export support for tests/linters
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = FIREBASE_CONFIG;
 }
