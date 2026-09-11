@@ -84,6 +84,8 @@ morningSubjects.forEach(s => {
   }
 });
 
+defaultData.includeSaturday = false;
+
 // 6. Merge into initialSchedules
 if (!defaultData.initialSchedules) defaultData.initialSchedules = {};
 Object.keys(morningSchedule).forEach(day => {
@@ -131,6 +133,7 @@ backupData.shifts = defaultData.shifts;
 backupData.schedules = defaultData.initialSchedules;
 backupData.classTeachers = defaultData.classTeachers;
 backupData.days = defaultData.days;
+backupData.includeSaturday = false;
 backupData.dutyPresets = defaultData.dutyPresets;
 backupData.initialDuties = defaultData.initialDuties;
 backupData.weeklyDutyPresets = defaultData.weeklyDutyPresets;
