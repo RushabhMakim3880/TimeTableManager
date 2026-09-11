@@ -302,7 +302,20 @@ const DocxGenerator = (function() {
    * Generates the XML for a single day's class timetable + duty schedule
    */
   function generateDayXml(dayName, daySchedule, dayDuties, standards, periods, allTeachers, leaveTeachers, schoolProfile, isLastDay, excludedFreeTeachersMap) {
-    const activeTeachers = allTeachers.filter(t => !(leaveTeachers || []).includes(t));
+    const isMorning = standards.length === 5 || standards.some(s => s.shift === 'morning');
+    const morningNames = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am", "Yamin Ma'am"];
+    const activeTeachers = allTeachers.filter(t => {
+      if ((leaveTeachers || []).includes(t)) return false;
+      if (isMorning) return morningNames.includes(t.trim());
+      return true;
+    });
+
+    const colWidthsDxa = isMorning
+      ? [1600, 2040, 2040, 2040, 2040, 2040, 2600]
+      : COL_WIDTHS_DXA;
+    const colWidthsPct = isMorning
+      ? [533, 680, 680, 680, 680, 680, 867]
+      : COL_WIDTHS_PCT;
 
     let xml = '';
 
@@ -318,7 +331,7 @@ const DocxGenerator = (function() {
         <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>
       </w:tblPr>
       <w:tblGrid>`;
-    COL_WIDTHS_DXA.forEach(w => {
+    colWidthsDxa.forEach(w => {
       xml += `<w:gridCol w:w="${w}"/>`;
     });
     xml += `</w:tblGrid>`;
@@ -329,7 +342,7 @@ const DocxGenerator = (function() {
         <w:trPr><w:tblHeader/></w:trPr>
         <w:tc>
           <w:tcPr>
-            <w:tcW w:w="${COL_WIDTHS_PCT[0]}" w:type="pct"/>
+            <w:tcW w:w="${colWidthsPct[0]}" w:type="pct"/>
             <w:vAlign w:val="center"/>
           </w:tcPr>
           <w:p>
@@ -338,11 +351,15 @@ const DocxGenerator = (function() {
           </w:p>
         </w:tc>`;
 
-    // Standards columns (Col 1 to 6)
+    // Standards columns
     standards.forEach((std, sIdx) => {
-      const pctWidth = COL_WIDTHS_PCT[sIdx + 1] || 641;
-      const base = std.baseName || ('Standard: ' + std.name.replace(/\D/g, ''));
-      const sup = std.sup || (std.name.match(/[a-z]+/i) ? std.name.match(/[a-z]+/i)[0] : '');
+      const pctWidth = colWidthsPct[sIdx + 1] || 680;
+      const base = std.baseName || (std.name.includes('Standard:') ? 'Standard: ' + std.name.replace(/\D/g, '') : std.name);
+      let sup = (std.sup !== undefined && std.sup !== '') ? std.sup : '';
+      if (!sup && (std.name.includes('1st') || std.name.includes('2nd') || std.name.includes('3rd') || std.name.includes('th'))) {
+        const m = std.name.match(/1st|2nd|3rd|\d+th/i);
+        if (m) sup = m[0].replace(/\d+/g, '');
+      }
 
       xml += `
         <w:tc>
@@ -368,11 +385,12 @@ const DocxGenerator = (function() {
         </w:tc>`;
     });
 
-    // Col 7: Free Teachers Header
+    // Free Teachers Header
+    const freeColPct = colWidthsPct[colWidthsPct.length - 1] || 867;
     xml += `
         <w:tc>
           <w:tcPr>
-            <w:tcW w:w="${COL_WIDTHS_PCT[7]}" w:type="pct"/>
+            <w:tcW w:w="${freeColPct}" w:type="pct"/>
             <w:vAlign w:val="center"/>
           </w:tcPr>
           <w:p>
@@ -385,8 +403,32 @@ const DocxGenerator = (function() {
         </w:tc>
       </w:tr>`;
 
-    // Row 1 to N: Period Rows
-    periods.forEach(period => {
+    // Period Rows
+    periods.forEach((period, pIdx) => {
+      // Recess break row placement (morning index 2: 9:50-10:10; afternoon index 3: 3:15-3:45)
+      const isMorningRecess = isMorning && pIdx === 2;
+      const isAfternoonRecess = !isMorning && pIdx === 3;
+      if (isMorningRecess || isAfternoonRecess) {
+        const recessText = isMorning
+          ? 'MORNING RECESS BREAK • 9:50 AM TO 10:10 AM (20 MINUTES)'
+          : 'AFTERNOON RECESS BREAK • 3:15 PM TO 3:45 PM (30 MINUTES)';
+        xml += `
+        <w:tr>
+          <w:tc>
+            <w:tcPr>
+              <w:gridSpan w:val="${standards.length + 2}"/>
+              <w:tcW w:w="5000" w:type="pct"/>
+              <w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/>
+              <w:vAlign w:val="center"/>
+            </w:tcPr>
+            <w:p>
+              <w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="1E3A8A"/><w:lang w:val="en-US"/></w:rPr></w:pPr>
+              <w:r><w:rPr><w:b/><w:sz w:val="18"/><w:color w:val="1E3A8A"/><w:lang w:val="en-US"/></w:rPr><w:t>${escapeXml(recessText)}</w:t></w:r>
+            </w:p>
+          </w:tc>
+        </w:tr>`;
+      }
+
       const pData = (daySchedule && daySchedule[period.id]) || {};
 
       const assignedTeachers = [];
@@ -405,7 +447,7 @@ const DocxGenerator = (function() {
         <!-- Col 0: Lecture Number & Timing -->
         <w:tc>
           <w:tcPr>
-            <w:tcW w:w="${COL_WIDTHS_PCT[0]}" w:type="pct"/>
+            <w:tcW w:w="${colWidthsPct[0]}" w:type="pct"/>
             <w:vAlign w:val="center"/>
           </w:tcPr>
           <w:p>
@@ -418,17 +460,31 @@ const DocxGenerator = (function() {
           </w:p>
         </w:tc>`;
 
-      // Standard Columns
-      standards.forEach((std, sIdx) => {
-        const pctWidth = COL_WIDTHS_PCT[sIdx + 1] || 641;
+      // Standard Columns with support for cell merges (colSpan)
+      let sIdx = 0;
+      while (sIdx < standards.length) {
+        const std = standards[sIdx];
         const slot = pData[std.id] || { subject: '', teacher: '' };
+
+        if (slot.isMergedChild) {
+          sIdx++;
+          continue;
+        }
+
+        const span = slot.colSpan && slot.colSpan > 1 ? slot.colSpan : 1;
+        let combinedPct = 0;
+        for (let k = 0; k < span; k++) {
+          combinedPct += (colWidthsPct[sIdx + 1 + k] || 680);
+        }
+
         const hasSubject = slot.subject && slot.subject.trim();
         const hasTeacher = slot.teacher && slot.teacher.trim();
 
         xml += `
         <w:tc>
           <w:tcPr>
-            <w:tcW w:w="${pctWidth}" w:type="pct"/>
+            ${span > 1 ? `<w:gridSpan w:val="${span}"/>` : ''}
+            <w:tcW w:w="${combinedPct}" w:type="pct"/>
             <w:vAlign w:val="center"/>
           </w:tcPr>
           <w:p>
@@ -442,13 +498,15 @@ const DocxGenerator = (function() {
             <w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:t>(${escapeXml(slot.teacher)})</w:t></w:r>` : ''}
           </w:p>
         </w:tc>`;
-      });
+
+        sIdx += span;
+      }
 
       // Free Teachers Column
       xml += `
         <w:tc>
           <w:tcPr>
-            <w:tcW w:w="${COL_WIDTHS_PCT[7]}" w:type="pct"/>
+            <w:tcW w:w="${freeColPct}" w:type="pct"/>
             <w:vAlign w:val="center"/>
           </w:tcPr>`;
 
@@ -496,7 +554,10 @@ const DocxGenerator = (function() {
    */
   function generateTeacherWeeklyXml(teacherName, state, isLastTeacher) {
     const { periods, standards, schedules } = state;
-    const teacherDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const includeSat = !!(state && state.includeSaturday);
+    const teacherDays = includeSat 
+      ? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     
     let xml = '';
 
@@ -526,7 +587,13 @@ const DocxGenerator = (function() {
       </w:r>
     </w:p>`;
 
-    // Table: Periods as rows, Days (Mon..Fri) as columns
+    // Table: Periods as rows, Days as columns
+    const dayColWidth = includeSat ? '2100' : '2600';
+    let teacherTblGrid = `<w:gridCol w:w="2200"/>`;
+    teacherDays.forEach(() => {
+      teacherTblGrid += `<w:gridCol w:w="${dayColWidth}"/>`;
+    });
+
     xml += `
     <w:tbl>
       <w:tblPr>
@@ -534,12 +601,7 @@ const DocxGenerator = (function() {
         <w:tblW w:w="5000" w:type="pct"/>
       </w:tblPr>
       <w:tblGrid>
-        <w:gridCol w:w="2200"/>
-        <w:gridCol w:w="2600"/>
-        <w:gridCol w:w="2600"/>
-        <w:gridCol w:w="2600"/>
-        <w:gridCol w:w="2600"/>
-        <w:gridCol w:w="2600"/>
+        ${teacherTblGrid}
       </w:tblGrid>`;
 
     // Header Row: Days (Mon to Fri only, Saturday excluded)
@@ -740,12 +802,40 @@ const DocxGenerator = (function() {
       throw new Error('DOCX_TEMPLATE_ASSETS is missing.');
     }
 
+    const activeShift = state.activeShift || 'afternoon';
+    const standardsList = (state.standards && Array.isArray(state.standards)) ? state.standards : ((typeof DEFAULT_DATA !== 'undefined' && DEFAULT_DATA.standards) || []);
+    const exportStandards = activeShift === 'morning'
+      ? standardsList.filter(s => s.shift === 'morning')
+      : (activeShift === 'afternoon' ? standardsList.filter(s => s.shift === 'afternoon') : standardsList);
+
+    const defaultMorningPeriods = (state.shifts && state.shifts.morning && state.shifts.morning.periods && state.shifts.morning.periods.length > 0)
+      ? state.shifts.morning.periods
+      : (typeof DEFAULT_DATA !== 'undefined' && DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.morning ? DEFAULT_DATA.shifts.morning.periods : []);
+
+    const exportPeriods = (activeShift === 'morning' && defaultMorningPeriods.length > 0)
+      ? defaultMorningPeriods
+      : (state.periods || (typeof DEFAULT_DATA !== 'undefined' ? DEFAULT_DATA.periods : []));
+
+    const teachersList = (state.teachers && Array.isArray(state.teachers)) ? state.teachers : ((typeof DEFAULT_DATA !== 'undefined' && DEFAULT_DATA.teachers) || []);
+    const morningTeacherList = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am", "Yamin Ma'am"];
+    const exportTeachers = activeShift === 'morning'
+      ? teachersList.filter(t => {
+          const prof = (state.teacherProfiles && state.teacherProfiles[t]) || {};
+          return prof.assignedShift === 'morning' || prof.assignedShift === 'both' || morningTeacherList.includes(t);
+        })
+      : teachersList;
+
+    const effectiveDaysToExport = (daysToExport || []).filter(d => {
+      if (state && state.includeSaturday) return true;
+      return d.toLowerCase() !== 'saturday';
+    });
+
     const docXml = buildFullDocumentXml(
-      daysToExport,
+      effectiveDaysToExport,
       state.schedules,
-      state.standards,
-      state.periods,
-      state.teachers,
+      exportStandards,
+      exportPeriods,
+      exportTeachers,
       state.leaves || {},
       state.schoolProfile || {},
       state.duties || {},
@@ -1089,20 +1179,28 @@ const DocxGenerator = (function() {
     const shiftsConfig = shifts || (typeof DEFAULT_DATA !== 'undefined' ? DEFAULT_DATA.shifts : null) || {};
     const shiftInfo = shiftsConfig[shiftKey] || {};
     const defaultMorningPeriods = [
-      { id: 'p1', number: 1, label: 'Lecture 1', time: '7:30 to 8:15' },
-      { id: 'p2', number: 2, label: 'Lecture 2', time: '8:15 to 9:00' },
-      { id: 'p3', number: 3, label: 'Lecture 3', time: '9:00 to 9:45' },
-      { id: 'p4', number: 4, label: 'Lecture 4', time: '10:15 to 11:00' },
-      { id: 'p5', number: 5, label: 'Lecture 5', time: '11:00 to 11:45' },
-      { id: 'p6', number: 6, label: 'Lecture 6', time: '11:45 to 12:30' }
+      { id: 'p1', number: 1, label: 'Lecture 1', time: '8:20 to 9:05' },
+      { id: 'p2', number: 2, label: 'Lecture 2', time: '9:05 to 9:50' },
+      { id: 'p3', number: 3, label: 'Lecture 3', time: '10:10 to 10:55' },
+      { id: 'p4', number: 4, label: 'Lecture 4', time: '10:55 to 11:40' },
+      { id: 'p5', number: 5, label: 'Lecture 5', time: '11:40 to 12:20' }
     ];
     const classPeriods = (shiftInfo.periods && shiftInfo.periods.length > 0) 
       ? shiftInfo.periods 
       : (shiftKey === 'morning' ? defaultMorningPeriods : periods);
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const days = (state && state.includeSaturday)
+      ? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const dayColWidth = (days.length === 6) ? '1500' : '1800';
+    const dayPctWidth = (days.length === 6) ? '700' : '840';
 
     const subTitle = `CLASS TIMETABLE: ${std.name.toUpperCase()} • CLASS TEACHER: ${classTeacherName || 'UNASSIGNED'} • ROOM: ${std.room || 'CLASSROOM'}`;
     let xml = generateSchoolHeaderXml(schoolProfile, subTitle);
+
+    let tblGridXml = `<w:gridCol w:w="1200"/>`;
+    days.forEach(() => {
+      tblGridXml += `<w:gridCol w:w="${dayColWidth}"/>`;
+    });
 
     xml += `
     <w:tbl>
@@ -1117,13 +1215,7 @@ const DocxGenerator = (function() {
         </w:tblBorders>
       </w:tblPr>
       <w:tblGrid>
-        <w:gridCol w:w="1200"/>
-        <w:gridCol w:w="1500"/>
-        <w:gridCol w:w="1500"/>
-        <w:gridCol w:w="1500"/>
-        <w:gridCol w:w="1500"/>
-        <w:gridCol w:w="1500"/>
-        <w:gridCol w:w="1500"/>
+        ${tblGridXml}
       </w:tblGrid>
       <w:tr>
         <w:tc>
@@ -1134,19 +1226,23 @@ const DocxGenerator = (function() {
     days.forEach(day => {
       xml += `
         <w:tc>
-          <w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr>
+          <w:tcPr><w:tcW w:w="${dayPctWidth}" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr>
           <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>${escapeXml(day)}</w:t></w:r></w:p>
         </w:tc>`;
     });
     xml += `</w:tr>`;
 
     classPeriods.forEach((period, pIdx) => {
-      if (pIdx === 3) {
-        const recessText = shiftKey === 'morning' ? 'RECESS BREAK • 9:45 AM TO 10:15 AM (30 MINUTES)' : 'RECESS BREAK • 3:15 PM TO 3:45 PM (30 MINUTES)';
+      const isMorningRecess = shiftKey === 'morning' && pIdx === 2;
+      const isAfternoonRecess = shiftKey !== 'morning' && pIdx === 3;
+      if (isMorningRecess || isAfternoonRecess) {
+        const recessText = shiftKey === 'morning'
+          ? 'MORNING RECESS BREAK • 9:50 AM TO 10:10 AM (20 MINUTES)'
+          : 'AFTERNOON RECESS BREAK • 3:15 PM TO 3:45 PM (30 MINUTES)';
         xml += `
         <w:tr>
           <w:tc>
-            <w:tcPr><w:gridSpan w:val="7"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
+            <w:tcPr><w:gridSpan w:val="${days.length + 1}"/><w:shd w:val="clear" w:color="auto" w:fill="F1F5F9"/></w:tcPr>
             <w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="475569"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="475569"/></w:rPr><w:t>${escapeXml(recessText)}</w:t></w:r></w:p>
           </w:tc>
         </w:tr>`;
@@ -1227,6 +1323,19 @@ const DocxGenerator = (function() {
   function generateAttendanceDutiesXml(state) {
     const { attendanceDuties, schoolProfile } = state;
     const subTitle = "FACULTY DAILY ATTENDANCE & ROLL CALL DUTY ROSTER";
+    const duties = attendanceDuties || [];
+    const includeSat = !!(state && state.includeSaturday);
+    const days = includeSat 
+      ? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] 
+      : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const dutyDayColWidth = includeSat ? '1000' : '1200';
+    const dutyDayPctWidth = includeSat ? '700' : '840';
+
+    let dutyTblGrid = `<w:gridCol w:w="1200"/>`;
+    days.forEach(() => {
+      dutyTblGrid += `<w:gridCol w:w="${dutyDayColWidth}"/>`;
+    });
+
     let xml = generateSchoolHeaderXml(schoolProfile, subTitle);
 
     xml += `
@@ -1242,26 +1351,18 @@ const DocxGenerator = (function() {
         </w:tblBorders>
       </w:tblPr>
       <w:tblGrid>
-        <w:gridCol w:w="1200"/>
-        <w:gridCol w:w="1000"/>
-        <w:gridCol w:w="1000"/>
-        <w:gridCol w:w="1000"/>
-        <w:gridCol w:w="1000"/>
-        <w:gridCol w:w="1000"/>
-        <w:gridCol w:w="1000"/>
+        ${dutyTblGrid}
       </w:tblGrid>
       <w:tr>
-        <w:tc><w:tcPr><w:tcW w:w="800" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Duty Shift &amp; Title</w:t></w:r></w:p></w:tc>
-        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Monday</w:t></w:r></w:p></w:tc>
-        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Tuesday</w:t></w:r></w:p></w:tc>
-        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Wednesday</w:t></w:r></w:p></w:tc>
-        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Thursday</w:t></w:r></w:p></w:tc>
-        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Friday</w:t></w:r></w:p></w:tc>
-        <w:tc><w:tcPr><w:tcW w:w="700" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Saturday</w:t></w:r></w:p></w:tc>
+        <w:tc><w:tcPr><w:tcW w:w="800" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>Duty Shift &amp; Title</w:t></w:r></w:p></w:tc>`;
+
+    days.forEach(d => {
+      xml += `
+        <w:tc><w:tcPr><w:tcW w:w="${dutyDayPctWidth}" w:type="pct"/><w:shd w:val="clear" w:color="auto" w:fill="1E3A8A"/></w:tcPr><w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr><w:t>${escapeXml(d)}</w:t></w:r></w:p></w:tc>`;
+    });
+    xml += `
       </w:tr>`;
 
-    const duties = attendanceDuties || [];
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     duties.forEach(duty => {
       xml += `
       <w:tr>

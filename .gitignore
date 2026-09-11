@@ -3,5 +3,6 @@ node_modules/
 *.log
 ~$*.docx
 Test_*.docx
+test_output_*.docx
 docx_template/
 __pycache__/

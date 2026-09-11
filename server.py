@@ -28,23 +28,80 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 import json
                 state = json.loads(body)
                 default_data_path = os.path.join(DIRECTORY, 'js', 'default-data.js')
+                current_data = {}
+                if os.path.exists(default_data_path):
+                    try:
+                        with open(default_data_path, 'r', encoding='utf-8') as f:
+                            c_text = f.read()
+                        j_str = c_text.split('const DEFAULT_DATA = ')[1].rsplit(';', 1)[0].strip()
+                        current_data = json.loads(j_str)
+                    except Exception:
+                        pass
                 
+                # Deep merge schedules
+                merged_schedules = current_data.get("initialSchedules", {})
+                if state.get("schedules"):
+                    for day, p_dict in state["schedules"].items():
+                        if day not in merged_schedules:
+                            merged_schedules[day] = {}
+                        for p_id, std_dict in p_dict.items():
+                            if p_id not in merged_schedules[day]:
+                                merged_schedules[day][p_id] = {}
+                            merged_schedules[day][p_id].update(std_dict)
+
+                # Deep merge shifts
+                merged_shifts = current_data.get("shifts", {})
+                if state.get("shifts"):
+                    if "morning" in state["shifts"]:
+                        if "morning" not in merged_shifts:
+                            merged_shifts["morning"] = {}
+                        merged_shifts["morning"].update(state["shifts"]["morning"])
+                        if not merged_shifts["morning"].get("periods"):
+                            merged_shifts["morning"]["periods"] = current_data.get("shifts", {}).get("morning", {}).get("periods", [])
+                        if not merged_shifts["morning"].get("schedules"):
+                            merged_shifts["morning"]["schedules"] = current_data.get("shifts", {}).get("morning", {}).get("schedules", {})
+                    if "afternoon" in state["shifts"]:
+                        if "afternoon" not in merged_shifts:
+                            merged_shifts["afternoon"] = {}
+                        merged_shifts["afternoon"].update(state["shifts"]["afternoon"])
+
+                # Deep merge standards
+                merged_standards = current_data.get("standards", [])
+                if state.get("standards"):
+                    std_map = {s["id"]: s for s in merged_standards}
+                    for s in state["standards"]:
+                        std_map[s["id"]] = s
+                # Deep merge teachers
+                merged_teachers = list(state.get("teachers") or current_data.get("teachers", []))
+                for t in ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am", "Yamin Ma'am"]:
+                    if t not in merged_teachers:
+                        merged_teachers.append(t)
+
+                merged_profiles = dict(current_data.get("teacherProfiles", {}))
+                if state.get("teacherProfiles"):
+                    merged_profiles.update(state["teacherProfiles"])
+
                 # Format DEFAULT_DATA object
                 updated_data = {
-                    "schoolProfile": state.get("schoolProfile", {}),
-                    "standards": state.get("standards", []),
-                    "periods": state.get("periods", []),
-                    "teachers": state.get("teachers", []),
-                    "teacherProfiles": state.get("teacherProfiles", {}),
-                    "subjects": state.get("subjects", []),
-                    "days": state.get("days", []),
-                    "initialSchedules": state.get("schedules", {}),
-                    "weeklyDutyPresets": state.get("dutyPresets", []),
-                    "initialWeeklyDuties": state.get("weeklyDuties", {}),
-                    "generalDutyPresets": [],
-                    "initialGeneralDuties": state.get("generalDuties", []),
-                    "dutyPresets": state.get("dutyPresets", []),
-                    "initialDuties": state.get("duties", {})
+                    "schoolProfile": state.get("schoolProfile") or current_data.get("schoolProfile", {}),
+                    "standards": merged_standards,
+                    "periods": state.get("periods") or current_data.get("periods", []),
+                    "shifts": merged_shifts,
+                    "classTeachers": state.get("classTeachers") or current_data.get("classTeachers", {}),
+                    "attendanceDuties": state.get("attendanceDuties") or current_data.get("attendanceDuties", []),
+                    "teachers": merged_teachers,
+                    "teacherProfiles": merged_profiles,
+                    "subjects": state.get("subjects") or current_data.get("subjects", []),
+                    "days": state.get("days") or current_data.get("days", []),
+                    "includeSaturday": state.get("includeSaturday", current_data.get("includeSaturday", False)),
+                    "initialSchedules": merged_schedules,
+                    "weeklyDutyPresets": current_data.get("weeklyDutyPresets", []),
+                    "initialWeeklyDuties": state.get("weeklyDuties") or current_data.get("initialWeeklyDuties", {}),
+                    "generalDutyPresets": current_data.get("generalDutyPresets", []),
+                    "initialGeneralDuties": state.get("generalDuties") or current_data.get("initialGeneralDuties", []),
+                    "dutyPresets": state.get("dutyPresets") or current_data.get("dutyPresets", []),
+                    "initialDuties": state.get("duties") or current_data.get("initialDuties", {}),
+                    "excludedFreeTeachers": state.get("excludedFreeTeachers") or current_data.get("excludedFreeTeachers", {})
                 }
                 
                 content = "// Default presets for School Timetable Management System\n"

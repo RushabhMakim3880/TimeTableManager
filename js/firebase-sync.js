@@ -169,6 +169,7 @@
             weeklyDuties: state.weeklyDuties || {},
             generalDuties: state.generalDuties || [],
             excludedFreeTeachers: state.excludedFreeTeachers || {},
+            includeSaturday: !!state.includeSaturday,
             updatedAt: new Date().toISOString(),
             clientVersion: 'v4.1'
           };

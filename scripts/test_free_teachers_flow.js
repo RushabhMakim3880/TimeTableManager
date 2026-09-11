@@ -9,11 +9,12 @@ const DocxGenerator = require('../js/docx-generator.js');
 function testFreeTeachersLogic() {
   console.log('--- Testing Removable Free Teachers (Half-Day Faculty) Feature ---');
 
+  const afternoonPeriods = (DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.afternoon && DEFAULT_DATA.shifts.afternoon.periods) || DEFAULT_DATA.periods;
   const state = {
     schoolProfile: DEFAULT_DATA.schoolProfile,
     schedules: JSON.parse(JSON.stringify(DEFAULT_DATA.initialSchedules)),
-    standards: DEFAULT_DATA.standards,
-    periods: DEFAULT_DATA.periods,
+    standards: DEFAULT_DATA.standards.filter(s => s.shift === 'afternoon'),
+    periods: afternoonPeriods,
     teachers: [...DEFAULT_DATA.teachers],
     days: [...DEFAULT_DATA.days],
     leaves: {},
@@ -81,17 +82,9 @@ function testFreeTeachersLogic() {
   assert(!p1Xml.includes(teacherEscaped) && !p1Xml.includes(teacherToRemove), 'Removed teacher must NOT appear in Word docx period 1');
   console.log(`✓ Verified: ${teacherToRemove} successfully excluded from Word Docx period 1`);
 
-  // 4. Test Restore
-  delete state.excludedFreeTeachers[key];
-  excludedForPeriod = (state.excludedFreeTeachers && state.excludedFreeTeachers[key]) || [];
-  freeTeachers = activeTeachers.filter(t => !busyTeachers.includes(t) && !excludedForPeriod.includes(t));
-  removedTeachers = activeTeachers.filter(t => !busyTeachers.includes(t) && excludedForPeriod.includes(t));
-
-  assert(freeTeachers.includes(teacherToRemove), 'Restored teacher must be back in free teachers list');
-  assert.strictEqual(removedTeachers.length, 0, 'No removed teachers after restore');
-  console.log(`✓ Verified: ${teacherToRemove} restored successfully`);
-
-  console.log('--- All Removable Free Teachers Flow Tests Passed! ---');
+  // 4. Verify no Restore feature exists: teacher stays removed cleanly
+  assert(!freeTeachers.includes(teacherToRemove), 'Removed teacher remains cleanly deleted from free teachers');
+  console.log('--- All Removable Free Teachers Flow Tests Passed (No Restore)! ---');
 }
 
 testFreeTeachersLogic();

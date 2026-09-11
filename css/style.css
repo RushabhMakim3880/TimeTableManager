@@ -420,6 +420,29 @@ body {
   border-color: var(--status-danger);
 }
 
+#btn-toggle-saturday {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#btn-toggle-saturday:hover {
+  background: var(--bg-subtle);
+  border-color: var(--primary-color);
+  color: var(--primary-navy);
+}
+
+#btn-toggle-saturday.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
 .btn-sm {
   padding: 5px 10px;
   font-size: 12px;
@@ -782,6 +805,41 @@ body {
   font-weight: 700;
 }
 
+.grid-period-cell.combined-class {
+  background: #f0f7ff !important;
+  border: 1.5px solid #60a5fa !important;
+}
+
+.grid-period-cell.combined-class .teacher-sublabel {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.grid-period-cell.is-merged {
+  background: #f8fafc;
+  border-left: 2px solid #3b82f6 !important;
+  border-right: 2px solid #3b82f6 !important;
+  position: relative;
+}
+
+.grid-period-cell.is-merged:hover {
+  background: #eff6ff;
+}
+
+.merged-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #1d4ed8;
+  background: #dbeafe;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  margin-top: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid #bfdbfe;
+}
+
 .free-staff-cell {
   background: #ffffff;
   padding: 6px 8px;
@@ -848,24 +906,6 @@ body {
 .btn-remove-free-teacher:hover {
   background: #fee2e2;
   color: #dc2626;
-}
-
-.btn-restore-free-teacher {
-  font-size: 11px;
-  font-weight: 600;
-  color: #2563eb;
-  background: #eff6ff;
-  border: 1px dashed #bfdbfe;
-  border-radius: 4px;
-  padding: 2px 6px;
-  cursor: pointer;
-  margin-top: 3px;
-  transition: all 0.12s ease;
-}
-
-.btn-restore-free-teacher:hover {
-  background: #dbeafe;
-  color: #1d4ed8;
 }
 
 .free-staff-none {
@@ -2466,8 +2506,7 @@ body {
     page-break-inside: avoid;
   }
 
-  .btn-remove-free-teacher,
-  .btn-restore-free-teacher {
+  .btn-remove-free-teacher {
     display: none !important;
   }
 

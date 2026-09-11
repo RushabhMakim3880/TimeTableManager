@@ -1,0 +1,706 @@
+{
+  "Monday": {
+    "p1": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Extra Activity",
+        "teacher": "Rakshita Ma'am",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_lkg",
+          "std_hkg"
+        ]
+      },
+      "std_hkg": {
+        "subject": "Extra Activity",
+        "teacher": "Rakshita Ma'am",
+        "isMergedChild": true,
+        "parentStdId": "std_lkg",
+        "parentPeriodId": "p1"
+      },
+      "std_1": {
+        "subject": "Extra Activity",
+        "teacher": "Neelam Ma'am",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_1",
+          "std_2"
+        ]
+      },
+      "std_2": {
+        "subject": "Extra Activity",
+        "teacher": "Neelam Ma'am",
+        "isMergedChild": true,
+        "parentStdId": "std_1",
+        "parentPeriodId": "p1"
+      }
+    },
+    "p2": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_hkg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_1": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_2": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      }
+    },
+    "p3": {
+      "std_fg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_lkg": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_hkg": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_1": {
+        "subject": "Games",
+        "teacher": "",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_1",
+          "std_2"
+        ]
+      },
+      "std_2": {
+        "subject": "Games",
+        "teacher": "",
+        "isMergedChild": true,
+        "parentStdId": "std_1",
+        "parentPeriodId": "p3"
+      }
+    },
+    "p4": {
+      "std_fg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_lkg": {
+        "subject": "Games",
+        "teacher": "",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_lkg",
+          "std_hkg"
+        ]
+      },
+      "std_hkg": {
+        "subject": "Games",
+        "teacher": "",
+        "isMergedChild": true,
+        "parentStdId": "std_lkg",
+        "parentPeriodId": "p4"
+      },
+      "std_1": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_2": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      }
+    },
+    "p5": {
+      "std_fg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_lkg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_hkg": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_1": {
+        "subject": "A",
+        "teacher": ""
+      },
+      "std_2": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      }
+    }
+  },
+  "Tuesday": {
+    "p1": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Extra Activity",
+        "teacher": "Rakshita Ma'am",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_lkg",
+          "std_hkg"
+        ]
+      },
+      "std_hkg": {
+        "subject": "Extra Activity",
+        "teacher": "Rakshita Ma'am",
+        "isMergedChild": true,
+        "parentStdId": "std_lkg",
+        "parentPeriodId": "p1"
+      },
+      "std_1": {
+        "subject": "Extra Activity",
+        "teacher": "Neelam Ma'am",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_1",
+          "std_2"
+        ]
+      },
+      "std_2": {
+        "subject": "Extra Activity",
+        "teacher": "Neelam Ma'am",
+        "isMergedChild": true,
+        "parentStdId": "std_1",
+        "parentPeriodId": "p1"
+      }
+    },
+    "p2": {
+      "std_fg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_lkg": {
+        "subject": "Games",
+        "teacher": "",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_lkg",
+          "std_hkg"
+        ]
+      },
+      "std_hkg": {
+        "subject": "Games",
+        "teacher": "",
+        "isMergedChild": true,
+        "parentStdId": "std_lkg",
+        "parentPeriodId": "p2"
+      },
+      "std_1": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_2": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      }
+    },
+    "p3": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_hkg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_1": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_2": {
+        "subject": "A",
+        "teacher": ""
+      }
+    },
+    "p4": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_hkg": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_1": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_2": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      }
+    },
+    "p5": {
+      "std_fg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_lkg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_hkg": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_1": {
+        "subject": "Games",
+        "teacher": "",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_1",
+          "std_2"
+        ]
+      },
+      "std_2": {
+        "subject": "Games",
+        "teacher": "",
+        "isMergedChild": true,
+        "parentStdId": "std_1",
+        "parentPeriodId": "p5"
+      }
+    }
+  },
+  "Wednesday": {
+    "p1": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Extra Activity",
+        "teacher": "Rakshita Ma'am",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_lkg",
+          "std_hkg"
+        ]
+      },
+      "std_hkg": {
+        "subject": "Extra Activity",
+        "teacher": "Rakshita Ma'am",
+        "isMergedChild": true,
+        "parentStdId": "std_lkg",
+        "parentPeriodId": "p1"
+      },
+      "std_1": {
+        "subject": "Extra Activity",
+        "teacher": "Neelam Ma'am",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_1",
+          "std_2"
+        ]
+      },
+      "std_2": {
+        "subject": "Extra Activity",
+        "teacher": "Neelam Ma'am",
+        "isMergedChild": true,
+        "parentStdId": "std_1",
+        "parentPeriodId": "p1"
+      }
+    },
+    "p2": {
+      "std_fg": {
+        "subject": "Games",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_hkg": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_1": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_2": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      }
+    },
+    "p3": {
+      "std_fg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_lkg": {
+        "subject": "Games",
+        "teacher": "",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_lkg",
+          "std_hkg"
+        ]
+      },
+      "std_hkg": {
+        "subject": "Games",
+        "teacher": "",
+        "isMergedChild": true,
+        "parentStdId": "std_lkg",
+        "parentPeriodId": "p3"
+      },
+      "std_1": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_2": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      }
+    },
+    "p4": {
+      "std_fg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_lkg": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_hkg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_1": {
+        "subject": "Games",
+        "teacher": "",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_1",
+          "std_2"
+        ]
+      },
+      "std_2": {
+        "subject": "Games",
+        "teacher": "",
+        "isMergedChild": true,
+        "parentStdId": "std_1",
+        "parentPeriodId": "p4"
+      }
+    },
+    "p5": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_hkg": {
+        "subject": "A",
+        "teacher": ""
+      },
+      "std_1": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_2": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      }
+    }
+  },
+  "Thursday": {
+    "p1": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Extra Activity",
+        "teacher": "Rakshita Ma'am",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_lkg",
+          "std_hkg"
+        ]
+      },
+      "std_hkg": {
+        "subject": "Extra Activity",
+        "teacher": "Rakshita Ma'am",
+        "isMergedChild": true,
+        "parentStdId": "std_lkg",
+        "parentPeriodId": "p1"
+      },
+      "std_1": {
+        "subject": "Extra Activity",
+        "teacher": "Neelam Ma'am",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_1",
+          "std_2"
+        ]
+      },
+      "std_2": {
+        "subject": "Extra Activity",
+        "teacher": "Neelam Ma'am",
+        "isMergedChild": true,
+        "parentStdId": "std_1",
+        "parentPeriodId": "p1"
+      }
+    },
+    "p2": {
+      "std_fg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_lkg": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_hkg": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_1": {
+        "subject": "R",
+        "teacher": ""
+      },
+      "std_2": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      }
+    },
+    "p3": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_hkg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_1": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_2": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      }
+    },
+    "p4": {
+      "std_fg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_lkg": {
+        "subject": "A",
+        "teacher": ""
+      },
+      "std_hkg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_1": {
+        "subject": "Games",
+        "teacher": "",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_1",
+          "std_2"
+        ]
+      },
+      "std_2": {
+        "subject": "Games",
+        "teacher": "",
+        "isMergedChild": true,
+        "parentStdId": "std_1",
+        "parentPeriodId": "p4"
+      }
+    },
+    "p5": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_hkg": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_1": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_2": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      }
+    }
+  },
+  "Friday": {
+    "p1": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Extra Activity",
+        "teacher": "Rakshita Ma'am",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_lkg",
+          "std_hkg"
+        ]
+      },
+      "std_hkg": {
+        "subject": "Extra Activity",
+        "teacher": "Rakshita Ma'am",
+        "isMergedChild": true,
+        "parentStdId": "std_lkg",
+        "parentPeriodId": "p1"
+      },
+      "std_1": {
+        "subject": "Extra Activity",
+        "teacher": "Neelam Ma'am",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_1",
+          "std_2"
+        ]
+      },
+      "std_2": {
+        "subject": "Extra Activity",
+        "teacher": "Neelam Ma'am",
+        "isMergedChild": true,
+        "parentStdId": "std_1",
+        "parentPeriodId": "p1"
+      }
+    },
+    "p2": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_hkg": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_1": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_2": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      }
+    },
+    "p3": {
+      "std_fg": {
+        "subject": "A",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Games",
+        "teacher": "",
+        "colSpan": 2,
+        "mergedStds": [
+          "std_lkg",
+          "std_hkg"
+        ]
+      },
+      "std_hkg": {
+        "subject": "Games",
+        "teacher": "",
+        "isMergedChild": true,
+        "parentStdId": "std_lkg",
+        "parentPeriodId": "p3"
+      },
+      "std_1": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_2": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      }
+    },
+    "p4": {
+      "std_fg": {
+        "subject": "Games",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "English",
+        "teacher": "Neelam Ma'am"
+      },
+      "std_hkg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_1": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      },
+      "std_2": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      }
+    },
+    "p5": {
+      "std_fg": {
+        "subject": "Articulation",
+        "teacher": ""
+      },
+      "std_lkg": {
+        "subject": "Drawing",
+        "teacher": "Yamin Ma'am"
+      },
+      "std_hkg": {
+        "subject": "R",
+        "teacher": ""
+      },
+      "std_1": {
+        "subject": "Maths",
+        "teacher": "Rakshita Ma'am"
+      },
+      "std_2": {
+        "subject": "Gymnastics",
+        "teacher": "Geetanjali Ma'am"
+      }
+    }
+  }
+}

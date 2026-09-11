@@ -26,6 +26,7 @@
     teacherProfiles: {},
     subjects: [],
     days: [],
+    includeSaturday: false,
     schedules: {},
     leaves: {}, // { "Monday": ["Teacher Name"] }
     substitutions: {}, // { "Monday": [ { periodId, stdId, absentTeacher, proxyTeacher } ] }
@@ -128,6 +129,9 @@
     displayDayStats: document.getElementById('display-day-stats'),
     timetableThead: document.getElementById('timetable-thead'),
     timetableTbody: document.getElementById('timetable-tbody'),
+    btnToggleSaturday: document.getElementById('btn-toggle-saturday'),
+    btnToggleSaturdayIcon: document.getElementById('btn-toggle-saturday-icon'),
+    btnToggleSaturdayText: document.getElementById('btn-toggle-saturday-text'),
     btnOpenCopyModal: document.getElementById('btn-open-copy-modal'),
     btnClearCurrentDay: document.getElementById('btn-clear-current-day'),
     btnClearFullTimetable: document.getElementById('btn-clear-full-timetable'),
@@ -236,6 +240,12 @@
     modalCustomTeacher: document.getElementById('modal-custom-teacher'),
     btnModalClearCell: document.getElementById('btn-modal-clear-cell'),
     btnModalSaveCell: document.getElementById('btn-modal-save-cell'),
+    modalMergeSection: document.getElementById('modal-merge-section'),
+    modalMergeStatusBadge: document.getElementById('modal-merge-status-badge'),
+    btnModalMergeNextClass: document.getElementById('btn-modal-merge-next-class'),
+    btnModalMergeNextLecture: document.getElementById('btn-modal-merge-next-lecture'),
+    btnModalSplitCell: document.getElementById('btn-modal-split-cell'),
+    modalMergeHint: document.getElementById('modal-merge-hint'),
 
     // School Profile Modal
     schoolProfileModal: document.getElementById('school-profile-modal'),
@@ -282,6 +292,8 @@
     btnAddSubject: document.getElementById('btn-add-subject'),
     settingsTeacherSubjectMapping: document.getElementById('settings-teacher-subject-mapping'),
     settingsClassTeacherMapping: document.getElementById('settings-class-teacher-mapping'),
+    settingIncludeSaturday: document.getElementById('setting-include-saturday'),
+    attendanceDutyThSaturday: document.getElementById('attendance-duty-th-saturday'),
 
     // Cloud Database Modal (Firebase Firestore)
     btnOpenCloudDb: document.getElementById('btn-open-cloud-db'),
@@ -390,40 +402,20 @@
       }
     }
 
-    // Populate initial schedules for morning standards if missing
-    if (DEFAULT_DATA.initialSchedules) {
-      if (!state.schedules) state.schedules = {};
-      Object.keys(DEFAULT_DATA.initialSchedules).forEach(day => {
-        if (!state.schedules[day]) state.schedules[day] = {};
-        const daySlots = DEFAULT_DATA.initialSchedules[day] || {};
-        Object.keys(daySlots).forEach(pId => {
-          if (!state.schedules[day][pId]) state.schedules[day][pId] = {};
-          const pSlot = daySlots[pId] || {};
-          Object.keys(pSlot).forEach(stdId => {
-            if (!state.schedules[day][pId][stdId]) {
-              state.schedules[day][pId][stdId] = Object.assign({}, pSlot[stdId]);
-            }
-          });
-        });
-      });
-    }
-
     // Shifts Configuration
     if (!state.shifts || Object.keys(state.shifts).length === 0) {
       state.shifts = JSON.parse(JSON.stringify(DEFAULT_DATA.shifts || {}));
     } else {
       if (!state.shifts.morning) state.shifts.morning = {};
-      if (!state.shifts.morning.periods || state.shifts.morning.periods.length === 0) {
-        state.shifts.morning.periods = (DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.morning && DEFAULT_DATA.shifts.morning.periods && DEFAULT_DATA.shifts.morning.periods.length > 0)
-          ? JSON.parse(JSON.stringify(DEFAULT_DATA.shifts.morning.periods))
-          : [
-              { id: 'p1', number: 1, label: 'Lecture 1', time: '7:30 to 8:15' },
-              { id: 'p2', number: 2, label: 'Lecture 2', time: '8:15 to 9:00' },
-              { id: 'p3', number: 3, label: 'Lecture 3', time: '9:00 to 9:45' },
-              { id: 'p4', number: 4, label: 'Lecture 4', time: '10:15 to 11:00' },
-              { id: 'p5', number: 5, label: 'Lecture 5', time: '11:00 to 11:45' },
-              { id: 'p6', number: 6, label: 'Lecture 6', time: '11:45 to 12:30' }
-            ];
+      state.shifts.morning.periods = [
+        { id: 'p1', number: 1, label: 'Lecture 1', time: '8:20 to 9:05' },
+        { id: 'p2', number: 2, label: 'Lecture 2', time: '9:05 to 9:50' },
+        { id: 'p3', number: 3, label: 'Lecture 3', time: '10:10 to 10:55' },
+        { id: 'p4', number: 4, label: 'Lecture 4', time: '10:55 to 11:40' },
+        { id: 'p5', number: 5, label: 'Lecture 5', time: '11:40 to 12:20' }
+      ];
+      if (DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.morning && DEFAULT_DATA.shifts.morning.schedules) {
+        state.shifts.morning.schedules = JSON.parse(JSON.stringify(DEFAULT_DATA.shifts.morning.schedules));
       }
       if (!state.shifts.afternoon) state.shifts.afternoon = {};
       if (!state.shifts.afternoon.periods || state.shifts.afternoon.periods.length === 0) {
@@ -432,6 +424,79 @@
           : (DEFAULT_DATA.periods ? JSON.parse(JSON.stringify(DEFAULT_DATA.periods)) : []);
       }
     }
+
+    // Guarantee teachers from DEFAULT_DATA (including morning faculty) are present
+    if (DEFAULT_DATA.teachers && Array.isArray(DEFAULT_DATA.teachers)) {
+      if (!state.teachers || state.teachers.length === 0) {
+        state.teachers = JSON.parse(JSON.stringify(DEFAULT_DATA.teachers));
+      } else {
+        DEFAULT_DATA.teachers.forEach(t => {
+          if (!state.teachers.includes(t)) state.teachers.push(t);
+        });
+      }
+    }
+
+    // Guarantee teacher profiles from DEFAULT_DATA are present
+    if (DEFAULT_DATA.teacherProfiles) {
+      if (!state.teacherProfiles) state.teacherProfiles = {};
+      Object.keys(DEFAULT_DATA.teacherProfiles).forEach(t => {
+        if (!state.teacherProfiles[t]) {
+          state.teacherProfiles[t] = Object.assign({}, DEFAULT_DATA.teacherProfiles[t]);
+        } else if (!state.teacherProfiles[t].assignedShift) {
+          state.teacherProfiles[t].assignedShift = DEFAULT_DATA.teacherProfiles[t].assignedShift;
+        }
+      });
+    }
+
+    // Guarantee subjects from DEFAULT_DATA are present
+    if (DEFAULT_DATA.subjects && Array.isArray(DEFAULT_DATA.subjects)) {
+      if (!state.subjects || state.subjects.length === 0) {
+        state.subjects = JSON.parse(JSON.stringify(DEFAULT_DATA.subjects));
+      } else {
+        DEFAULT_DATA.subjects.forEach(s => {
+          if (!state.subjects.includes(s)) state.subjects.push(s);
+        });
+      }
+    }
+
+    // Populate initial schedules for morning & afternoon standards
+    if (!state.schedules) state.schedules = {};
+    if (DEFAULT_DATA.initialSchedules) {
+      Object.keys(DEFAULT_DATA.initialSchedules).forEach(day => {
+        if (!state.schedules[day]) state.schedules[day] = {};
+        const daySlots = DEFAULT_DATA.initialSchedules[day] || {};
+        Object.keys(daySlots).forEach(pId => {
+          if (!state.schedules[day][pId]) state.schedules[day][pId] = {};
+          const pSlot = daySlots[pId] || {};
+          Object.keys(pSlot).forEach(stdId => {
+            const current = state.schedules[day][pId][stdId];
+            if (!current || (!current.subject && !current.teacher)) {
+              state.schedules[day][pId][stdId] = JSON.parse(JSON.stringify(pSlot[stdId]));
+            }
+          });
+        });
+      });
+    }
+
+    // Explicit guarantee: Force seed all 5 morning standards (FG, LKG, HKG, 1st, 2nd) for Monday through Friday from morning schedule source
+    const morningStdIds = ['std_fg', 'std_lkg', 'std_hkg', 'std_1', 'std_2'];
+    const morningSchedSource = (DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.morning && DEFAULT_DATA.shifts.morning.schedules) || DEFAULT_DATA.initialSchedules || {};
+    ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
+      if (!state.schedules[day]) state.schedules[day] = {};
+      const srcDay = morningSchedSource[day] || {};
+      ['p1', 'p2', 'p3', 'p4', 'p5'].forEach(pId => {
+        if (!state.schedules[day][pId]) state.schedules[day][pId] = {};
+        const srcSlots = srcDay[pId] || {};
+        morningStdIds.forEach(stdId => {
+          const current = state.schedules[day][pId][stdId];
+          if (!current || !current.subject || (srcSlots[stdId] && current.subject === '' && srcSlots[stdId].subject !== '')) {
+            if (srcSlots[stdId]) {
+              state.schedules[day][pId][stdId] = JSON.parse(JSON.stringify(srcSlots[stdId]));
+            }
+          }
+        });
+      });
+    });
 
     // Class Teachers Mapping
     if (!state.classTeachers || Object.keys(state.classTeachers).length === 0) {
@@ -506,6 +571,12 @@
 
     if (!state.selectedTeacher && state.teachers.length > 0) {
       state.selectedTeacher = state.teachers[0];
+    }
+    if (typeof state.includeSaturday === 'undefined') {
+      state.includeSaturday = (typeof DEFAULT_DATA !== 'undefined' && DEFAULT_DATA.includeSaturday) || false;
+    }
+    if (!state.includeSaturday && state.currentDay === 'Saturday') {
+      state.currentDay = 'Monday';
     }
     normalizeStateStandards(state);
   }
@@ -644,6 +715,7 @@
     state.teacherProfiles = JSON.parse(JSON.stringify(DEFAULT_DATA.teacherProfiles || {}));
     state.subjects = JSON.parse(JSON.stringify(DEFAULT_DATA.subjects));
     state.days = JSON.parse(JSON.stringify(DEFAULT_DATA.days));
+    state.includeSaturday = (typeof DEFAULT_DATA !== 'undefined' && DEFAULT_DATA.includeSaturday) || false;
     state.schedules = JSON.parse(JSON.stringify(DEFAULT_DATA.initialSchedules));
     state.leaves = {};
     state.substitutions = {};
@@ -1009,6 +1081,7 @@
   }
 
   function renderAll() {
+    updateSaturdayToggleUi();
     renderClassView();
     renderTeacherView();
     renderWeeklyDutyView();
@@ -1018,13 +1091,56 @@
     updateExportBar();
   }
 
+  function getActiveDays() {
+    const allDays = (state.days && state.days.length > 0) ? state.days : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    if (state.includeSaturday) return allDays;
+    return allDays.filter(d => d.toLowerCase() !== 'saturday');
+  }
+
+  function updateSaturdayToggleUi() {
+    const isSat = !!state.includeSaturday;
+    if (DOM.btnToggleSaturday) {
+      DOM.btnToggleSaturday.classList.toggle('active', isSat);
+      if (DOM.btnToggleSaturdayText) {
+        DOM.btnToggleSaturdayText.textContent = isSat ? 'Saturday: On' : 'Saturday: Off';
+      }
+      DOM.btnToggleSaturday.title = isSat 
+        ? 'Saturday is active across timetables & Word documents. Click to deactivate/hide.' 
+        : 'Saturday is hidden across timetables & Word documents. Click to activate/show.';
+    }
+    if (DOM.settingIncludeSaturday) {
+      DOM.settingIncludeSaturday.checked = isSat;
+    }
+  }
+
+  function toggleSaturdayVisibility(newValue) {
+    state.includeSaturday = (typeof newValue === 'boolean') ? newValue : !state.includeSaturday;
+    if (!state.includeSaturday && state.currentDay === 'Saturday') {
+      state.currentDay = 'Monday';
+    }
+    updateSaturdayToggleUi();
+    saveState();
+    renderAll();
+    showToast(state.includeSaturday ? 'Saturday enabled across timetables and exports' : 'Saturday hidden from all timetables and exports', 'info');
+  }
+
   // --- Shift & Format Helpers ---
   function getShiftPeriods(shiftKey) {
-    if (shiftKey === 'morning' && DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.morning) {
-      return DEFAULT_DATA.shifts.morning.periods;
+    if (shiftKey === 'morning') {
+      if (state.shifts && state.shifts.morning && Array.isArray(state.shifts.morning.periods) && state.shifts.morning.periods.length > 0) {
+        return state.shifts.morning.periods;
+      }
+      if (typeof DEFAULT_DATA !== 'undefined' && DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.morning && DEFAULT_DATA.shifts.morning.periods) {
+        return DEFAULT_DATA.shifts.morning.periods;
+      }
     }
-    if (shiftKey === 'afternoon' && DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.afternoon) {
-      return DEFAULT_DATA.shifts.afternoon.periods;
+    if (shiftKey === 'afternoon') {
+      if (state.shifts && state.shifts.afternoon && Array.isArray(state.shifts.afternoon.periods) && state.shifts.afternoon.periods.length > 0) {
+        return state.shifts.afternoon.periods;
+      }
+      if (typeof DEFAULT_DATA !== 'undefined' && DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.afternoon && DEFAULT_DATA.shifts.afternoon.periods) {
+        return DEFAULT_DATA.shifts.afternoon.periods;
+      }
     }
     return state.periods;
   }
@@ -1077,8 +1193,12 @@
     visibleStds = sortStandardsIncrementally(visibleStds.slice());
 
     const shiftPeriods = getShiftPeriods(state.activeShift);
+    const activeDays = getActiveDays();
+    if (!activeDays.includes(state.currentDay)) {
+      state.currentDay = activeDays[0] || 'Monday';
+    }
 
-    state.days.forEach(day => {
+    activeDays.forEach(day => {
       const tab = document.createElement('button');
       tab.className = `day-tab-btn ${day === state.currentDay ? 'active' : ''}`;
       
@@ -1110,7 +1230,20 @@
     DOM.attendanceChipsContainer.innerHTML = '';
     const dayLeaves = state.leaves[state.currentDay] || [];
 
-    state.teachers.forEach(teacher => {
+    let shiftTeachers = state.teachers;
+    if (state.activeShift === 'morning') {
+      shiftTeachers = state.teachers.filter(t => {
+        const prof = (state.teacherProfiles && state.teacherProfiles[t]) || {};
+        return prof.assignedShift === 'morning' || prof.assignedShift === 'both';
+      });
+    } else if (state.activeShift === 'afternoon') {
+      shiftTeachers = state.teachers.filter(t => {
+        const prof = (state.teacherProfiles && state.teacherProfiles[t]) || {};
+        return prof.assignedShift === 'afternoon' || prof.assignedShift === 'both' || !prof.assignedShift;
+      });
+    }
+
+    shiftTeachers.forEach(teacher => {
       const isOnLeave = dayLeaves.includes(teacher);
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -1174,15 +1307,14 @@
     let tbodyHtml = '';
 
     displayPeriods.forEach((period, pIdx) => {
-      if (pIdx === 3) {
-        let recessText = 'RECESS BREAK • 3:15 PM TO 3:45 PM (30 MINUTES)';
-        if (state.activeShift === 'morning') {
-          recessText = 'MORNING RECESS BREAK • 9:45 AM TO 10:15 AM (30 MINUTES)';
-        } else if (state.activeShift === 'afternoon') {
-          recessText = 'AFTERNOON RECESS BREAK • 3:15 PM TO 3:45 PM (30 MINUTES)';
-        } else {
-          recessText = 'RECESS BREAK • Morning: 9:45–10:15 AM | Afternoon: 3:15–3:45 PM';
-        }
+      const isMorningRecess = state.activeShift === 'morning' && pIdx === 2;
+      const isAfternoonRecess = state.activeShift !== 'morning' && pIdx === 3;
+      if (isMorningRecess || isAfternoonRecess) {
+        const recessText = state.activeShift === 'morning'
+          ? 'MORNING RECESS BREAK • 9:50 AM TO 10:10 AM (20 MINUTES)'
+          : (state.activeShift === 'afternoon'
+              ? 'AFTERNOON RECESS BREAK • 3:15 PM TO 3:45 PM (30 MINUTES)'
+              : 'RECESS BREAK • Morning: 9:50–10:10 AM | Afternoon: 3:15–3:45 PM');
 
         tbodyHtml += `
           <tr class="recess-break-row">
@@ -1239,8 +1371,16 @@
 
       const excludedKey = `${state.currentDay}_${period.id}`;
       const excludedForPeriod = (state.excludedFreeTeachers && state.excludedFreeTeachers[excludedKey]) || [];
-      const freeTeachers = activeTeachers.filter(t => !busyTeachers.includes(t) && !excludedForPeriod.includes(t));
-      const removedTeachers = activeTeachers.filter(t => !busyTeachers.includes(t) && excludedForPeriod.includes(t));
+      const morningFacultyNames = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am", "Yamin Ma'am"];
+      const shiftActiveTeachers = (state.activeShift === 'morning')
+        ? activeTeachers.filter(t => {
+            const prof = (state.teacherProfiles && state.teacherProfiles[t]) || {};
+            return prof.assignedShift === 'morning' || prof.assignedShift === 'both' || morningFacultyNames.includes(t);
+          })
+        : activeTeachers;
+
+      const freeTeachers = shiftActiveTeachers.filter(t => !busyTeachers.includes(t) && !excludedForPeriod.includes(t));
+      const removedTeachers = shiftActiveTeachers.filter(t => !busyTeachers.includes(t) && excludedForPeriod.includes(t));
 
       tbodyHtml += `
         <tr>
@@ -1251,21 +1391,63 @@
 
       visibleStandards.forEach(std => {
         const slot = pSlots[std.id] || { subject: '', teacher: '' };
+        if (slot.isMergedChild) {
+          return;
+        }
+
+        const colSpan = slot.colSpan && slot.colSpan > 1 ? slot.colSpan : 1;
+        const rowSpan = slot.rowSpan && slot.rowSpan > 1 ? slot.rowSpan : 1;
         const hasContent = slot.subject || slot.teacher;
         const stdShift = std.shift || 'afternoon';
-        const isConflict = slot.teacher &&
+
+        const isMultiRoom = slot.teacher &&
           shiftTeacherAllocation[stdShift] &&
           shiftTeacherAllocation[stdShift][slot.teacher.trim()] &&
           shiftTeacherAllocation[stdShift][slot.teacher.trim()].length > 1;
 
+        let isCombined = false;
+        let isConflict = false;
+        if (isMultiRoom) {
+          const tName = slot.teacher.trim();
+          const stds = shiftTeacherAllocation[stdShift][tName] || [];
+          const subjs = stds.map(sName => {
+            const f = state.standards.find(s => s.name === sName);
+            return f && pSlots[f.id] ? pSlots[f.id].subject : '';
+          });
+          const allSame = subjs.every(s => s === slot.subject);
+          if (allSame || colSpan > 1) {
+            isCombined = true;
+          } else {
+            isConflict = true;
+          }
+        }
+
+        const isMerged = colSpan > 1 || rowSpan > 1;
+        let cellClass = 'grid-period-cell';
+        if (isConflict) cellClass += ' has-conflict';
+        else if (isCombined) cellClass += ' combined-class';
+        if (isMerged) cellClass += ' is-merged';
+
+        let badgeHtml = '';
+        if (colSpan > 1) {
+          const mNames = (slot.mergedStds || []).map(sid => {
+            const found = state.standards.find(s => s.id === sid);
+            return found ? (found.baseName || found.name) : sid;
+          }).join(' + ');
+          badgeHtml = `<div class="merged-badge">🔗 Combined (${escapeHtml(mNames)})</div>`;
+        } else if (rowSpan > 1) {
+          badgeHtml = `<div class="merged-badge">⏳ Double Period (${rowSpan} Lecs)</div>`;
+        }
+
         tbodyHtml += `
-          <td class="grid-period-cell ${isConflict ? 'has-conflict' : ''}" data-period="${period.id}" data-std="${std.id}">
+          <td class="${cellClass}" data-period="${period.id}" data-std="${std.id}" ${colSpan > 1 ? `colspan="${colSpan}"` : ''} ${rowSpan > 1 ? `rowspan="${rowSpan}"` : ''}>
             <div class="grid-cell-inner">`;
 
         if (hasContent) {
           tbodyHtml += `
               <div class="subject-label">${escapeHtml(slot.subject || '-')}</div>
-              <div class="teacher-sublabel">(${escapeHtml(slot.teacher || 'Unassigned')})</div>`;
+              <div class="teacher-sublabel">(${escapeHtml(slot.teacher || 'Unassigned')})</div>
+              ${badgeHtml}`;
         } else {
           tbodyHtml += `<div class="empty-prompt">+ Assign Period</div>`;
         }
@@ -1276,23 +1458,16 @@
       tbodyHtml += `
           <td class="free-staff-cell">
             <div class="free-staff-flow">`;
-      if (freeTeachers.length === 0 && removedTeachers.length === 0) {
+      if (freeTeachers.length === 0) {
         tbodyHtml += `<span class="free-staff-none">None Free</span>`;
       } else {
         freeTeachers.forEach(t => {
           tbodyHtml += `
             <div class="free-staff-item">
               <span class="free-staff-name" title="${escapeHtml(t)}">${escapeHtml(t)}</span>
-              <button type="button" class="btn-remove-free-teacher" data-day="${escapeHtml(state.currentDay)}" data-period="${escapeHtml(period.id)}" data-teacher="${escapeHtml(t)}" title="Remove ${escapeHtml(t)} from free list (e.g. half-day duty)">&times;</button>
+              <button type="button" class="btn-remove-free-teacher" data-day="${escapeHtml(state.currentDay)}" data-period="${escapeHtml(period.id)}" data-teacher="${escapeHtml(t)}" title="Remove ${escapeHtml(t)} from free list">&times;</button>
             </div>`;
         });
-        if (removedTeachers.length > 0) {
-          const restoreLabel = removedTeachers.length === 1 
-            ? `+ Restore (${escapeHtml(removedTeachers[0])})` 
-            : `+ Restore (${removedTeachers.length} hidden)`;
-          tbodyHtml += `
-            <button type="button" class="btn-restore-free-teacher" data-day="${escapeHtml(state.currentDay)}" data-period="${escapeHtml(period.id)}" title="Click to restore: ${escapeHtml(removedTeachers.join(', '))}">${restoreLabel}</button>`;
-        }
       }
       tbodyHtml += `</div></td></tr>`;
     });
@@ -1315,15 +1490,6 @@
       });
     });
 
-    DOM.timetableTbody.querySelectorAll('.btn-restore-free-teacher').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const day = btn.getAttribute('data-day');
-        const periodId = btn.getAttribute('data-period');
-        restoreFreeTeachers(day, periodId);
-      });
-    });
-
     if (allConflicts.length > 0) {
       DOM.conflictBanner.classList.add('visible');
       const conflictSnippets = allConflicts.map(c => 
@@ -1336,7 +1502,7 @@
 
     if (DOM.displayDayStats) {
       if (state.activeShift === 'morning') {
-        DOM.displayDayStats.textContent = `Standards: FG to 2nd (Morning) • Lectures: 1 to 6 (7:30 AM – 12:30 PM)`;
+        DOM.displayDayStats.textContent = `Standards: FG to 2nd (Morning) • Lectures: 1 to 5 (8:20 AM – 12:20 PM)`;
       } else if (state.activeShift === 'afternoon') {
         DOM.displayDayStats.textContent = `Standards: 3rd to 8th (Afternoon) • Lectures: 1 to 6 (1:00 PM – 5:50 PM)`;
       } else {
@@ -1404,8 +1570,9 @@
     }
 
     // Count weekly lectures
+    const activeDays = getActiveDays();
     let weeklyLectures = 0;
-    state.days.forEach(day => {
+    activeDays.forEach(day => {
       const daySlots = state.schedules[day] || {};
       shiftPeriods.forEach(p => {
         const slot = daySlots[p.id]?.[currentStd.id];
@@ -1419,8 +1586,9 @@
     // 3. Render Weekly Table Header
     if (DOM.classWeeklyThead) {
       let theadHtml = `<tr><th style="width: 16%;">Period / Timing</th>`;
-      state.days.forEach(day => {
-        theadHtml += `<th style="width: 14%;">${escapeHtml(day)}</th>`;
+      const colWidth = activeDays.length === 5 ? '16.8%' : '14%';
+      activeDays.forEach(day => {
+        theadHtml += `<th style="width: ${colWidth};">${escapeHtml(day)}</th>`;
       });
       theadHtml += `</tr>`;
       DOM.classWeeklyThead.innerHTML = theadHtml;
@@ -1434,7 +1602,7 @@
           const recessTime = isMorning ? '9:45 AM TO 10:15 AM (30 MINUTES)' : '3:15 PM TO 3:45 PM (30 MINUTES)';
           tbodyHtml += `
             <tr class="recess-break-row">
-              <td colspan="7">${isMorning ? 'MORNING' : 'AFTERNOON'} RECESS BREAK • ${recessTime}</td>
+              <td colspan="${activeDays.length + 1}">${isMorning ? 'MORNING' : 'AFTERNOON'} RECESS BREAK • ${recessTime}</td>
             </tr>`;
         }
 
@@ -1445,7 +1613,7 @@
               <div class="period-header-time">${escapeHtml(period.time)}</div>
             </td>`;
 
-        state.days.forEach(day => {
+        activeDays.forEach(day => {
           const slot = state.schedules[day]?.[period.id]?.[currentStd.id] || { subject: '', teacher: '' };
           const hasContent = slot.subject || slot.teacher;
 
@@ -1496,18 +1664,6 @@
     showToast(`Removed ${teacher} from Free Teachers (${day} ${periodId.toUpperCase()})`, 'info');
   }
 
-  function restoreFreeTeachers(day, periodId) {
-    if (!state.excludedFreeTeachers) return;
-    const key = `${day}_${periodId}`;
-    if (state.excludedFreeTeachers[key]) {
-      delete state.excludedFreeTeachers[key];
-      saveState();
-      renderClassTable();
-      renderSubstitutionView();
-      showToast(`Restored Free Teachers for ${day} ${periodId.toUpperCase()}`, 'success');
-    }
-  }
-
   // --- 2. Teacher-Wise Individual Timetable Rendering ---
   function renderTeacherView() {
     DOM.selectTeacherFilter.innerHTML = '';
@@ -1531,14 +1687,17 @@
     const teacher = state.selectedTeacher || state.teachers[0];
     DOM.displayTeacherName.textContent = `${teacher} • Weekly Timetable`;
 
-    // Filter to Monday through Friday (exclude Saturday)
-    const teacherDays = state.days.filter(d => d !== 'Saturday');
+    // Filter to active days
+    const teacherDays = getActiveDays();
+    const prof = (state.teacherProfiles && state.teacherProfiles[teacher]) || {};
+    const tShift = prof.assignedShift === 'morning' ? 'morning' : 'afternoon';
+    const teacherPeriods = getShiftPeriods(tShift);
 
     // Compute load stats
     let totalAssigned = 0;
     teacherDays.forEach(d => {
       const dSched = state.schedules[d] || {};
-      state.periods.forEach(p => {
+      teacherPeriods.forEach(p => {
         const pSlots = dSched[p.id] || {};
         state.standards.forEach(s => {
           if (pSlots[s.id] && pSlots[s.id].teacher && pSlots[s.id].teacher.trim() === teacher) totalAssigned++;
@@ -1546,21 +1705,22 @@
       });
     });
 
-    const totalSlots = teacherDays.length * state.periods.length;
+    const totalSlots = teacherDays.length * teacherPeriods.length;
     DOM.teacherLoadStat.textContent = totalAssigned;
     DOM.teacherFreeStat.textContent = totalSlots - totalAssigned;
 
     // Thead
     let theadHtml = `<tr><th style="width: 14%;">Period / Time</th>`;
+    const colW = teacherDays.length === 5 ? '17.2%' : '14.3%';
     teacherDays.forEach(d => {
-      theadHtml += `<th style="width: 17.2%;">${escapeHtml(d)}</th>`;
+      theadHtml += `<th style="width: ${colW};">${escapeHtml(d)}</th>`;
     });
     theadHtml += `</tr>`;
     DOM.teacherGridThead.innerHTML = theadHtml;
 
     // Tbody
     let tbodyHtml = '';
-    state.periods.forEach(p => {
+    teacherPeriods.forEach(p => {
       tbodyHtml += `
         <tr>
           <td class="period-header-cell">
@@ -2061,8 +2221,12 @@
           </div>
         </td>`;
 
+      if (DOM.attendanceDutyThSaturday) {
+        DOM.attendanceDutyThSaturday.style.display = state.includeSaturday ? '' : 'none';
+      }
+
       let dayCols = '';
-      state.days.forEach(day => {
+      getActiveDays().forEach(day => {
         const assignedTeacher = (duty.allocations && duty.allocations[day]) || '';
         
         let teacherOptions = `<option value="">-- Unassigned --</option>`;
@@ -2295,7 +2459,11 @@
   function renderSubstitutionView() {
     // Populate Day dropdown
     DOM.subDaySelect.innerHTML = '';
-    state.days.forEach(d => {
+    const activeDays = getActiveDays();
+    if (!activeDays.includes(state.currentDay)) {
+      state.currentDay = activeDays[0] || 'Monday';
+    }
+    activeDays.forEach(d => {
       const opt = document.createElement('option');
       opt.value = d;
       opt.textContent = d;
@@ -2721,8 +2889,9 @@
     if (state.activeView === 'class-view') {
       if (state.classViewMode === 'class-weekly') {
         const curStd = state.standards.find(s => s.id === state.selectedClassStandard) || state.standards[0];
+        const spanText = state.includeSaturday ? 'Monday-to-Saturday' : 'Monday-to-Friday';
         DOM.exportBarTitle.textContent = `Export ${curStd ? curStd.name : 'Class'} Weekly Timetable`;
-        DOM.exportBarDesc.textContent = `Generates official Monday-to-Saturday schedule for ${curStd ? curStd.name : 'this class'} with Class Teacher in-charge & room details.`;
+        DOM.exportBarDesc.textContent = `Generates official ${spanText} schedule for ${curStd ? curStd.name : 'this class'} with Class Teacher in-charge & room details.`;
         DOM.btnDownloadSingleDay.style.display = 'none';
         DOM.btnDownloadAllDays.textContent = "Download Class Word (.docx)";
       } else {
@@ -2763,31 +2932,42 @@
   // --- In-Place Popover Actions ---
   function openPeriodModal(periodId, stdId, dayOverride = null) {
     const targetDay = dayOverride || state.currentDay;
-    editingCell.day = targetDay;
-    editingCell.periodId = periodId;
-    editingCell.stdId = stdId;
-
-    const std = state.standards.find(s => s.id === stdId);
-    const isMorning = std && std.shift === 'morning';
-    const shiftPeriods = getShiftPeriods(isMorning ? 'morning' : 'afternoon');
-    const period = shiftPeriods.find(p => p.id === periodId) || state.periods.find(p => p.id === periodId) || { label: periodId, time: '' };
-
     const dayData = state.schedules[targetDay] || {};
     const pSlots = dayData[periodId] || {};
-    const currentSlot = pSlots[stdId] || { subject: '', teacher: '' };
+    let currentSlot = pSlots[stdId] || { subject: '', teacher: '' };
+
+    // If this is a child of a merged cell, resolve the root parent
+    let activeStdId = stdId;
+    let activePeriodId = periodId;
+    if (currentSlot.isMergedChild) {
+      if (currentSlot.parentStdId) activeStdId = currentSlot.parentStdId;
+      if (currentSlot.parentPeriodId) activePeriodId = currentSlot.parentPeriodId;
+      currentSlot = (dayData[activePeriodId] && dayData[activePeriodId][activeStdId]) || currentSlot;
+    }
+
+    editingCell.day = targetDay;
+    editingCell.periodId = activePeriodId;
+    editingCell.stdId = activeStdId;
+
+    const std = state.standards.find(s => s.id === activeStdId);
+    const isMorning = std && std.shift === 'morning';
+    const shiftPeriods = getShiftPeriods(isMorning ? 'morning' : 'afternoon');
+    const period = shiftPeriods.find(p => p.id === activePeriodId) || state.periods.find(p => p.id === activePeriodId) || { label: activePeriodId, time: '' };
+
     const dayLeaves = state.leaves[targetDay] || [];
 
     editingCell.subject = currentSlot.subject || '';
     editingCell.teacher = currentSlot.teacher || '';
 
-    DOM.periodModalTitle.innerHTML = `Assign Period: <strong>${escapeHtml(period.label)} (${escapeHtml(period.time)})</strong> • <span>${escapeHtml(std ? std.name : stdId)}</span> <small style="font-weight: 500; color: var(--primary-navy);">[${escapeHtml(targetDay)}]</small>`;
+    DOM.periodModalTitle.innerHTML = `Assign Period: <strong>${escapeHtml(period.label)} (${escapeHtml(period.time)})</strong> • <span>${escapeHtml(std ? std.name : activeStdId)}</span> <small style="font-weight: 500; color: var(--primary-navy);">[${escapeHtml(targetDay)}]</small>`;
     if (DOM.modalSubjectHint) DOM.modalSubjectHint.textContent = '';
     if (DOM.modalTeacherHint) DOM.modalTeacherHint.textContent = '';
 
     const busyIn = {};
+    const activeSlots = dayData[activePeriodId] || {};
     state.standards.forEach(s => {
-      if (s.id !== stdId) {
-        const slot = pSlots[s.id];
+      if (s.id !== activeStdId) {
+        const slot = activeSlots[s.id];
         if (slot && slot.teacher && slot.teacher.trim()) {
           busyIn[slot.teacher.trim()] = s.name.replace('Standard: ', '');
         }
@@ -2833,11 +3013,15 @@
     }
 
     // 2. Subjects
-    renderModalSubjectChips(periodId, stdId, busyIn, dayLeaves);
+    renderModalSubjectChips(activePeriodId, activeStdId, busyIn, dayLeaves);
     DOM.modalCustomSubject.value = state.subjects.includes(editingCell.subject) ? '' : editingCell.subject;
 
     // 3. Teachers
-    renderTeacherChipsInModal(periodId, stdId, busyIn, dayLeaves);
+    renderTeacherChipsInModal(activePeriodId, activeStdId, busyIn, dayLeaves);
+
+    // 4. Merge Controls
+    updateModalMergeControls();
+
     DOM.periodModal.classList.add('active');
   }
 
@@ -2930,6 +3114,213 @@
     DOM.modalCustomTeacher.value = state.teachers.includes(editingCell.teacher) ? '' : editingCell.teacher;
   }
 
+  function updateModalMergeControls() {
+    if (!DOM.btnModalMergeNextClass || !DOM.btnModalMergeNextLecture || !DOM.btnModalSplitCell) return;
+
+    const dayData = state.schedules[editingCell.day] || {};
+    const pSlots = dayData[editingCell.periodId] || {};
+    const slot = pSlots[editingCell.stdId] || {};
+
+    const isMergedParent = (slot.colSpan && slot.colSpan > 1) || (slot.rowSpan && slot.rowSpan > 1);
+    const isMergedChild = !!slot.isMergedChild;
+    const isMerged = isMergedParent || isMergedChild;
+
+    // Determine next standard in current shift
+    const std = state.standards.find(s => s.id === editingCell.stdId);
+    const currentShift = (std && std.shift) || state.activeShift || 'afternoon';
+    const shiftStds = state.standards.filter(s => s.shift === currentShift);
+    const sortedStds = sortStandardsIncrementally(shiftStds.slice());
+    const currentStdIdx = sortedStds.findIndex(s => s.id === editingCell.stdId);
+    const hasNextClass = (currentStdIdx >= 0 && currentStdIdx < sortedStds.length - 1);
+    const nextStd = hasNextClass ? sortedStds[currentStdIdx + 1] : null;
+
+    // Determine next lecture in current shift
+    const shiftPeriods = getShiftPeriods(currentShift);
+    const currentPIdx = shiftPeriods.findIndex(p => p.id === editingCell.periodId);
+    const hasNextLecture = (currentPIdx >= 0 && currentPIdx < shiftPeriods.length - 1);
+    const nextPeriod = hasNextLecture ? shiftPeriods[currentPIdx + 1] : null;
+
+    if (DOM.modalMergeStatusBadge) {
+      if (isMerged) {
+        let label = 'Merged';
+        if (slot.colSpan && slot.colSpan > 1) label = `Merged (${slot.colSpan} Classes)`;
+        else if (slot.rowSpan && slot.rowSpan > 1) label = `Merged (${slot.rowSpan} Lectures)`;
+        else if (isMergedChild) label = 'Merged (Combined Class)';
+        DOM.modalMergeStatusBadge.textContent = label;
+        DOM.modalMergeStatusBadge.style.display = 'inline-block';
+      } else {
+        DOM.modalMergeStatusBadge.style.display = 'none';
+      }
+    }
+
+    if (DOM.modalMergeHint) {
+      if (isMerged) {
+        DOM.modalMergeHint.textContent = 'This slot is currently merged. Click "Split / Unmerge" to separate into individual class periods.';
+      } else {
+        DOM.modalMergeHint.textContent = 'Merge with adjacent classes (e.g. LKG + HKG) or next lecture for combined sessions.';
+      }
+    }
+
+    DOM.btnModalMergeNextClass.style.display = isMerged ? 'none' : (hasNextClass ? 'inline-flex' : 'none');
+    if (hasNextClass && nextStd) {
+      DOM.btnModalMergeNextClass.innerHTML = `<i class="fa-solid fa-arrows-left-right"></i> Merge with ${escapeHtml(nextStd.name)}`;
+    }
+
+    DOM.btnModalMergeNextLecture.style.display = isMerged ? 'none' : (hasNextLecture ? 'inline-flex' : 'none');
+    if (hasNextLecture && nextPeriod) {
+      DOM.btnModalMergeNextLecture.innerHTML = `<i class="fa-solid fa-arrows-up-down"></i> Merge with ${escapeHtml(nextPeriod.label)}`;
+    }
+
+    DOM.btnModalSplitCell.style.display = isMerged ? 'inline-flex' : 'none';
+  }
+
+  function mergeWithNextClass() {
+    const std = state.standards.find(s => s.id === editingCell.stdId);
+    const currentShift = (std && std.shift) || state.activeShift || 'afternoon';
+    const shiftStds = state.standards.filter(s => s.shift === currentShift);
+    const sortedStds = sortStandardsIncrementally(shiftStds.slice());
+    const currentStdIdx = sortedStds.findIndex(s => s.id === editingCell.stdId);
+    if (currentStdIdx < 0 || currentStdIdx >= sortedStds.length - 1) {
+      showToast('No adjacent class to merge with', 'warning');
+      return;
+    }
+    const nextStd = sortedStds[currentStdIdx + 1];
+
+    if (!state.schedules[editingCell.day]) state.schedules[editingCell.day] = {};
+    if (!state.schedules[editingCell.day][editingCell.periodId]) state.schedules[editingCell.day][editingCell.periodId] = {};
+
+    const customSubj = DOM.modalCustomSubject.value.trim() || editingCell.subject || 'Extra Activity';
+    const customTeacher = DOM.modalCustomTeacher.value.trim() || editingCell.teacher || '';
+
+    // Parent cell
+    state.schedules[editingCell.day][editingCell.periodId][editingCell.stdId] = {
+      subject: customSubj,
+      teacher: customTeacher,
+      colSpan: 2,
+      mergedStds: [editingCell.stdId, nextStd.id]
+    };
+
+    // Child cell
+    state.schedules[editingCell.day][editingCell.periodId][nextStd.id] = {
+      subject: customSubj,
+      teacher: customTeacher,
+      isMergedChild: true,
+      parentStdId: editingCell.stdId,
+      parentPeriodId: editingCell.periodId
+    };
+
+    saveState();
+    updateModalMergeControls();
+    renderAll();
+    showToast(`Merged ${std ? std.name : editingCell.stdId} with ${nextStd.name}`, 'success');
+  }
+
+  function mergeWithNextLecture() {
+    const std = state.standards.find(s => s.id === editingCell.stdId);
+    const currentShift = (std && std.shift) || state.activeShift || 'afternoon';
+    const shiftPeriods = getShiftPeriods(currentShift);
+    const currentPIdx = shiftPeriods.findIndex(p => p.id === editingCell.periodId);
+    if (currentPIdx < 0 || currentPIdx >= shiftPeriods.length - 1) {
+      showToast('No next lecture to merge with', 'warning');
+      return;
+    }
+    const nextPeriod = shiftPeriods[currentPIdx + 1];
+
+    if (!state.schedules[editingCell.day]) state.schedules[editingCell.day] = {};
+    if (!state.schedules[editingCell.day][editingCell.periodId]) state.schedules[editingCell.day][editingCell.periodId] = {};
+    if (!state.schedules[editingCell.day][nextPeriod.id]) state.schedules[editingCell.day][nextPeriod.id] = {};
+
+    const customSubj = DOM.modalCustomSubject.value.trim() || editingCell.subject || '';
+    const customTeacher = DOM.modalCustomTeacher.value.trim() || editingCell.teacher || '';
+
+    // Parent cell
+    state.schedules[editingCell.day][editingCell.periodId][editingCell.stdId] = {
+      subject: customSubj,
+      teacher: customTeacher,
+      rowSpan: 2,
+      mergedPeriods: [editingCell.periodId, nextPeriod.id]
+    };
+
+    // Child cell in next period
+    state.schedules[editingCell.day][nextPeriod.id][editingCell.stdId] = {
+      subject: customSubj,
+      teacher: customTeacher,
+      isMergedChild: true,
+      parentStdId: editingCell.stdId,
+      parentPeriodId: editingCell.periodId
+    };
+
+    saveState();
+    updateModalMergeControls();
+    renderAll();
+    showToast(`Merged ${editingCell.periodId} with ${nextPeriod.label}`, 'success');
+  }
+
+  function splitCell() {
+    const dayData = state.schedules[editingCell.day] || {};
+    const pSlots = dayData[editingCell.periodId] || {};
+    const slot = pSlots[editingCell.stdId] || {};
+
+    let rootStdId = editingCell.stdId;
+    let rootPeriodId = editingCell.periodId;
+
+    if (slot.isMergedChild) {
+      if (slot.parentStdId) rootStdId = slot.parentStdId;
+      if (slot.parentPeriodId) rootPeriodId = slot.parentPeriodId;
+    }
+
+    const rootSlot = (dayData[rootPeriodId] && dayData[rootPeriodId][rootStdId]) || slot;
+
+    // Unmerge across standards
+    if (rootSlot.mergedStds && Array.isArray(rootSlot.mergedStds)) {
+      rootSlot.mergedStds.forEach(sId => {
+        if (dayData[rootPeriodId] && dayData[rootPeriodId][sId]) {
+          const sSlot = dayData[rootPeriodId][sId];
+          delete sSlot.colSpan;
+          delete sSlot.mergedStds;
+          delete sSlot.isMergedChild;
+          delete sSlot.parentStdId;
+          delete sSlot.parentPeriodId;
+        }
+      });
+    }
+
+    // Unmerge across periods
+    if (rootSlot.mergedPeriods && Array.isArray(rootSlot.mergedPeriods)) {
+      rootSlot.mergedPeriods.forEach(pId => {
+        if (dayData[pId] && dayData[pId][rootStdId]) {
+          const sSlot = dayData[pId][rootStdId];
+          delete sSlot.rowSpan;
+          delete sSlot.mergedPeriods;
+          delete sSlot.isMergedChild;
+          delete sSlot.parentStdId;
+          delete sSlot.parentPeriodId;
+        }
+      });
+    }
+
+    delete rootSlot.colSpan;
+    delete rootSlot.rowSpan;
+    delete rootSlot.mergedStds;
+    delete rootSlot.mergedPeriods;
+    delete rootSlot.isMergedChild;
+    delete rootSlot.parentStdId;
+    delete rootSlot.parentPeriodId;
+
+    delete slot.colSpan;
+    delete slot.rowSpan;
+    delete slot.mergedStds;
+    delete slot.mergedPeriods;
+    delete slot.isMergedChild;
+    delete slot.parentStdId;
+    delete slot.parentPeriodId;
+
+    saveState();
+    updateModalMergeControls();
+    renderAll();
+    showToast('Cells unmerged and split into individual slots', 'success');
+  }
+
   function saveModalCell() {
     const customSubj = DOM.modalCustomSubject.value.trim();
     if (customSubj) {
@@ -2946,10 +3337,44 @@
     if (!state.schedules[editingCell.day]) state.schedules[editingCell.day] = {};
     if (!state.schedules[editingCell.day][editingCell.periodId]) state.schedules[editingCell.day][editingCell.periodId] = {};
 
-    state.schedules[editingCell.day][editingCell.periodId][editingCell.stdId] = {
+    const existingSlot = state.schedules[editingCell.day][editingCell.periodId][editingCell.stdId] || {};
+    state.schedules[editingCell.day][editingCell.periodId][editingCell.stdId] = Object.assign({}, existingSlot, {
       subject: editingCell.subject,
       teacher: editingCell.teacher
-    };
+    });
+
+    // Synchronize to merged children if cell is merged across standards
+    if (existingSlot.mergedStds && Array.isArray(existingSlot.mergedStds)) {
+      existingSlot.mergedStds.forEach(sId => {
+        if (sId !== editingCell.stdId) {
+          if (!state.schedules[editingCell.day][editingCell.periodId][sId]) state.schedules[editingCell.day][editingCell.periodId][sId] = {};
+          Object.assign(state.schedules[editingCell.day][editingCell.periodId][sId], {
+            subject: editingCell.subject,
+            teacher: editingCell.teacher,
+            isMergedChild: true,
+            parentStdId: editingCell.stdId,
+            parentPeriodId: editingCell.periodId
+          });
+        }
+      });
+    }
+
+    // Synchronize to merged children if cell is merged across periods
+    if (existingSlot.mergedPeriods && Array.isArray(existingSlot.mergedPeriods)) {
+      existingSlot.mergedPeriods.forEach(pId => {
+        if (pId !== editingCell.periodId) {
+          if (!state.schedules[editingCell.day][pId]) state.schedules[editingCell.day][pId] = {};
+          if (!state.schedules[editingCell.day][pId][editingCell.stdId]) state.schedules[editingCell.day][pId][editingCell.stdId] = {};
+          Object.assign(state.schedules[editingCell.day][pId][editingCell.stdId], {
+            subject: editingCell.subject,
+            teacher: editingCell.teacher,
+            isMergedChild: true,
+            parentStdId: editingCell.stdId,
+            parentPeriodId: editingCell.periodId
+          });
+        }
+      });
+    }
 
     saveState();
     DOM.periodModal.classList.remove('active');
@@ -2958,6 +3383,7 @@
   }
 
   function clearModalCell() {
+    splitCell();
     if (state.schedules[editingCell.day] && state.schedules[editingCell.day][editingCell.periodId]) {
       delete state.schedules[editingCell.day][editingCell.periodId][editingCell.stdId];
     }
@@ -2972,7 +3398,8 @@
     DOM.copySourceDay.innerHTML = '';
     DOM.copyTargetDay.innerHTML = '';
 
-    state.days.forEach(day => {
+    const activeDays = getActiveDays();
+    activeDays.forEach(day => {
       const optSrc = document.createElement('option');
       optSrc.value = day;
       optSrc.textContent = day;
@@ -2982,10 +3409,12 @@
 
     const optAll = document.createElement('option');
     optAll.value = '__ALL_OTHER__';
-    optAll.textContent = 'All Other Weekdays (Tuesday through Saturday)';
+    optAll.textContent = state.includeSaturday
+      ? 'All Other Weekdays (Tuesday through Saturday)'
+      : 'All Other Weekdays (Tuesday through Friday)';
     DOM.copyTargetDay.appendChild(optAll);
 
-    state.days.forEach(day => {
+    activeDays.forEach(day => {
       if (day !== state.currentDay) {
         const optTgt = document.createElement('option');
         optTgt.value = day;
@@ -3006,12 +3435,13 @@
       return;
     }
 
+    const activeDays = getActiveDays();
     if (tgt === '__ALL_OTHER__') {
-      state.days.forEach(d => {
+      activeDays.forEach(d => {
         if (d !== src) state.schedules[d] = JSON.parse(JSON.stringify(sourceData));
       });
       if (state.excludedFreeTeachers) {
-        state.days.forEach(d => {
+        activeDays.forEach(d => {
           if (d !== src) {
             state.periods.forEach(p => {
               const srcKey = `${src}_${p.id}`;
@@ -3025,7 +3455,7 @@
           }
         });
       }
-      showToast(`Schedule duplicated from ${src} to all weekdays`, 'success');
+      showToast(`Schedule duplicated from ${src} to all active weekdays`, 'success');
     } else {
       state.schedules[tgt] = JSON.parse(JSON.stringify(sourceData));
       if (state.excludedFreeTeachers) {
@@ -3116,6 +3546,8 @@
           </div>`;
       }
     } else if (type === 'full') {
+      const dayRangeText = state.includeSaturday ? 'all 6 days (Monday to Saturday)' : 'all 5 days (Monday to Friday)';
+      const dayRangeSimple = state.includeSaturday ? 'Monday to Saturday' : 'Monday to Friday';
       titleText = 'Clear Whole Weekly Timetable';
       if (shift === 'morning') {
         const morningStds = getShiftStandards('morning');
@@ -3125,7 +3557,7 @@
               ⚠️ Clear Whole Morning Shift Timetable?
             </div>
             <div style="color: #7f1d1d; font-size: 12.5px; margin-bottom: 10px;">
-              This will clear the entire weekly timetable across all 6 days (Monday to Saturday) for all <strong>Morning Shift</strong> classes:
+              This will clear the entire weekly timetable across ${dayRangeText} for all <strong>Morning Shift</strong> classes:
             </div>
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
               ${morningStds.map(s => `<span style="background: #fee2e2; color: #991b1b; font-weight: 600; font-size: 11.5px; padding: 3px 8px; border-radius: 4px; border: 1px solid #fca5a5;">${escapeHtml(s.name)}</span>`).join('')}
@@ -3143,7 +3575,7 @@
               ⚠️ Clear Whole Afternoon Shift Timetable?
             </div>
             <div style="color: #7f1d1d; font-size: 12.5px; margin-bottom: 10px;">
-              This will clear the entire weekly timetable across all 6 days (Monday to Saturday) for all <strong>Afternoon Shift</strong> classes:
+              This will clear the entire weekly timetable across ${dayRangeText} for all <strong>Afternoon Shift</strong> classes:
             </div>
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
               ${afternoonStds.map(s => `<span style="background: #fee2e2; color: #991b1b; font-weight: 600; font-size: 11.5px; padding: 3px 8px; border-radius: 4px; border: 1px solid #fca5a5;">${escapeHtml(s.name)}</span>`).join('')}
@@ -3160,7 +3592,7 @@
               ⚠️ Clear Entire School Timetable?
             </div>
             <div style="color: #7f1d1d; font-size: 12.5px;">
-              You are in <strong>All Classes</strong> view. This will clear the entire weekly timetable across all classes for Monday to Saturday.
+              You are in <strong>All Classes</strong> view. This will clear the entire weekly timetable across all classes for ${dayRangeSimple}.
             </div>
           </div>`;
       }
@@ -3168,6 +3600,7 @@
       const stdId = state.selectedClassStandard;
       const std = state.standards.find(s => s.id === stdId) || { name: stdId };
       const stdName = std.name || stdId;
+      const dayRangeSimple = state.includeSaturday ? 'Monday to Saturday' : 'Monday to Friday';
       titleText = `Clear ${escapeHtml(stdName)} Weekly Schedule`;
       bodyHtml = `
         <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;">
@@ -3175,7 +3608,7 @@
             ⚠️ Clear All Periods for ${escapeHtml(stdName)}?
           </div>
           <div style="color: #7f1d1d; font-size: 12.5px;">
-            This will clear all scheduled periods for <strong>${escapeHtml(stdName)}</strong> from Monday to Saturday.
+            This will clear all scheduled periods for <strong>${escapeHtml(stdName)}</strong> from ${dayRangeSimple}.
           </div>
         </div>
         <div style="background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 8px; padding: 12px 14px; color: #065f46; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
@@ -3496,7 +3929,7 @@
         downloadSubstitutionDocx();
       } else {
         showToast('Generating Full Week Timetable (.docx)...', 'info');
-        const blob = await DocxGenerator.generateDocxBlob(state.days, state);
+        const blob = await DocxGenerator.generateDocxBlob(getActiveDays(), state);
         DocxGenerator.triggerDownload(blob, 'Weekly_School_TimeTable.docx');
         showToast('Full Week Timetable exported successfully', 'success');
       }
@@ -3790,6 +4223,12 @@
     }
 
     // Header Actions
+    if (DOM.btnToggleSaturday) {
+      DOM.btnToggleSaturday.onclick = () => toggleSaturdayVisibility();
+    }
+    if (DOM.settingIncludeSaturday) {
+      DOM.settingIncludeSaturday.onchange = (e) => toggleSaturdayVisibility(e.target.checked);
+    }
     DOM.btnOpenSettings.onclick = openSettingsModal;
     DOM.btnCloseSettingsModal.onclick = () => DOM.settingsModal.classList.remove('active');
     DOM.btnCloseSettings.onclick = () => DOM.settingsModal.classList.remove('active');
@@ -3828,6 +4267,9 @@
     DOM.btnModalCancel.onclick = () => DOM.periodModal.classList.remove('active');
     DOM.btnModalSaveCell.onclick = saveModalCell;
     DOM.btnModalClearCell.onclick = clearModalCell;
+    if (DOM.btnModalMergeNextClass) DOM.btnModalMergeNextClass.onclick = mergeWithNextClass;
+    if (DOM.btnModalMergeNextLecture) DOM.btnModalMergeNextLecture.onclick = mergeWithNextLecture;
+    if (DOM.btnModalSplitCell) DOM.btnModalSplitCell.onclick = splitCell;
     DOM.modalCustomSubject.oninput = () => {
       editingCell.subject = DOM.modalCustomSubject.value;
       renderModalChips();

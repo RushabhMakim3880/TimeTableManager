@@ -28,30 +28,84 @@ const MIME_TYPES = {
 function saveStateToDefaultData(state) {
   const defaultDataPath = path.join(DIRECTORY, 'js', 'default-data.js');
   let currentDefaultData = {};
+  // Clear require cache for fresh load
   try {
+    delete require.cache[require.resolve(defaultDataPath)];
     currentDefaultData = require(defaultDataPath);
   } catch (e) {
     // If not required cleanly, fallback
   }
 
+  // Deep merge schedules so morning & afternoon standards are both preserved
+  const mergedSchedules = JSON.parse(JSON.stringify(currentDefaultData.initialSchedules || {}));
+  if (state.schedules) {
+    Object.keys(state.schedules).forEach(day => {
+      if (!mergedSchedules[day]) mergedSchedules[day] = {};
+      const daySlots = state.schedules[day] || {};
+      Object.keys(daySlots).forEach(pId => {
+        if (!mergedSchedules[day][pId]) mergedSchedules[day][pId] = {};
+        Object.assign(mergedSchedules[day][pId], daySlots[pId]);
+      });
+    });
+  }
+
+  // Deep merge shifts so morning periods and schedules are preserved
+  const mergedShifts = JSON.parse(JSON.stringify(currentDefaultData.shifts || {}));
+  if (state.shifts) {
+    if (state.shifts.morning) {
+      if (!mergedShifts.morning) mergedShifts.morning = {};
+      Object.assign(mergedShifts.morning, state.shifts.morning);
+      if (!mergedShifts.morning.periods || mergedShifts.morning.periods.length === 0) {
+        mergedShifts.morning.periods = (currentDefaultData.shifts && currentDefaultData.shifts.morning && currentDefaultData.shifts.morning.periods) || [];
+      }
+      if (!mergedShifts.morning.schedules || Object.keys(mergedShifts.morning.schedules).length === 0) {
+        mergedShifts.morning.schedules = (currentDefaultData.shifts && currentDefaultData.shifts.morning && currentDefaultData.shifts.morning.schedules) || {};
+      }
+    }
+    if (state.shifts.afternoon) {
+      if (!mergedShifts.afternoon) mergedShifts.afternoon = {};
+      Object.assign(mergedShifts.afternoon, state.shifts.afternoon);
+    }
+  }
+
+  // Merge standards
+  let mergedStandards = currentDefaultData.standards || [];
+  if (state.standards && state.standards.length > 0) {
+    const stdMap = {};
+    mergedStandards.forEach(s => { stdMap[s.id] = s; });
+    state.standards.forEach(s => { stdMap[s.id] = Object.assign({}, stdMap[s.id] || {}, s); });
+    mergedStandards = Object.values(stdMap);
+  }
+
+  // Merge teachers to guarantee morning faculty are always present
+  const morningFaculty = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am", "Yamin Ma'am"];
+  const mergedTeachers = [...(state.teachers || currentDefaultData.teachers || [])];
+  morningFaculty.forEach(t => {
+    if (!mergedTeachers.includes(t)) mergedTeachers.push(t);
+  });
+
+  const mergedTeacherProfiles = Object.assign({}, currentDefaultData.teacherProfiles || {}, state.teacherProfiles || {});
+
   const updatedDefaultData = {
     schoolProfile: state.schoolProfile || currentDefaultData.schoolProfile || {},
-    standards: state.standards || currentDefaultData.standards || [],
+    standards: mergedStandards,
     periods: state.periods || currentDefaultData.periods || [],
-    shifts: state.shifts || currentDefaultData.shifts || {},
+    shifts: mergedShifts,
     classTeachers: state.classTeachers || currentDefaultData.classTeachers || {},
     attendanceDuties: state.attendanceDuties || currentDefaultData.attendanceDuties || [],
-    teachers: state.teachers || currentDefaultData.teachers || [],
-    teacherProfiles: state.teacherProfiles || currentDefaultData.teacherProfiles || {},
+    teachers: mergedTeachers,
+    teacherProfiles: mergedTeacherProfiles,
     subjects: state.subjects || currentDefaultData.subjects || [],
     days: state.days || currentDefaultData.days || [],
-    initialSchedules: state.schedules || currentDefaultData.initialSchedules || {},
+    includeSaturday: (state.includeSaturday !== undefined) ? state.includeSaturday : (currentDefaultData.includeSaturday || false),
+    initialSchedules: mergedSchedules,
     weeklyDutyPresets: currentDefaultData.weeklyDutyPresets || [],
     initialWeeklyDuties: state.weeklyDuties || currentDefaultData.initialWeeklyDuties || {},
     generalDutyPresets: currentDefaultData.generalDutyPresets || [],
     initialGeneralDuties: state.generalDuties || currentDefaultData.initialGeneralDuties || [],
     dutyPresets: state.dutyPresets || currentDefaultData.dutyPresets || [],
-    initialDuties: state.duties || currentDefaultData.initialDuties || {}
+    initialDuties: state.duties || currentDefaultData.initialDuties || {},
+    excludedFreeTeachers: state.excludedFreeTeachers || currentDefaultData.excludedFreeTeachers || {}
   };
 
   const fileContent = `// Default presets for School Timetable Management System
