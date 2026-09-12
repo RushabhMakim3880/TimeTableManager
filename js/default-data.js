@@ -1856,6 +1856,8 @@ const DEFAULT_DATA = {
     },
     "Yamin Ma'am": {
       "primarySubject": "Drawing",
+      "morningSubject": "Drawing",
+      "afternoonSubject": "Environment",
       "assignedShift": "both",
       "maxPeriods": 6,
       "workSchedule": "full_day",

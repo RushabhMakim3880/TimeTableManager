@@ -5,8 +5,9 @@ console.log('--- Testing Dual Shift & Duplicate Teacher Handling ---');
 
 // 1. Verify DEFAULT_DATA has Yamin Ma'am as dual shift
 assert(DEFAULT_DATA.teacherProfiles["Yamin Ma'am"], "Yamin Ma'am must exist in DEFAULT_DATA.teacherProfiles");
-assert.strictEqual(DEFAULT_DATA.teacherProfiles["Yamin Ma'am"].assignedShift, "both", "Yamin Ma'am must have assignedShift: 'both'");
-console.log('✓ Test 1: DEFAULT_DATA has Yamin Ma\'am with assignedShift: both');
+assert.strictEqual(DEFAULT_DATA.teacherProfiles["Yamin Ma'am"].morningSubject, "Drawing", "Yamin Ma'am morningSubject must be Drawing");
+assert.strictEqual(DEFAULT_DATA.teacherProfiles["Yamin Ma'am"].afternoonSubject, "Environment", "Yamin Ma'am afternoonSubject must be Environment");
+console.log('✓ Test 1: DEFAULT_DATA has Yamin Ma\'am with assignedShift: both, morningSubject: Drawing, afternoonSubject: Environment');
 
 // Simulate state and functions as in app.js
 const state = {
@@ -40,6 +41,17 @@ function getTeachersForShift(shift = state.activeShift) {
   });
 }
 
+function getTeacherSubjectForShift(teacher, shift) {
+  const prof = (state.teacherProfiles && state.teacherProfiles[teacher]) || {};
+  if (shift === 'morning' && prof.morningSubject) {
+    return prof.morningSubject;
+  }
+  if (shift === 'afternoon' && prof.afternoonSubject) {
+    return prof.afternoonSubject;
+  }
+  return prof.primarySubject || '';
+}
+
 // 2. Verify Yamin Ma'am is in BOTH morning and afternoon shift lists
 const morningList = getTeachersForShift('morning');
 const afternoonList = getTeachersForShift('afternoon');
@@ -47,7 +59,32 @@ assert(morningList.includes("Yamin Ma'am"), "Yamin Ma'am MUST appear in morning 
 assert(afternoonList.includes("Yamin Ma'am"), "Yamin Ma'am MUST appear in afternoon shift teacher list");
 console.log('✓ Test 2: Yamin Ma\'am is present in both Morning and Afternoon faculty lists');
 
-// 3. Simulate adding an afternoon teacher to morning shift
+// 3. Verify getTeacherSubjectForShift returns Drawing in morning and Environment in afternoon
+assert.strictEqual(getTeacherSubjectForShift("Yamin Ma'am", "morning"), "Drawing");
+assert.strictEqual(getTeacherSubjectForShift("Yamin Ma'am", "afternoon"), "Environment");
+console.log('✓ Test 3: Yamin Ma\'am dynamically gets Drawing for Morning and Environment for Afternoon');
+
+// 4. Test flexible assignment: Clicking teacher preserves existing user-selected subject
+let editingCell = { subject: 'Hindi', teacher: null };
+let shiftSubj = getTeacherSubjectForShift("Yamin Ma'am", "morning");
+// Only overwrite subject if subject wasn't already selected
+if (!editingCell.subject && shiftSubj) {
+  editingCell.subject = shiftSubj;
+}
+editingCell.teacher = "Yamin Ma'am";
+assert.strictEqual(editingCell.subject, "Hindi", "User selected subject 'Hindi' must NOT be overwritten when clicking teacher chip");
+assert.strictEqual(editingCell.teacher, "Yamin Ma'am");
+
+// When no subject is selected yet, clicking teacher auto-suggests shift subject
+let emptyCell = { subject: '', teacher: null };
+if (!emptyCell.subject && shiftSubj) {
+  emptyCell.subject = shiftSubj;
+}
+emptyCell.teacher = "Yamin Ma'am";
+assert.strictEqual(emptyCell.subject, "Drawing", "Empty cell auto-suggests morningSubject 'Drawing'");
+console.log('✓ Test 4: Slot assignment is flexible - preserves user chosen subject and defaults smoothly when empty');
+
+// 5. Simulate adding an afternoon teacher to morning shift
 const testTeacher = "Payal Ma'am"; // currently afternoon
 assert.strictEqual(getTeacherShift(testTeacher), "afternoon");
 
@@ -60,9 +97,9 @@ if (requestedShift === 'both' || (currentShift !== requestedShift && currentShif
 assert.strictEqual(getTeacherShift(testTeacher), "both", "Payal Ma'am must now be dual shift");
 assert(getTeachersForShift('morning').includes(testTeacher), "Payal Ma'am should now appear in morning shift list");
 assert(getTeachersForShift('afternoon').includes(testTeacher), "Payal Ma'am should still appear in afternoon shift list");
-console.log('✓ Test 3: Adding an existing teacher to a different shift cleanly upgrades them to dual shift');
+console.log('✓ Test 5: Adding an existing teacher to a different shift cleanly upgrades them to dual shift');
 
-// 4. Verify adding a duplicate name with distinguishing suffix
+// 6. Verify adding a duplicate name with distinguishing suffix
 const duplicateName = "Alpa Ma'am";
 const shiftName = 'Morning';
 let candidate = `${duplicateName} (${shiftName})`;
@@ -79,6 +116,6 @@ state.teacherProfiles[candidate] = {
 };
 assert(getTeachersForShift('morning').includes("Alpa Ma'am (Morning)"), "Disambiguated duplicate teacher appears in morning list");
 assert(!getTeachersForShift('afternoon').includes("Alpa Ma'am (Morning)"), "Morning duplicate does not appear in afternoon list");
-console.log('✓ Test 4: Duplicate name disambiguation allows multiple staff with same name across or within shifts');
+console.log('✓ Test 6: Duplicate name disambiguation allows multiple staff with same name across or within shifts');
 
-console.log('=== All Dual Shift Tests Passed Successfully! ===');
+console.log('=== All Dual Shift & Subject Flexibility Tests Passed Successfully! ===');

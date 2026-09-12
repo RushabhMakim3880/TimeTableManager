@@ -296,6 +296,19 @@
     settingIncludeSaturday: document.getElementById('setting-include-saturday'),
     attendanceDutyThSaturday: document.getElementById('attendance-duty-th-saturday'),
 
+    // Duplicate Teacher Name / Dual Shift Modal
+    duplicateTeacherModal: document.getElementById('duplicate-teacher-modal'),
+    btnCloseDupTeacherModal: document.getElementById('btn-close-dup-teacher-modal'),
+    btnCancelDupTeacher: document.getElementById('btn-cancel-dup-teacher'),
+    btnConfirmDupTeacher: document.getElementById('btn-confirm-dup-teacher'),
+    dupTeacherName: document.getElementById('dup-teacher-name'),
+    dupTeacherCurrentShift: document.getElementById('dup-teacher-current-shift'),
+    dupRadioDual: document.getElementById('dup-radio-dual'),
+    dupRadioDifferent: document.getElementById('dup-radio-different'),
+    dupOptionDualCard: document.getElementById('dup-option-dual-card'),
+    dupOptionDifferentCard: document.getElementById('dup-option-different-card'),
+    dupTeacherNewName: document.getElementById('dup-teacher-new-name'),
+
     // Cloud Database Modal (Firebase Firestore)
     btnOpenCloudDb: document.getElementById('btn-open-cloud-db'),
     cloudDbModal: document.getElementById('cloud-db-modal'),
@@ -456,6 +469,12 @@
           if (DEFAULT_DATA.teacherProfiles[t].assignedShift === 'both' && state.teacherProfiles[t].assignedShift !== 'both') {
             state.teacherProfiles[t].assignedShift = 'both';
           }
+          if (state.teacherProfiles[t].morningSubject === undefined && DEFAULT_DATA.teacherProfiles[t].morningSubject) {
+            state.teacherProfiles[t].morningSubject = DEFAULT_DATA.teacherProfiles[t].morningSubject;
+          }
+          if (state.teacherProfiles[t].afternoonSubject === undefined && DEFAULT_DATA.teacherProfiles[t].afternoonSubject) {
+            state.teacherProfiles[t].afternoonSubject = DEFAULT_DATA.teacherProfiles[t].afternoonSubject;
+          }
           if (state.teacherProfiles[t].primarySubject === undefined) {
             state.teacherProfiles[t].primarySubject = DEFAULT_DATA.teacherProfiles[t].primarySubject || '';
           }
@@ -591,6 +610,12 @@
           if (DEFAULT_DATA.teacherProfiles[t].assignedShift === 'both' && state.teacherProfiles[t].assignedShift !== 'both') {
             state.teacherProfiles[t].assignedShift = 'both';
           }
+          if (state.teacherProfiles[t].morningSubject === undefined && DEFAULT_DATA.teacherProfiles[t].morningSubject) {
+            state.teacherProfiles[t].morningSubject = DEFAULT_DATA.teacherProfiles[t].morningSubject;
+          }
+          if (state.teacherProfiles[t].afternoonSubject === undefined && DEFAULT_DATA.teacherProfiles[t].afternoonSubject) {
+            state.teacherProfiles[t].afternoonSubject = DEFAULT_DATA.teacherProfiles[t].afternoonSubject;
+          }
         }
       });
     }
@@ -608,9 +633,15 @@
       }
     });
 
-    // Ensure Yamin Ma'am is always dual shift
+    // Ensure Yamin Ma'am is always dual shift with Drawing in Morning & Environment in Afternoon
     if (state.teacherProfiles && state.teacherProfiles["Yamin Ma'am"]) {
       state.teacherProfiles["Yamin Ma'am"].assignedShift = 'both';
+      if (!state.teacherProfiles["Yamin Ma'am"].morningSubject) {
+        state.teacherProfiles["Yamin Ma'am"].morningSubject = 'Drawing';
+      }
+      if (!state.teacherProfiles["Yamin Ma'am"].afternoonSubject) {
+        state.teacherProfiles["Yamin Ma'am"].afternoonSubject = 'Environment';
+      }
     }
 
     if (!state.selectedTeacher && state.teachers.length > 0) {
@@ -767,6 +798,17 @@
       }
       return true;
     });
+  }
+
+  function getTeacherSubjectForShift(teacher, shift) {
+    const prof = (state.teacherProfiles && state.teacherProfiles[teacher]) || {};
+    if (shift === 'morning') {
+      return prof.morningSubject || (prof.assignedShift === 'morning' ? prof.primarySubject : '') || (teacher === "Yamin Ma'am" ? 'Drawing' : (prof.primarySubject || ''));
+    }
+    if (shift === 'afternoon') {
+      return prof.afternoonSubject || (prof.assignedShift === 'afternoon' ? prof.primarySubject : '') || (teacher === "Yamin Ma'am" ? 'Environment' : (prof.primarySubject || ''));
+    }
+    return prof.primarySubject || prof.morningSubject || prof.afternoonSubject || '';
   }
 
   function resetToDefaults() {
@@ -3098,8 +3140,8 @@
       DOM.modalQuickPairs.innerHTML = '';
       allowedTeachers.forEach(teacher => {
         const prof = state.teacherProfiles[teacher] || {};
-        const primarySubj = prof.primarySubject || '';
-        if (!primarySubj) return;
+        const shiftSubj = getTeacherSubjectForShift(teacher, cellShift);
+        if (!shiftSubj) return;
 
         const isBusy = !!busyIn[teacher];
         const isOnLeave = dayLeaves.includes(teacher);
@@ -3112,8 +3154,8 @@
         if (isOnLeave) badge = ' <span style="font-size: 10px;">(Leave)</span>';
         else if (isBusy) badge = ` <span style="font-size: 10px;">(In Std ${busyIn[teacher]})</span>`;
 
-        btn.innerHTML = `<span><strong>${escapeHtml(primarySubj)}</strong> • ${escapeHtml(teacher)}</span>${badge}`;
-        btn.title = isOnLeave ? `${teacher} is on leave` : (isBusy ? `${teacher} is teaching in Std ${busyIn[teacher]}` : `1-Click Assign: ${primarySubj} (${teacher})`);
+        btn.innerHTML = `<span><strong>${escapeHtml(shiftSubj)}</strong> • ${escapeHtml(teacher)}</span>${badge}`;
+        btn.title = isOnLeave ? `${teacher} is on leave` : (isBusy ? `${teacher} is teaching in Std ${busyIn[teacher]}` : `1-Click Assign: ${shiftSubj} (${teacher})`);
 
         btn.onclick = () => {
           if (isOnLeave) {
@@ -3122,7 +3164,7 @@
             if (!confirm(`${teacher} is already teaching in Std ${busyIn[teacher]}. Assign anyway?`)) return;
           }
 
-          editingCell.subject = primarySubj;
+          editingCell.subject = shiftSubj;
           editingCell.teacher = teacher;
           saveModalCell();
         };
@@ -3161,8 +3203,12 @@
 
         // Auto-assign or suggest matching teacher for this subject
         const candidates = allowedTeachers.filter(t => {
-          const p = state.teacherProfiles[t];
-          return p && p.primarySubject && p.primarySubject.toLowerCase() === subj.toLowerCase();
+          const p = state.teacherProfiles[t] || {};
+          const tSubj = getTeacherSubjectForShift(t, cellShift);
+          return (tSubj && tSubj.toLowerCase() === subj.toLowerCase()) ||
+                 (p.primarySubject && p.primarySubject.toLowerCase() === subj.toLowerCase()) ||
+                 (p.morningSubject && p.morningSubject.toLowerCase() === subj.toLowerCase()) ||
+                 (p.afternoonSubject && p.afternoonSubject.toLowerCase() === subj.toLowerCase());
         });
 
         if (candidates.length === 1) {
@@ -3209,12 +3255,12 @@
       const isOnLeave = dayLeaves.includes(teacher);
 
       const prof = state.teacherProfiles[teacher] || {};
-      const primarySubj = prof.primarySubject || '';
-      const matchesSelectedSubj = editingCell.subject && primarySubj && (primarySubj.toLowerCase() === editingCell.subject.toLowerCase());
+      const shiftSubj = getTeacherSubjectForShift(teacher, cellShift);
+      const matchesSelectedSubj = editingCell.subject && shiftSubj && (shiftSubj.toLowerCase() === editingCell.subject.toLowerCase());
 
       pill.className = `pill-choice ${isSelected ? 'selected' : ''} ${matchesSelectedSubj && !isSelected ? 'suggested' : ''} ${isBusy ? 'is-busy' : ''} ${isOnLeave ? 'is-leave' : ''}`;
       
-      let subjTag = primarySubj ? `<span class="pill-subj-tag">${escapeHtml(primarySubj)}</span>` : '';
+      let subjTag = shiftSubj ? `<span class="pill-subj-tag">${escapeHtml(shiftSubj)}</span>` : '';
       let badge = '';
       if (isOnLeave) badge = ' <span style="font-size: 10.5px;">(On Leave)</span>';
       else if (isBusy) badge = ` <span style="font-size: 10.5px;">(In ${busyIn[teacher]})</span>`;
@@ -3224,11 +3270,12 @@
         editingCell.teacher = teacher;
         DOM.modalCustomTeacher.value = '';
 
-        // Auto-assign subject assigned to this teacher!
-        if (primarySubj) {
-          editingCell.subject = primarySubj;
+        // FLEXIBILITY FIX: If user already picked a subject, DO NOT overwrite it!
+        // Only auto-fill if no subject has been picked yet:
+        if (!editingCell.subject && shiftSubj) {
+          editingCell.subject = shiftSubj;
           DOM.modalCustomSubject.value = '';
-          if (DOM.modalTeacherHint) DOM.modalTeacherHint.textContent = `Auto-selected: ${primarySubj}`;
+          if (DOM.modalTeacherHint) DOM.modalTeacherHint.textContent = `Auto-selected: ${shiftSubj}`;
         }
 
         renderModalChips();
@@ -3963,40 +4010,115 @@
       DOM.settingsTeacherSubjectMapping.innerHTML = '';
       state.teachers.forEach(teacher => {
         const row = document.createElement('div');
-        row.className = 'teacher-subject-row';
-        const currentSubj = (state.teacherProfiles[teacher] && state.teacherProfiles[teacher].primarySubject) || '';
+        row.className = 'teacher-subject-card';
+        row.style.cssText = 'padding: 8px 12px; background: #ffffff; border: 1px solid var(--border-light); border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 6px;';
+
+        const prof = state.teacherProfiles[teacher] || {};
         const tShift = getTeacherShift(teacher);
+        const mornSubj = prof.morningSubject || (tShift === 'morning' ? prof.primarySubject : '') || (teacher === "Yamin Ma'am" ? 'Drawing' : '');
+        const aftSubj = prof.afternoonSubject || (tShift === 'afternoon' ? prof.primarySubject : '') || (teacher === "Yamin Ma'am" ? 'Environment' : '');
 
         let shiftBadge = '';
         if (tShift === 'both') {
-          shiftBadge = `<span style="font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: 600; background: #ecfdf5; color: #047857;">🔄 Dual</span>`;
+          shiftBadge = `<span style="font-size: 10.5px; padding: 2px 6px; border-radius: 4px; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">🔄 Dual Shift</span>`;
         } else if (tShift === 'morning') {
-          shiftBadge = `<span style="font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: 600; background: #fef3c7; color: #92400e;">☀️ Morn</span>`;
+          shiftBadge = `<span style="font-size: 10.5px; padding: 2px 6px; border-radius: 4px; font-weight: 700; background: #fffbeb; color: #92400e; border: 1px solid #fde68a;">☀️ Morning Shift</span>`;
         } else {
-          shiftBadge = `<span style="font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: 600; background: #e0e7ff; color: #3730a3;">🌙 Aft</span>`;
+          shiftBadge = `<span style="font-size: 10.5px; padding: 2px 6px; border-radius: 4px; font-weight: 700; background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe;">🌙 Afternoon Shift</span>`;
         }
 
-        let opts = `<option value="">-- Unassigned --</option>`;
-        state.subjects.forEach(s => {
-          opts += `<option value="${escapeHtml(s)}" ${s === currentSubj ? 'selected' : ''}>${escapeHtml(s)}</option>`;
-        });
+        let headerHtml = `
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              ${shiftBadge}
+              <strong style="font-size: 13px; color: var(--text-primary);">${escapeHtml(teacher)}</strong>
+            </div>
+          </div>`;
 
-        row.innerHTML = `
-          <div class="teacher-name-label" style="display: flex; align-items: center; gap: 6px;">
-            ${shiftBadge}
-            <span>${escapeHtml(teacher)}</span>
-          </div>
-          <select class="mapping-select" data-teacher="${escapeHtml(teacher)}">
-            ${opts}
-          </select>`;
+        let selectorsHtml = '';
 
-        row.querySelector('select').onchange = function() {
-          const t = this.getAttribute('data-teacher');
-          if (!state.teacherProfiles[t]) state.teacherProfiles[t] = {};
-          state.teacherProfiles[t].primarySubject = this.value;
-          saveState();
-          showToast(`Assigned ${this.value || 'None'} to ${t}`, 'success');
-        };
+        if (tShift === 'both') {
+          // Both shifts: Provide both Morning Subject AND Afternoon Subject
+          let mornOpts = `<option value="">-- Unassigned --</option>`;
+          let aftOpts = `<option value="">-- Unassigned --</option>`;
+          state.subjects.forEach(s => {
+            mornOpts += `<option value="${escapeHtml(s)}" ${s === mornSubj ? 'selected' : ''}>${escapeHtml(s)}</option>`;
+            aftOpts += `<option value="${escapeHtml(s)}" ${s === aftSubj ? 'selected' : ''}>${escapeHtml(s)}</option>`;
+          });
+
+          selectorsHtml = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 2px;">
+              <div>
+                <label style="font-size: 10.5px; font-weight: 700; color: #92400e; display: block; margin-bottom: 2px;">☀️ Morning Subject:</label>
+                <select class="mapping-select morn-subj-select" data-teacher="${escapeHtml(teacher)}" style="width: 100%; font-size: 12px; font-weight: 600; padding: 4px 6px; border-radius: 4px; border: 1px solid #fde68a; background: #fffbeb; color: #92400e;">
+                  ${mornOpts}
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 10.5px; font-weight: 700; color: #3730a3; display: block; margin-bottom: 2px;">🌙 Afternoon Subject:</label>
+                <select class="mapping-select aft-subj-select" data-teacher="${escapeHtml(teacher)}" style="width: 100%; font-size: 12px; font-weight: 600; padding: 4px 6px; border-radius: 4px; border: 1px solid #c7d2fe; background: #eef2ff; color: #3730a3;">
+                  ${aftOpts}
+                </select>
+              </div>
+            </div>`;
+        } else if (tShift === 'morning') {
+          let mornOpts = `<option value="">-- Unassigned --</option>`;
+          state.subjects.forEach(s => {
+            mornOpts += `<option value="${escapeHtml(s)}" ${s === mornSubj ? 'selected' : ''}>${escapeHtml(s)}</option>`;
+          });
+
+          selectorsHtml = `
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px;">
+              <span style="font-size: 11px; font-weight: 600; color: #92400e;">☀️ Morning Subject:</span>
+              <select class="mapping-select single-morn-select" data-teacher="${escapeHtml(teacher)}" style="max-width: 200px; font-size: 12px; font-weight: 600; padding: 4px 6px; border-radius: 4px; border: 1px solid #fde68a; background: #fffbeb; color: #92400e;">
+                ${mornOpts}
+              </select>
+            </div>`;
+        } else {
+          let aftOpts = `<option value="">-- Unassigned --</option>`;
+          state.subjects.forEach(s => {
+            aftOpts += `<option value="${escapeHtml(s)}" ${s === aftSubj ? 'selected' : ''}>${escapeHtml(s)}</option>`;
+          });
+
+          selectorsHtml = `
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px;">
+              <span style="font-size: 11px; font-weight: 600; color: #3730a3;">🌙 Afternoon Subject:</span>
+              <select class="mapping-select single-aft-select" data-teacher="${escapeHtml(teacher)}" style="max-width: 200px; font-size: 12px; font-weight: 600; padding: 4px 6px; border-radius: 4px; border: 1px solid #c7d2fe; background: #eef2ff; color: #3730a3;">
+                ${aftOpts}
+              </select>
+            </div>`;
+        }
+
+        row.innerHTML = headerHtml + selectorsHtml;
+
+        // Wire change events
+        const mornSel = row.querySelector('.morn-subj-select') || row.querySelector('.single-morn-select');
+        if (mornSel) {
+          mornSel.onchange = function() {
+            const t = this.getAttribute('data-teacher');
+            if (!state.teacherProfiles[t]) state.teacherProfiles[t] = {};
+            state.teacherProfiles[t].morningSubject = this.value;
+            if (tShift === 'morning' || !state.teacherProfiles[t].primarySubject) {
+              state.teacherProfiles[t].primarySubject = this.value;
+            }
+            saveState();
+            showToast(`Assigned Morning Subject: ${this.value || 'None'} to ${t}`, 'success');
+          };
+        }
+
+        const aftSel = row.querySelector('.aft-subj-select') || row.querySelector('.single-aft-select');
+        if (aftSel) {
+          aftSel.onchange = function() {
+            const t = this.getAttribute('data-teacher');
+            if (!state.teacherProfiles[t]) state.teacherProfiles[t] = {};
+            state.teacherProfiles[t].afternoonSubject = this.value;
+            if (tShift === 'afternoon' || !state.teacherProfiles[t].primarySubject) {
+              state.teacherProfiles[t].primarySubject = this.value;
+            }
+            saveState();
+            showToast(`Assigned Afternoon Subject: ${this.value || 'None'} to ${t}`, 'success');
+          };
+        }
 
         DOM.settingsTeacherSubjectMapping.appendChild(row);
       });
@@ -4044,6 +4166,114 @@
     }
   }
 
+  let pendingDuplicateTeacherData = null;
+
+  function openDuplicateTeacherModal(name, targetShift) {
+    pendingDuplicateTeacherData = { name, targetShift };
+    const currentShift = getTeacherShift(name);
+    const currentShiftLabel = currentShift === 'both' ? 'Both Shifts (Dual)' : (currentShift === 'morning' ? 'Morning Shift' : 'Afternoon Shift');
+    const targetShiftLabel = targetShift === 'both' ? 'Both Shifts (Dual)' : (targetShift === 'morning' ? 'Morning Shift' : 'Afternoon Shift');
+
+    if (DOM.dupTeacherName) DOM.dupTeacherName.textContent = `"${name}"`;
+    if (DOM.dupTeacherCurrentShift) DOM.dupTeacherCurrentShift.textContent = `Currently: ${currentShiftLabel}`;
+
+    // Compute candidate name for different teacher
+    const suffix = targetShift === 'morning' ? 'Morning' : (targetShift === 'afternoon' ? 'Afternoon' : '2');
+    let candidate = `${name} (${suffix})`;
+    let idx = 2;
+    while (state.teachers.includes(candidate)) {
+      candidate = `${name} (${suffix} ${idx})`;
+      idx++;
+    }
+    if (DOM.dupTeacherNewName) DOM.dupTeacherNewName.value = candidate;
+
+    // Configure Dual Shift Option vs Different Teacher Option
+    if (currentShift === 'both') {
+      if (DOM.dupRadioDual) DOM.dupRadioDual.disabled = true;
+      if (DOM.dupRadioDifferent) DOM.dupRadioDifferent.checked = true;
+      if (DOM.dupOptionDualCard) {
+        DOM.dupOptionDualCard.style.opacity = '0.6';
+        DOM.dupOptionDualCard.style.border = '1px solid var(--border-color)';
+        DOM.dupOptionDualCard.style.background = '#f5f5f5';
+      }
+      if (DOM.dupOptionDifferentCard) {
+        DOM.dupOptionDifferentCard.style.border = '1.5px solid var(--primary-color)';
+        DOM.dupOptionDifferentCard.style.background = '#eff6ff';
+      }
+    } else {
+      if (DOM.dupRadioDual) {
+        DOM.dupRadioDual.disabled = false;
+        DOM.dupRadioDual.checked = true;
+      }
+      if (DOM.dupOptionDualCard) {
+        DOM.dupOptionDualCard.style.opacity = '1';
+        DOM.dupOptionDualCard.style.border = '1.5px solid var(--primary-color)';
+        DOM.dupOptionDualCard.style.background = '#f0fdf4';
+      }
+      if (DOM.dupOptionDifferentCard) {
+        DOM.dupOptionDifferentCard.style.border = '1.5px solid var(--border-color)';
+        DOM.dupOptionDifferentCard.style.background = '#fafafa';
+      }
+    }
+
+    if (DOM.duplicateTeacherModal) DOM.duplicateTeacherModal.classList.add('active');
+  }
+
+  function handleConfirmDuplicateTeacher() {
+    if (!pendingDuplicateTeacherData) return;
+    const { name, targetShift } = pendingDuplicateTeacherData;
+    const isDual = DOM.dupRadioDual && DOM.dupRadioDual.checked && !DOM.dupRadioDual.disabled;
+
+    if (isDual) {
+      // Option 1: Assign same teacher to Dual Shift
+      if (!state.teacherProfiles[name]) state.teacherProfiles[name] = {};
+      state.teacherProfiles[name].assignedShift = 'both';
+      if (name === "Yamin Ma'am") {
+        if (!state.teacherProfiles[name].morningSubject) state.teacherProfiles[name].morningSubject = 'Drawing';
+        if (!state.teacherProfiles[name].afternoonSubject) state.teacherProfiles[name].afternoonSubject = 'Environment';
+      }
+      if (DOM.duplicateTeacherModal) DOM.duplicateTeacherModal.classList.remove('active');
+      DOM.settingsNewTeacher.value = '';
+      saveState();
+      renderSettingsLists();
+      renderAll();
+      showToast(`${name} is now assigned to BOTH Morning & Afternoon shifts (Dual Shift)!`, 'success');
+      pendingDuplicateTeacherData = null;
+    } else {
+      // Option 2: Different teacher with distinguishing name
+      const finalName = (DOM.dupTeacherNewName && DOM.dupTeacherNewName.value ? DOM.dupTeacherNewName.value : '').trim();
+      if (!finalName) {
+        showToast('Please enter a distinguishing name for the new teacher.', 'warning');
+        return;
+      }
+      if (state.teachers.includes(finalName)) {
+        showToast(`A teacher named "${finalName}" already exists in the roster.`, 'warning');
+        return;
+      }
+
+      state.teachers.push(finalName);
+      if (!state.teacherProfiles) state.teacherProfiles = {};
+      state.teacherProfiles[finalName] = {
+        primarySubject: '',
+        morningSubject: '',
+        afternoonSubject: '',
+        assignedShift: targetShift,
+        halfDayAvailability: 'all',
+        workSchedule: 'full_day',
+        maxPeriods: targetShift === 'both' ? 6 : 5
+      };
+
+      if (DOM.duplicateTeacherModal) DOM.duplicateTeacherModal.classList.remove('active');
+      DOM.settingsNewTeacher.value = '';
+      saveState();
+      renderSettingsLists();
+      renderAll();
+      const shiftLabel = targetShift === 'both' ? 'Both Shifts (Dual)' : (targetShift === 'morning' ? 'Morning Shift' : 'Afternoon Shift');
+      showToast(`Added new teacher: ${finalName} (${shiftLabel})`, 'success');
+      pendingDuplicateTeacherData = null;
+    }
+  }
+
   function addTeacher() {
     const rawName = (DOM.settingsNewTeacher.value || '').trim();
     if (!rawName) {
@@ -4053,56 +4283,9 @@
     const shiftSelect = DOM.settingsNewTeacherShift || document.getElementById('settings-new-teacher-shift');
     const assignedShift = (shiftSelect && shiftSelect.value) || state.activeShift || 'afternoon';
 
-    // If teacher already exists in the roster
+    // If teacher already exists in the roster, prompt with the dedicated Dual Shift vs Different Teacher choice modal!
     if (state.teachers.includes(rawName)) {
-      const currentShift = getTeacherShift(rawName);
-
-      // Case 1: Enabling dual shift (e.g. Yamin Ma'am is in Afternoon, user adds her to Morning or Both)
-      if (assignedShift === 'both' || (currentShift !== assignedShift && currentShift !== 'both')) {
-        if (!state.teacherProfiles[rawName]) state.teacherProfiles[rawName] = {};
-        state.teacherProfiles[rawName].assignedShift = 'both';
-        DOM.settingsNewTeacher.value = '';
-        saveState();
-        renderSettingsLists();
-        renderAll();
-        showToast(`${rawName} is now assigned to BOTH Morning & Afternoon shifts (Dual Shift)!`, 'success');
-        return;
-      }
-
-      // Case 2: Teacher already exists in this exact shift, or already has both shifts.
-      // Allow adding another faculty member with the same name by giving a distinguishing identifier
-      const shiftName = assignedShift === 'morning' ? 'Morning' : (assignedShift === 'afternoon' ? 'Afternoon' : 'Dual');
-      let candidate = `${rawName} (${shiftName})`;
-      let idx = 2;
-      while (state.teachers.includes(candidate)) {
-        candidate = `${rawName} (${shiftName} ${idx})`;
-        idx++;
-      }
-
-      const promptMsg = `A faculty member named "${rawName}" already exists in the roster.\n\nTo add another teacher with this name, enter a distinguishing name (e.g. "${candidate}"):`;
-      const chosen = prompt(promptMsg, candidate);
-      if (!chosen || !chosen.trim()) return;
-
-      const finalName = chosen.trim();
-      if (state.teachers.includes(finalName)) {
-        showToast(`"${finalName}" already exists in the roster.`, 'warning');
-        return;
-      }
-
-      state.teachers.push(finalName);
-      if (!state.teacherProfiles) state.teacherProfiles = {};
-      state.teacherProfiles[finalName] = {
-        primarySubject: '',
-        assignedShift: assignedShift,
-        halfDayAvailability: 'all',
-        workSchedule: 'full_day',
-        maxPeriods: assignedShift === 'both' ? 6 : 5
-      };
-      DOM.settingsNewTeacher.value = '';
-      saveState();
-      renderSettingsLists();
-      renderAll();
-      showToast(`Added ${finalName} (${shiftName} Shift)`, 'success');
+      openDuplicateTeacherModal(rawName, assignedShift);
       return;
     }
 
@@ -4111,6 +4294,8 @@
     if (!state.teacherProfiles) state.teacherProfiles = {};
     state.teacherProfiles[rawName] = {
       primarySubject: '',
+      morningSubject: '',
+      afternoonSubject: '',
       assignedShift: assignedShift,
       halfDayAvailability: 'all',
       workSchedule: 'full_day',
@@ -4501,6 +4686,57 @@
       };
     }
 
+    // Duplicate Teacher / Dual Shift Action Modal Actions
+    if (DOM.btnCloseDupTeacherModal) DOM.btnCloseDupTeacherModal.onclick = () => DOM.duplicateTeacherModal.classList.remove('active');
+    if (DOM.btnCancelDupTeacher) DOM.btnCancelDupTeacher.onclick = () => DOM.duplicateTeacherModal.classList.remove('active');
+    if (DOM.btnConfirmDupTeacher) DOM.btnConfirmDupTeacher.onclick = handleConfirmDuplicateTeacher;
+
+    if (DOM.dupRadioDual) {
+      DOM.dupRadioDual.onchange = () => {
+        if (DOM.dupRadioDual.checked) {
+          if (DOM.dupOptionDualCard) {
+            DOM.dupOptionDualCard.style.border = '1.5px solid var(--primary-color)';
+            DOM.dupOptionDualCard.style.background = '#f0fdf4';
+          }
+          if (DOM.dupOptionDifferentCard) {
+            DOM.dupOptionDifferentCard.style.border = '1.5px solid var(--border-color)';
+            DOM.dupOptionDifferentCard.style.background = '#fafafa';
+          }
+        }
+      };
+    }
+    if (DOM.dupRadioDifferent) {
+      DOM.dupRadioDifferent.onchange = () => {
+        if (DOM.dupRadioDifferent.checked) {
+          if (DOM.dupOptionDifferentCard) {
+            DOM.dupOptionDifferentCard.style.border = '1.5px solid var(--primary-color)';
+            DOM.dupOptionDifferentCard.style.background = '#eff6ff';
+          }
+          if (DOM.dupOptionDualCard) {
+            DOM.dupOptionDualCard.style.border = '1.5px solid var(--border-color)';
+            DOM.dupOptionDualCard.style.background = '#fafafa';
+          }
+          if (DOM.dupTeacherNewName) DOM.dupTeacherNewName.focus();
+        }
+      };
+    }
+    if (DOM.dupOptionDualCard) {
+      DOM.dupOptionDualCard.onclick = () => {
+        if (DOM.dupRadioDual && !DOM.dupRadioDual.disabled) {
+          DOM.dupRadioDual.checked = true;
+          DOM.dupRadioDual.dispatchEvent(new Event('change'));
+        }
+      };
+    }
+    if (DOM.dupOptionDifferentCard) {
+      DOM.dupOptionDifferentCard.onclick = () => {
+        if (DOM.dupRadioDifferent) {
+          DOM.dupRadioDifferent.checked = true;
+          DOM.dupRadioDifferent.dispatchEvent(new Event('change'));
+        }
+      };
+    }
+
     // Period Popover Modal
     DOM.btnClosePeriodModal.onclick = () => DOM.periodModal.classList.remove('active');
     DOM.btnModalCancel.onclick = () => DOM.periodModal.classList.remove('active');
@@ -4518,7 +4754,7 @@
     };
 
     // Close Modals on background click
-    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.schoolProfileModal, DOM.cloudDbModal, DOM.confirmClearModal].forEach(m => {
+    [DOM.periodModal, DOM.dutyCellModal, DOM.generalDutyModal, DOM.copyModal, DOM.settingsModal, DOM.duplicateTeacherModal, DOM.schoolProfileModal, DOM.cloudDbModal, DOM.confirmClearModal].forEach(m => {
       if (m) m.onclick = (e) => { if (e.target === m) m.classList.remove('active'); };
     });
 
@@ -4530,6 +4766,7 @@
         if (DOM.generalDutyModal) DOM.generalDutyModal.classList.remove('active');
         if (DOM.copyModal) DOM.copyModal.classList.remove('active');
         if (DOM.settingsModal) DOM.settingsModal.classList.remove('active');
+        if (DOM.duplicateTeacherModal) DOM.duplicateTeacherModal.classList.remove('active');
         if (DOM.schoolProfileModal) DOM.schoolProfileModal.classList.remove('active');
         if (DOM.cloudDbModal) DOM.cloudDbModal.classList.remove('active');
         if (DOM.confirmClearModal) DOM.confirmClearModal.classList.remove('active');

@@ -1068,12 +1068,12 @@
 
         <div>
           <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">
-            FACULTY SUBJECT MAPPING (ASSIGN PRIMARY SUBJECT TO EACH MA'AM)
+            FACULTY SUBJECT MAPPING (ASSIGN MORNING &amp; AFTERNOON SUBJECTS)
           </label>
           <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 8px;">
-            Sets each teacher's default subject to enable instant 1-click period scheduling.
+            Configure primary subjects for faculty. Dual-shift teachers can have distinct subjects per shift (e.g. Drawing in Morning &amp; Environment in Afternoon).
           </div>
-          <div id="settings-teacher-subject-mapping" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 190px; overflow-y: auto; padding: 8px; border: 1px solid var(--border-light); border-radius: 4px; background: var(--bg-subtle);"></div>
+          <div id="settings-teacher-subject-mapping" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding: 8px; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-subtle);"></div>
         </div>
 
         <div>
@@ -1104,6 +1104,57 @@
       </div>
       <div class="modal-actions-bar">
         <button id="btn-close-settings" class="btn btn-primary btn-sm">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enterprise Modal: Duplicate Teacher Name / Dual Shift Action Selector -->
+  <div class="enterprise-modal-overlay" id="duplicate-teacher-modal" style="z-index: 1050;">
+    <div class="enterprise-modal-card" style="max-width: 520px;">
+      <div class="modal-title-bar">
+        <h3>Teacher Name Match Found</h3>
+        <button class="popover-close-btn" id="btn-close-dup-teacher-modal">&times;</button>
+      </div>
+      <div class="modal-content-area" style="padding: 16px 20px;">
+        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+          A faculty member named <strong id="dup-teacher-name" style="color: var(--primary-navy);">"Yamin Ma'am"</strong> already exists in your roster (<span id="dup-teacher-current-shift" style="font-weight: 600;">Currently: Afternoon Shift</span>).
+        </div>
+        <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px;">
+          Is this the same person (Dual Shift) or a different teacher?
+        </div>
+
+        <!-- Option 1: Dual Shift (Same Teacher) -->
+        <label class="dup-option-card" id="dup-option-dual-card" style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; border: 1.5px solid var(--primary-color); border-radius: 8px; margin-bottom: 10px; cursor: pointer; background: #f0fdf4; transition: all 0.2s ease;">
+          <input type="radio" name="dup-teacher-action" value="dual_shift" id="dup-radio-dual" style="margin-top: 3px;" checked>
+          <div style="flex: 1;">
+            <div style="font-weight: 700; font-size: 13px; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+              <span>🔄 Dual Shift (Same Teacher)</span>
+              <span id="dup-badge-recommended" style="font-size: 10px; background: #ecfdf5; color: #047857; padding: 2px 6px; border-radius: 4px; font-weight: 700;">DUAL SHIFT</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+              Assign this same teacher to <strong>Both Morning &amp; Afternoon shifts</strong>. She can teach different lectures in each shift (e.g. Drawing in Morning, Environment in Afternoon).
+            </div>
+          </div>
+        </label>
+
+        <!-- Option 2: Different Teacher (Separate Staff Member) -->
+        <label class="dup-option-card" id="dup-option-different-card" style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 8px; margin-bottom: 14px; cursor: pointer; background: #fafafa; transition: all 0.2s ease;">
+          <input type="radio" name="dup-teacher-action" value="different_teacher" id="dup-radio-different" style="margin-top: 3px;">
+          <div style="flex: 1;">
+            <div style="font-weight: 700; font-size: 13px; color: var(--text-primary);">
+              👤 Different Teacher (Separate Person)
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px; margin-bottom: 8px; line-height: 1.4;">
+              This is a separate faculty member who shares the same name. Enter a distinguishing title or suffix:
+            </div>
+            <input type="text" id="dup-teacher-new-name" class="popover-input" style="width: 100%; font-size: 12.5px; font-weight: 600;" placeholder="e.g. Yamin Ma'am (Morning)">
+          </div>
+        </label>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-dup-teacher">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-dup-teacher">Confirm &amp; Proceed</button>
+        </div>
       </div>
     </div>
   </div>
