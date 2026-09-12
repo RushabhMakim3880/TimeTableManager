@@ -426,6 +426,12 @@
       }
     }
 
+    if (!state.periods || state.periods.length === 0) {
+      state.periods = (state.shifts && state.shifts.afternoon && state.shifts.afternoon.periods && state.shifts.afternoon.periods.length > 0)
+        ? JSON.parse(JSON.stringify(state.shifts.afternoon.periods))
+        : ((DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.afternoon && DEFAULT_DATA.shifts.afternoon.periods) || []);
+    }
+
     // Guarantee teachers from DEFAULT_DATA (including morning faculty) are present
     if (DEFAULT_DATA.teachers && Array.isArray(DEFAULT_DATA.teachers)) {
       if (!state.teachers || state.teachers.length === 0) {
@@ -755,7 +761,9 @@
     state.selectedClassStandard = 'std_3';
     state.schoolProfile = JSON.parse(JSON.stringify(DEFAULT_DATA.schoolProfile));
     state.standards = JSON.parse(JSON.stringify(DEFAULT_DATA.standards));
-    state.periods = JSON.parse(JSON.stringify(DEFAULT_DATA.periods));
+    state.periods = (DEFAULT_DATA.shifts && DEFAULT_DATA.shifts.afternoon && DEFAULT_DATA.shifts.afternoon.periods && DEFAULT_DATA.shifts.afternoon.periods.length > 0)
+      ? JSON.parse(JSON.stringify(DEFAULT_DATA.shifts.afternoon.periods))
+      : JSON.parse(JSON.stringify(DEFAULT_DATA.periods || []));
     state.shifts = JSON.parse(JSON.stringify(DEFAULT_DATA.shifts || {}));
     state.classTeachers = JSON.parse(JSON.stringify(DEFAULT_DATA.classTeachers || {}));
     state.attendanceDuties = JSON.parse(JSON.stringify(DEFAULT_DATA.attendanceDuties || []));
@@ -2939,11 +2947,14 @@
       subjDistHtml += `<tr><td><strong>${escapeHtml(subj)}</strong></td>`;
       state.standards.forEach(std => {
         let count = 0;
+        const stdPeriods = getShiftPeriods(std.shift || 'afternoon');
         workingDays.forEach(d => {
           const dSched = state.schedules[d] || {};
-          state.periods.forEach(p => {
+          stdPeriods.forEach(p => {
             const slot = (dSched[p.id] || {})[std.id];
-            if (slot && slot.subject && slot.subject.trim() === subj) count++;
+            if (slot && slot.subject && slot.subject.trim().toLowerCase() === subj.trim().toLowerCase()) {
+              count++;
+            }
           });
         });
         rowTotal += count;

@@ -115,7 +115,44 @@ const DEFAULT_DATA = {
       "name": "Standard: 8th"
     }
   ],
-  "periods": [],
+  "periods": [
+    {
+      "label": "Lecture 1",
+      "time": "1:00 to 1:45",
+      "number": 1,
+      "id": "p1"
+    },
+    {
+      "id": "p2",
+      "time": "1:45 to 2:30",
+      "label": "Lecture 2",
+      "number": 2
+    },
+    {
+      "time": "2:30 to 3:15",
+      "id": "p3",
+      "number": 3,
+      "label": "Lecture 3"
+    },
+    {
+      "number": 4,
+      "label": "Lecture 4",
+      "time": "3:45 to 4:30",
+      "id": "p4"
+    },
+    {
+      "number": 5,
+      "time": "4:30 to 5:15",
+      "label": "Lecture 5",
+      "id": "p5"
+    },
+    {
+      "time": "5:15 to 5:50",
+      "number": 6,
+      "label": "Lecture 6",
+      "id": "p6"
+    }
+  ],
   "shifts": {
     "afternoon": {
       "leaves": {
