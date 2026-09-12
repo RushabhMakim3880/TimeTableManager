@@ -303,10 +303,8 @@ const DocxGenerator = (function() {
    */
   function generateDayXml(dayName, daySchedule, dayDuties, standards, periods, allTeachers, leaveTeachers, schoolProfile, isLastDay, excludedFreeTeachersMap) {
     const isMorning = standards.length === 5 || standards.some(s => s.shift === 'morning');
-    const morningNames = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am", "Yamin Ma'am"];
     const activeTeachers = allTeachers.filter(t => {
       if ((leaveTeachers || []).includes(t)) return false;
-      if (isMorning) return morningNames.includes(t.trim());
       return true;
     });
 

@@ -453,6 +453,9 @@
           if (!state.teacherProfiles[t].assignedShift) {
             state.teacherProfiles[t].assignedShift = DEFAULT_DATA.teacherProfiles[t].assignedShift || 'afternoon';
           }
+          if (DEFAULT_DATA.teacherProfiles[t].assignedShift === 'both' && state.teacherProfiles[t].assignedShift !== 'both') {
+            state.teacherProfiles[t].assignedShift = 'both';
+          }
           if (state.teacherProfiles[t].primarySubject === undefined) {
             state.teacherProfiles[t].primarySubject = DEFAULT_DATA.teacherProfiles[t].primarySubject || '';
           }
@@ -585,6 +588,9 @@
           if (!state.teacherProfiles[t].assignedShift) {
             state.teacherProfiles[t].assignedShift = DEFAULT_DATA.teacherProfiles[t].assignedShift || 'afternoon';
           }
+          if (DEFAULT_DATA.teacherProfiles[t].assignedShift === 'both' && state.teacherProfiles[t].assignedShift !== 'both') {
+            state.teacherProfiles[t].assignedShift = 'both';
+          }
         }
       });
     }
@@ -594,9 +600,18 @@
       const prof = state.teacherProfiles[t];
       if (prof.primarySubject === undefined) prof.primarySubject = '';
       if (!prof.assignedShift) {
-        prof.assignedShift = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am"].includes(t) ? 'morning' : 'afternoon';
+        if (t === "Yamin Ma'am") {
+          prof.assignedShift = 'both';
+        } else {
+          prof.assignedShift = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am"].includes(t) ? 'morning' : 'afternoon';
+        }
       }
     });
+
+    // Ensure Yamin Ma'am is always dual shift
+    if (state.teacherProfiles && state.teacherProfiles["Yamin Ma'am"]) {
+      state.teacherProfiles["Yamin Ma'am"].assignedShift = 'both';
+    }
 
     if (!state.selectedTeacher && state.teachers.length > 0) {
       state.selectedTeacher = state.teachers[0];
@@ -733,6 +748,7 @@
     const morningDefaults = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am"];
     const prof = (state.teacherProfiles && state.teacherProfiles[teacher]) || {};
     if (prof.assignedShift) return prof.assignedShift;
+    if (teacher === "Yamin Ma'am") return 'both';
     if (morningDefaults.includes(teacher)) return 'morning';
     return 'afternoon';
   }
@@ -1771,7 +1787,9 @@
     // Filter to active days
     const teacherDays = getActiveDays();
     const prof = (state.teacherProfiles && state.teacherProfiles[teacher]) || {};
-    const tShift = prof.assignedShift === 'morning' ? 'morning' : 'afternoon';
+    const tShift = prof.assignedShift === 'both'
+      ? (state.activeShift === 'morning' ? 'morning' : 'afternoon')
+      : (prof.assignedShift === 'morning' ? 'morning' : 'afternoon');
     const teacherPeriods = getShiftPeriods(tShift);
 
     // Compute load stats
@@ -3878,19 +3896,41 @@
     DOM.settingsTeacherCount.textContent = state.teachers.length;
     state.teachers.forEach(t => {
       const prof = state.teacherProfiles[t] || {};
-      const tShift = prof.assignedShift || (["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am"].includes(t) ? 'morning' : 'afternoon');
-      const isMorn = tShift === 'morning';
+      const tShift = getTeacherShift(t);
 
-      const tag = document.createElement('span');
-      tag.style.cssText = 'display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 4px; font-size: 12.5px;';
+      const tag = document.createElement('div');
+      tag.className = 'settings-teacher-chip';
+      tag.style.cssText = 'display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12.5px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); margin: 2px;';
+
+      let shiftStyle = 'background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe;';
+      if (tShift === 'morning') {
+        shiftStyle = 'background: #fffbeb; color: #92400e; border: 1px solid #fde68a;';
+      } else if (tShift === 'both') {
+        shiftStyle = 'background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;';
+      }
+
       tag.innerHTML = `
-        <span style="font-size: 10.5px; padding: 1px 5px; border-radius: 3px; font-weight: 600; ${isMorn ? 'background: #fef3c7; color: #92400e;' : 'background: #e0e7ff; color: #3730a3;'}">
-          ${isMorn ? '☀️ Morning' : '🌙 Afternoon'}
-        </span>
-        <span>${escapeHtml(t)}</span>
-        <button style="background: none; border: none; color: var(--status-danger); cursor: pointer; font-size: 14px; line-height: 1;" title="Remove teacher">&times;</button>`;
+        <span style="font-weight: 600; color: var(--text-primary); white-space: nowrap;">${escapeHtml(t)}</span>
+        <select class="settings-shift-dropdown" data-teacher="${escapeHtml(t)}" style="font-size: 11px; padding: 2px 5px; border-radius: 4px; font-weight: 600; cursor: pointer; ${shiftStyle}" title="Change Shift Assignment">
+          <option value="morning" ${tShift === 'morning' ? 'selected' : ''}>☀️ Morning</option>
+          <option value="afternoon" ${tShift === 'afternoon' ? 'selected' : ''}>🌙 Afternoon</option>
+          <option value="both" ${tShift === 'both' ? 'selected' : ''}>🔄 Both (Dual)</option>
+        </select>
+        <button class="settings-remove-teacher-btn" style="background: none; border: none; color: var(--status-danger); cursor: pointer; font-size: 16px; line-height: 1; padding: 0 2px;" title="Remove teacher">&times;</button>`;
 
-      tag.querySelector('button').onclick = () => {
+      const shiftSelect = tag.querySelector('.settings-shift-dropdown');
+      shiftSelect.onchange = function() {
+        const newShift = this.value;
+        if (!state.teacherProfiles[t]) state.teacherProfiles[t] = {};
+        state.teacherProfiles[t].assignedShift = newShift;
+        saveState();
+        renderSettingsLists();
+        renderAll();
+        const label = newShift === 'both' ? 'Both Shifts (Dual)' : (newShift === 'morning' ? 'Morning Shift' : 'Afternoon Shift');
+        showToast(`Updated ${t} shift to ${label}`, 'success');
+      };
+
+      tag.querySelector('.settings-remove-teacher-btn').onclick = () => {
         if (confirm(`Remove ${t} from teachers roster?`)) {
           state.teachers = state.teachers.filter(item => item !== t);
           saveState();
@@ -3905,7 +3945,7 @@
     DOM.settingsSubjectCount.textContent = state.subjects.length;
     state.subjects.forEach(s => {
       const tag = document.createElement('span');
-      tag.style.cssText = 'display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 4px; font-size: 12.5px;';
+      tag.style.cssText = 'display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 4px; font-size: 12.5px; margin: 2px;';
       tag.innerHTML = `<span>${escapeHtml(s)}</span><button style="background: none; border: none; color: var(--status-danger); cursor: pointer; font-size: 14px; line-height: 1;">&times;</button>`;
       tag.querySelector('button').onclick = () => {
         if (confirm(`Remove subject ${s}?`)) {
@@ -3925,8 +3965,16 @@
         const row = document.createElement('div');
         row.className = 'teacher-subject-row';
         const currentSubj = (state.teacherProfiles[teacher] && state.teacherProfiles[teacher].primarySubject) || '';
-        const tShift = (state.teacherProfiles[teacher] && state.teacherProfiles[teacher].assignedShift) || (["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am"].includes(teacher) ? 'morning' : 'afternoon');
-        const isMorn = tShift === 'morning';
+        const tShift = getTeacherShift(teacher);
+
+        let shiftBadge = '';
+        if (tShift === 'both') {
+          shiftBadge = `<span style="font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: 600; background: #ecfdf5; color: #047857;">🔄 Dual</span>`;
+        } else if (tShift === 'morning') {
+          shiftBadge = `<span style="font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: 600; background: #fef3c7; color: #92400e;">☀️ Morn</span>`;
+        } else {
+          shiftBadge = `<span style="font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: 600; background: #e0e7ff; color: #3730a3;">🌙 Aft</span>`;
+        }
 
         let opts = `<option value="">-- Unassigned --</option>`;
         state.subjects.forEach(s => {
@@ -3935,9 +3983,7 @@
 
         row.innerHTML = `
           <div class="teacher-name-label" style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: 600; ${isMorn ? 'background: #fef3c7; color: #92400e;' : 'background: #e0e7ff; color: #3730a3;'}">
-              ${isMorn ? '☀️' : '🌙'}
-            </span>
+            ${shiftBadge}
             <span>${escapeHtml(teacher)}</span>
           </div>
           <select class="mapping-select" data-teacher="${escapeHtml(teacher)}">
@@ -3999,25 +4045,83 @@
   }
 
   function addTeacher() {
-    const name = DOM.settingsNewTeacher.value.trim();
-    if (!name || state.teachers.includes(name)) return;
+    const rawName = (DOM.settingsNewTeacher.value || '').trim();
+    if (!rawName) {
+      showToast('Please enter a teacher name', 'warning');
+      return;
+    }
     const shiftSelect = DOM.settingsNewTeacherShift || document.getElementById('settings-new-teacher-shift');
     const assignedShift = (shiftSelect && shiftSelect.value) || state.activeShift || 'afternoon';
 
-    state.teachers.push(name);
+    // If teacher already exists in the roster
+    if (state.teachers.includes(rawName)) {
+      const currentShift = getTeacherShift(rawName);
+
+      // Case 1: Enabling dual shift (e.g. Yamin Ma'am is in Afternoon, user adds her to Morning or Both)
+      if (assignedShift === 'both' || (currentShift !== assignedShift && currentShift !== 'both')) {
+        if (!state.teacherProfiles[rawName]) state.teacherProfiles[rawName] = {};
+        state.teacherProfiles[rawName].assignedShift = 'both';
+        DOM.settingsNewTeacher.value = '';
+        saveState();
+        renderSettingsLists();
+        renderAll();
+        showToast(`${rawName} is now assigned to BOTH Morning & Afternoon shifts (Dual Shift)!`, 'success');
+        return;
+      }
+
+      // Case 2: Teacher already exists in this exact shift, or already has both shifts.
+      // Allow adding another faculty member with the same name by giving a distinguishing identifier
+      const shiftName = assignedShift === 'morning' ? 'Morning' : (assignedShift === 'afternoon' ? 'Afternoon' : 'Dual');
+      let candidate = `${rawName} (${shiftName})`;
+      let idx = 2;
+      while (state.teachers.includes(candidate)) {
+        candidate = `${rawName} (${shiftName} ${idx})`;
+        idx++;
+      }
+
+      const promptMsg = `A faculty member named "${rawName}" already exists in the roster.\n\nTo add another teacher with this name, enter a distinguishing name (e.g. "${candidate}"):`;
+      const chosen = prompt(promptMsg, candidate);
+      if (!chosen || !chosen.trim()) return;
+
+      const finalName = chosen.trim();
+      if (state.teachers.includes(finalName)) {
+        showToast(`"${finalName}" already exists in the roster.`, 'warning');
+        return;
+      }
+
+      state.teachers.push(finalName);
+      if (!state.teacherProfiles) state.teacherProfiles = {};
+      state.teacherProfiles[finalName] = {
+        primarySubject: '',
+        assignedShift: assignedShift,
+        halfDayAvailability: 'all',
+        workSchedule: 'full_day',
+        maxPeriods: assignedShift === 'both' ? 6 : 5
+      };
+      DOM.settingsNewTeacher.value = '';
+      saveState();
+      renderSettingsLists();
+      renderAll();
+      showToast(`Added ${finalName} (${shiftName} Shift)`, 'success');
+      return;
+    }
+
+    // Normal add for brand new teacher name
+    state.teachers.push(rawName);
     if (!state.teacherProfiles) state.teacherProfiles = {};
-    state.teacherProfiles[name] = {
+    state.teacherProfiles[rawName] = {
       primarySubject: '',
       assignedShift: assignedShift,
       halfDayAvailability: 'all',
       workSchedule: 'full_day',
-      maxPeriods: 5
+      maxPeriods: assignedShift === 'both' ? 6 : 5
     };
     DOM.settingsNewTeacher.value = '';
     saveState();
     renderSettingsLists();
     renderAll();
-    showToast(`Added ${name} to ${assignedShift === 'morning' ? 'Morning' : 'Afternoon'} roster`, 'success');
+    const shiftLabel = assignedShift === 'both' ? 'Both Shifts (Dual)' : (assignedShift === 'morning' ? 'Morning Shift' : 'Afternoon Shift');
+    showToast(`Added ${rawName} (${shiftLabel})`, 'success');
   }
 
   function addSubject() {
