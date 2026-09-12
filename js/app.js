@@ -1367,8 +1367,10 @@
         afternoon: {}
       };
 
-      state.standards.forEach(std => {
-        const stdShift = std.shift || 'afternoon';
+      // Check teacher allocations within current shift standards
+      const currentShiftStds = (state.activeShift === 'all') ? state.standards : visibleStandards;
+      currentShiftStds.forEach(std => {
+        const stdShift = std.shift || (state.activeShift === 'all' ? 'afternoon' : state.activeShift);
         const slot = pSlots[std.id];
         if (slot && slot.teacher && slot.teacher.trim()) {
           const t = slot.teacher.trim();
@@ -1381,13 +1383,13 @@
       // Free and busy teachers determined by the active shift perspective
       let busyTeachers = [];
       if (state.activeShift === 'morning') {
-        busyTeachers = Object.keys(shiftTeacherAllocation.morning);
+        busyTeachers = Object.keys(shiftTeacherAllocation.morning || {});
       } else if (state.activeShift === 'afternoon') {
-        busyTeachers = Object.keys(shiftTeacherAllocation.afternoon);
+        busyTeachers = Object.keys(shiftTeacherAllocation.afternoon || {});
       } else {
         busyTeachers = Array.from(new Set([
-          ...Object.keys(shiftTeacherAllocation.morning),
-          ...Object.keys(shiftTeacherAllocation.afternoon)
+          ...Object.keys(shiftTeacherAllocation.morning || {}),
+          ...Object.keys(shiftTeacherAllocation.afternoon || {})
         ]));
       }
 
@@ -1494,6 +1496,12 @@
             <div class="free-staff-flow">`;
       if (freeTeachers.length === 0) {
         tbodyHtml += `<span class="free-staff-none">None Free</span>`;
+        if (removedTeachers.length > 0) {
+          tbodyHtml += `
+            <button type="button" class="btn-restore-free-teachers" data-day="${escapeHtml(state.currentDay)}" data-period="${escapeHtml(period.id)}" title="Restore ${escapeHtml(removedTeachers.join(', '))}" style="background: none; border: 1px dashed #94a3b8; border-radius: 4px; padding: 2px 6px; font-size: 11px; color: #475569; cursor: pointer; margin-top: 3px;">
+              ↺ Restore (${removedTeachers.length})
+            </button>`;
+        }
       } else {
         freeTeachers.forEach(t => {
           tbodyHtml += `
@@ -1502,6 +1510,12 @@
               <button type="button" class="btn-remove-free-teacher" data-day="${escapeHtml(state.currentDay)}" data-period="${escapeHtml(period.id)}" data-teacher="${escapeHtml(t)}" title="Remove ${escapeHtml(t)} from free list">&times;</button>
             </div>`;
         });
+        if (removedTeachers.length > 0) {
+          tbodyHtml += `
+            <button type="button" class="btn-restore-free-teachers" data-day="${escapeHtml(state.currentDay)}" data-period="${escapeHtml(period.id)}" title="Restore ${escapeHtml(removedTeachers.join(', '))}" style="background: none; border: none; font-size: 10px; color: #64748b; cursor: pointer; text-decoration: underline; margin-top: 2px;">
+              + Restore (${removedTeachers.length})
+            </button>`;
+        }
       }
       tbodyHtml += `</div></td></tr>`;
     });
@@ -1521,6 +1535,15 @@
         const periodId = btn.getAttribute('data-period');
         const teacher = btn.getAttribute('data-teacher');
         removeFreeTeacher(day, periodId, teacher);
+      });
+    });
+
+    DOM.timetableTbody.querySelectorAll('.btn-restore-free-teachers').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const day = btn.getAttribute('data-day');
+        const periodId = btn.getAttribute('data-period');
+        restoreFreeTeachers(day, periodId);
       });
     });
 
@@ -1696,6 +1719,17 @@
     renderClassTable();
     renderSubstitutionView();
     showToast(`Removed ${teacher} from Free Teachers (${day} ${periodId.toUpperCase()})`, 'info');
+  }
+
+  function restoreFreeTeachers(day, periodId) {
+    const key = `${day}_${periodId}`;
+    if (state.excludedFreeTeachers && state.excludedFreeTeachers[key]) {
+      delete state.excludedFreeTeachers[key];
+      saveState();
+      renderClassTable();
+      renderSubstitutionView();
+      showToast(`Restored free teachers for ${day} ${periodId.toUpperCase()}`, 'success');
+    }
   }
 
   // --- 2. Teacher-Wise Individual Timetable Rendering ---
