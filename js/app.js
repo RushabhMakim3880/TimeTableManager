@@ -285,6 +285,7 @@
     settingsTeachersList: document.getElementById('settings-teachers-list'),
     settingsTeacherCount: document.getElementById('settings-teacher-count'),
     settingsNewTeacher: document.getElementById('settings-new-teacher'),
+    settingsNewTeacherShift: document.getElementById('settings-new-teacher-shift'),
     btnAddTeacher: document.getElementById('btn-add-teacher'),
     settingsSubjectsList: document.getElementById('settings-subjects-list'),
     settingsSubjectCount: document.getElementById('settings-subject-count'),
@@ -442,8 +443,13 @@
       Object.keys(DEFAULT_DATA.teacherProfiles).forEach(t => {
         if (!state.teacherProfiles[t]) {
           state.teacherProfiles[t] = Object.assign({}, DEFAULT_DATA.teacherProfiles[t]);
-        } else if (!state.teacherProfiles[t].assignedShift) {
-          state.teacherProfiles[t].assignedShift = DEFAULT_DATA.teacherProfiles[t].assignedShift;
+        } else {
+          if (!state.teacherProfiles[t].assignedShift) {
+            state.teacherProfiles[t].assignedShift = DEFAULT_DATA.teacherProfiles[t].assignedShift || 'afternoon';
+          }
+          if (state.teacherProfiles[t].primarySubject === undefined) {
+            state.teacherProfiles[t].primarySubject = DEFAULT_DATA.teacherProfiles[t].primarySubject || '';
+          }
         }
       });
     }
@@ -563,11 +569,28 @@
       Object.keys(DEFAULT_DATA.teacherProfiles).forEach(t => {
         if (!state.teacherProfiles[t]) {
           state.teacherProfiles[t] = Object.assign({}, DEFAULT_DATA.teacherProfiles[t]);
-        } else if (!state.teacherProfiles[t].primarySubject) {
-          state.teacherProfiles[t].primarySubject = DEFAULT_DATA.teacherProfiles[t].primarySubject;
+        } else {
+          if (!state.teacherProfiles[t].primarySubject && DEFAULT_DATA.teacherProfiles[t].primarySubject) {
+            state.teacherProfiles[t].primarySubject = DEFAULT_DATA.teacherProfiles[t].primarySubject;
+          }
+          if (state.teacherProfiles[t].primarySubject === undefined) {
+            state.teacherProfiles[t].primarySubject = '';
+          }
+          if (!state.teacherProfiles[t].assignedShift) {
+            state.teacherProfiles[t].assignedShift = DEFAULT_DATA.teacherProfiles[t].assignedShift || 'afternoon';
+          }
         }
       });
     }
+
+    // Clean any undefined or missing properties in state.teacherProfiles
+    Object.keys(state.teacherProfiles).forEach(t => {
+      const prof = state.teacherProfiles[t];
+      if (prof.primarySubject === undefined) prof.primarySubject = '';
+      if (!prof.assignedShift) {
+        prof.assignedShift = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am"].includes(t) ? 'morning' : 'afternoon';
+      }
+    });
 
     if (!state.selectedTeacher && state.teachers.length > 0) {
       state.selectedTeacher = state.teachers[0];
@@ -699,6 +722,31 @@
     }
   }
 
+  // --- Shift-Aware Faculty Segregation Helpers ---
+  function getTeacherShift(teacher) {
+    const morningDefaults = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am"];
+    const prof = (state.teacherProfiles && state.teacherProfiles[teacher]) || {};
+    if (prof.assignedShift) return prof.assignedShift;
+    if (morningDefaults.includes(teacher)) return 'morning';
+    return 'afternoon';
+  }
+
+  function getTeachersForShift(shift = state.activeShift) {
+    if (!shift || shift === 'all') {
+      return state.teachers || [];
+    }
+    return (state.teachers || []).filter(t => {
+      const tShift = getTeacherShift(t);
+      if (shift === 'morning') {
+        return tShift === 'morning' || tShift === 'both';
+      }
+      if (shift === 'afternoon') {
+        return tShift === 'afternoon' || tShift === 'both';
+      }
+      return true;
+    });
+  }
+
   function resetToDefaults() {
     state.activeView = 'class-view';
     state.currentDay = 'Monday';
@@ -791,10 +839,12 @@
             renderSchoolProfile();
             renderAll();
             showToast('Loaded latest timetable from Cloud Firestore', 'success');
-          } else {
-            // First time connection: upload current timetable to Cloud
+          } else if (cloudData && cloudData._emptyDoc) {
+            // Document confirmed empty: seed initial timetable to Firestore
             console.log('[Firebase Sync] Cloud empty. Seeding initial timetable to Firestore');
             window.FirebaseSync.save(state, { immediate: true });
+          } else {
+            console.log('[Firebase Sync] Cloud fetch skipped seeding due to offline/network status');
           }
 
           // Start listening to real-time changes made on other devices
@@ -1230,18 +1280,7 @@
     DOM.attendanceChipsContainer.innerHTML = '';
     const dayLeaves = state.leaves[state.currentDay] || [];
 
-    let shiftTeachers = state.teachers;
-    if (state.activeShift === 'morning') {
-      shiftTeachers = state.teachers.filter(t => {
-        const prof = (state.teacherProfiles && state.teacherProfiles[t]) || {};
-        return prof.assignedShift === 'morning' || prof.assignedShift === 'both';
-      });
-    } else if (state.activeShift === 'afternoon') {
-      shiftTeachers = state.teachers.filter(t => {
-        const prof = (state.teacherProfiles && state.teacherProfiles[t]) || {};
-        return prof.assignedShift === 'afternoon' || prof.assignedShift === 'both' || !prof.assignedShift;
-      });
-    }
+    const shiftTeachers = getTeachersForShift(state.activeShift);
 
     shiftTeachers.forEach(teacher => {
       const isOnLeave = dayLeaves.includes(teacher);
@@ -1371,13 +1410,8 @@
 
       const excludedKey = `${state.currentDay}_${period.id}`;
       const excludedForPeriod = (state.excludedFreeTeachers && state.excludedFreeTeachers[excludedKey]) || [];
-      const morningFacultyNames = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am", "Yamin Ma'am"];
-      const shiftActiveTeachers = (state.activeShift === 'morning')
-        ? activeTeachers.filter(t => {
-            const prof = (state.teacherProfiles && state.teacherProfiles[t]) || {};
-            return prof.assignedShift === 'morning' || prof.assignedShift === 'both' || morningFacultyNames.includes(t);
-          })
-        : activeTeachers;
+      const shiftFaculty = getTeachersForShift(state.activeShift);
+      const shiftActiveTeachers = shiftFaculty.filter(t => !dayLeaves.includes(t));
 
       const freeTeachers = shiftActiveTeachers.filter(t => !busyTeachers.includes(t) && !excludedForPeriod.includes(t));
       const removedTeachers = shiftActiveTeachers.filter(t => !busyTeachers.includes(t) && excludedForPeriod.includes(t));
@@ -1667,7 +1701,11 @@
   // --- 2. Teacher-Wise Individual Timetable Rendering ---
   function renderTeacherView() {
     DOM.selectTeacherFilter.innerHTML = '';
-    state.teachers.forEach(t => {
+    const shiftTeachers = getTeachersForShift(state.activeShift);
+    if (shiftTeachers.length > 0 && !shiftTeachers.includes(state.selectedTeacher)) {
+      state.selectedTeacher = shiftTeachers[0];
+    }
+    shiftTeachers.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t;
       opt.textContent = t;
@@ -1684,7 +1722,8 @@
   }
 
   function renderTeacherGrid() {
-    const teacher = state.selectedTeacher || state.teachers[0];
+    const shiftTeachers = getTeachersForShift(state.activeShift);
+    const teacher = (shiftTeachers.includes(state.selectedTeacher) ? state.selectedTeacher : shiftTeachers[0]) || state.teachers[0];
     DOM.displayTeacherName.textContent = `${teacher} • Weekly Timetable`;
 
     // Filter to active days
@@ -2229,8 +2268,10 @@
       getActiveDays().forEach(day => {
         const assignedTeacher = (duty.allocations && duty.allocations[day]) || '';
         
+        const dutyShift = duty.shift || (duty.id && duty.id.includes('morning') ? 'morning' : 'afternoon');
+        const allowedTeachers = getTeachersForShift(dutyShift);
         let teacherOptions = `<option value="">-- Unassigned --</option>`;
-        state.teachers.forEach(t => {
+        allowedTeachers.forEach(t => {
           teacherOptions += `<option value="${escapeHtml(t)}" ${t === assignedTeacher ? 'selected' : ''}>${escapeHtml(t)}</option>`;
         });
 
@@ -2481,7 +2522,8 @@
 
     // Absent Staff toggles
     DOM.subAbsentSelectionContainer.innerHTML = '';
-    state.teachers.forEach(t => {
+    const shiftTeachers = getTeachersForShift(state.activeShift);
+    shiftTeachers.forEach(t => {
       const isAbsent = dayLeaves.includes(t);
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -2493,13 +2535,15 @@
       DOM.subAbsentSelectionContainer.appendChild(btn);
     });
 
-    // Calculate Vacant periods
+    // Calculate Vacant periods for active shift
     const daySched = state.schedules[targetDay] || {};
     const vacantList = [];
+    const shiftPeriods = getShiftPeriods(state.activeShift);
+    const shiftStandards = state.standards.filter(s => state.activeShift === 'all' || (s.shift || 'afternoon') === state.activeShift);
 
-    state.periods.forEach(p => {
+    shiftPeriods.forEach(p => {
       const pSlots = daySched[p.id] || {};
-      state.standards.forEach(s => {
+      shiftStandards.forEach(s => {
         const slot = pSlots[s.id];
         if (slot && slot.teacher && dayLeaves.includes(slot.teacher.trim())) {
           vacantList.push({
@@ -2546,8 +2590,11 @@
         }
       });
 
+      const stdObj = state.standards.find(s => s.id === vacant.stdId);
+      const stdShift = (stdObj && stdObj.shift) || state.activeShift || 'afternoon';
+      const allowedCandidates = getTeachersForShift(stdShift);
       const excludedForPeriod = (state.excludedFreeTeachers && state.excludedFreeTeachers[`${targetDay}_${vacant.periodId}`]) || [];
-      const freeCandidates = state.teachers.filter(t => !dayLeaves.includes(t) && !busyInThisPeriod.includes(t) && !excludedForPeriod.includes(t));
+      const freeCandidates = allowedCandidates.filter(t => !dayLeaves.includes(t) && !busyInThisPeriod.includes(t) && !excludedForPeriod.includes(t));
 
       tbodyHtml += `
         <tr>
@@ -2603,8 +2650,11 @@
             busy.push(pSlots[s.id].teacher.trim());
           }
         });
+        const stdObj = state.standards.find(s => s.id === vacant.stdId);
+        const stdShift = (stdObj && stdObj.shift) || state.activeShift || 'afternoon';
+        const allowedCandidates = getTeachersForShift(stdShift);
         const excludedForPeriod = (state.excludedFreeTeachers && state.excludedFreeTeachers[`${targetDay}_${vacant.periodId}`]) || [];
-        const free = state.teachers.filter(t => !dayLeaves.includes(t) && !busy.includes(t) && !excludedForPeriod.includes(t));
+        const free = allowedCandidates.filter(t => !dayLeaves.includes(t) && !busy.includes(t) && !excludedForPeriod.includes(t));
         if (free.length > 0) {
           currentSubs[subKey] = free[0];
         }
@@ -2620,12 +2670,14 @@
   function renderWorkloadView() {
     // We compute metrics strictly for active instructional days (Monday through Friday)
     const workingDays = state.days.filter(d => d.toLowerCase() !== 'saturday');
-    const totalWorkingPeriods = workingDays.length * state.periods.length; // 5 * 6 = 30 max periods
+    const shiftPeriods = getShiftPeriods(state.activeShift);
+    const totalWorkingPeriods = workingDays.length * shiftPeriods.length; // 5 * periods
+    const shiftTeachers = getTeachersForShift(state.activeShift);
 
     // 1. Calculate weekly periods and subject breakdown per teacher
     const teacherWeeklyLoad = {};
     const teacherSubjects = {};
-    state.teachers.forEach(t => {
+    shiftTeachers.forEach(t => {
       teacherWeeklyLoad[t] = 0;
       teacherSubjects[t] = {};
     });
@@ -2638,10 +2690,10 @@
       const dSched = state.schedules[d] || {};
 
       // Daily consecutive check per teacher
-      state.teachers.forEach(t => {
+      shiftTeachers.forEach(t => {
         let consecutive = 0;
         let maxConsecutiveInDay = 0;
-        state.periods.forEach(p => {
+        shiftPeriods.forEach(p => {
           const pSlots = dSched[p.id] || {};
           let teachesThisPeriod = false;
           state.standards.forEach(s => {
@@ -2662,7 +2714,7 @@
       });
 
       // Aggregate total workload and subject frequencies
-      state.periods.forEach(p => {
+      shiftPeriods.forEach(p => {
         const pSlots = dSched[p.id] || {};
         state.standards.forEach(s => {
           const slot = pSlots[s.id];
@@ -2681,7 +2733,7 @@
       });
     });
 
-    const teacherCount = state.teachers.length || 1;
+    const teacherCount = shiftTeachers.length || 1;
     const avgLoad = (totalScheduledPeriods / teacherCount).toFixed(1);
 
     // Sorted teachers
@@ -2715,7 +2767,7 @@
         : `${overloadedTeachers.length} faculty member(s) exceed ceiling`;
     }
     if (DOM.workloadStaffCount) {
-      DOM.workloadStaffCount.textContent = `${state.teachers.length} Staff Members`;
+      DOM.workloadStaffCount.textContent = `${shiftTeachers.length} Staff Members (${state.activeShift === 'morning' ? 'Morning Shift' : 'Afternoon Shift'})`;
     }
 
     // 3. Render Rich Teacher Workload Rows
@@ -2771,7 +2823,7 @@
     DOM.workloadBarsContainer.innerHTML = barsHtml;
 
     // 4. Render Pedagogical Compliance & Faculty Health Diagnostics
-    const totalPotentialCapacity = state.teachers.length * totalWorkingPeriods;
+    const totalPotentialCapacity = shiftTeachers.length * totalWorkingPeriods;
     const totalFreePrepPeriods = Math.max(0, totalPotentialCapacity - totalScheduledPeriods);
 
     let diagHtml = '';
@@ -2782,7 +2834,7 @@
           <div class="diagnostic-icon" style="color: #059669;">✓</div>
           <div class="diagnostic-content">
             <div class="diagnostic-title">Weekly Labor Ceiling (≤ 26 Periods)</div>
-            <div class="diagnostic-desc">All ${state.teachers.length} faculty members operate strictly within institutional guidelines. No burnout risks detected.</div>
+            <div class="diagnostic-desc">All ${shiftTeachers.length} faculty members operate strictly within institutional guidelines. No burnout risks detected.</div>
           </div>
         </div>`;
     } else {
@@ -2974,10 +3026,14 @@
       }
     });
 
+    const activeStd = state.standards.find(s => s.id === activeStdId);
+    const cellShift = (activeStd && activeStd.shift) || state.activeShift || 'afternoon';
+    const allowedTeachers = getTeachersForShift(cellShift);
+
     // 1. Quick Pairs (1-Click Fast Assign)
     if (DOM.modalQuickPairs) {
       DOM.modalQuickPairs.innerHTML = '';
-      state.teachers.forEach(teacher => {
+      allowedTeachers.forEach(teacher => {
         const prof = state.teacherProfiles[teacher] || {};
         const primarySubj = prof.primarySubject || '';
         if (!primarySubj) return;
@@ -3027,6 +3083,10 @@
 
   function renderModalSubjectChips(periodId, stdId, busyIn, dayLeaves) {
     DOM.modalSubjectChips.innerHTML = '';
+    const std = state.standards.find(s => s.id === stdId);
+    const cellShift = (std && std.shift) || state.activeShift || 'afternoon';
+    const allowedTeachers = getTeachersForShift(cellShift);
+
     state.subjects.forEach(subj => {
       const pill = document.createElement('button');
       pill.type = 'button';
@@ -3037,7 +3097,7 @@
         DOM.modalCustomSubject.value = '';
 
         // Auto-assign or suggest matching teacher for this subject
-        const candidates = state.teachers.filter(t => {
+        const candidates = allowedTeachers.filter(t => {
           const p = state.teacherProfiles[t];
           return p && p.primarySubject && p.primarySubject.toLowerCase() === subj.toLowerCase();
         });
@@ -3074,8 +3134,11 @@
 
   function renderTeacherChipsInModal(periodId, currentStdId, busyIn, dayLeaves) {
     DOM.modalTeacherChips.innerHTML = '';
+    const std = state.standards.find(s => s.id === currentStdId);
+    const cellShift = (std && std.shift) || state.activeShift || 'afternoon';
+    const allowedTeachers = getTeachersForShift(cellShift);
 
-    state.teachers.forEach(teacher => {
+    allowedTeachers.forEach(teacher => {
       const pill = document.createElement('button');
       pill.type = 'button';
       const isSelected = (editingCell.teacher === teacher);
@@ -3769,9 +3832,19 @@
     DOM.settingsTeachersList.innerHTML = '';
     DOM.settingsTeacherCount.textContent = state.teachers.length;
     state.teachers.forEach(t => {
+      const prof = state.teacherProfiles[t] || {};
+      const tShift = prof.assignedShift || (["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am"].includes(t) ? 'morning' : 'afternoon');
+      const isMorn = tShift === 'morning';
+
       const tag = document.createElement('span');
       tag.style.cssText = 'display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 4px; font-size: 12.5px;';
-      tag.innerHTML = `<span>${escapeHtml(t)}</span><button style="background: none; border: none; color: var(--status-danger); cursor: pointer; font-size: 14px; line-height: 1;">&times;</button>`;
+      tag.innerHTML = `
+        <span style="font-size: 10.5px; padding: 1px 5px; border-radius: 3px; font-weight: 600; ${isMorn ? 'background: #fef3c7; color: #92400e;' : 'background: #e0e7ff; color: #3730a3;'}">
+          ${isMorn ? '☀️ Morning' : '🌙 Afternoon'}
+        </span>
+        <span>${escapeHtml(t)}</span>
+        <button style="background: none; border: none; color: var(--status-danger); cursor: pointer; font-size: 14px; line-height: 1;" title="Remove teacher">&times;</button>`;
+
       tag.querySelector('button').onclick = () => {
         if (confirm(`Remove ${t} from teachers roster?`)) {
           state.teachers = state.teachers.filter(item => item !== t);
@@ -3807,6 +3880,8 @@
         const row = document.createElement('div');
         row.className = 'teacher-subject-row';
         const currentSubj = (state.teacherProfiles[teacher] && state.teacherProfiles[teacher].primarySubject) || '';
+        const tShift = (state.teacherProfiles[teacher] && state.teacherProfiles[teacher].assignedShift) || (["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am"].includes(teacher) ? 'morning' : 'afternoon');
+        const isMorn = tShift === 'morning';
 
         let opts = `<option value="">-- Unassigned --</option>`;
         state.subjects.forEach(s => {
@@ -3814,8 +3889,10 @@
         });
 
         row.innerHTML = `
-          <div class="teacher-name-label">
-            <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--primary-navy); display: inline-block;"></span>
+          <div class="teacher-name-label" style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: 600; ${isMorn ? 'background: #fef3c7; color: #92400e;' : 'background: #e0e7ff; color: #3730a3;'}">
+              ${isMorn ? '☀️' : '🌙'}
+            </span>
             <span>${escapeHtml(teacher)}</span>
           </div>
           <select class="mapping-select" data-teacher="${escapeHtml(teacher)}">
@@ -3843,9 +3920,10 @@
         row.className = 'teacher-subject-row';
         const currentTeacher = (state.classTeachers && state.classTeachers[std.id]) || '';
         const isMorning = std.shift === 'morning';
+        const allowedTeachers = getTeachersForShift(isMorning ? 'morning' : 'afternoon');
 
         let opts = `<option value="">-- Unassigned --</option>`;
-        state.teachers.forEach(t => {
+        allowedTeachers.forEach(t => {
           opts += `<option value="${escapeHtml(t)}" ${t === currentTeacher ? 'selected' : ''}>${escapeHtml(t)}</option>`;
         });
 
@@ -3878,12 +3956,23 @@
   function addTeacher() {
     const name = DOM.settingsNewTeacher.value.trim();
     if (!name || state.teachers.includes(name)) return;
+    const shiftSelect = DOM.settingsNewTeacherShift || document.getElementById('settings-new-teacher-shift');
+    const assignedShift = (shiftSelect && shiftSelect.value) || state.activeShift || 'afternoon';
+
     state.teachers.push(name);
+    if (!state.teacherProfiles) state.teacherProfiles = {};
+    state.teacherProfiles[name] = {
+      primarySubject: '',
+      assignedShift: assignedShift,
+      halfDayAvailability: 'all',
+      workSchedule: 'full_day',
+      maxPeriods: 5
+    };
     DOM.settingsNewTeacher.value = '';
     saveState();
     renderSettingsLists();
     renderAll();
-    showToast(`Added ${name} to roster`, 'success');
+    showToast(`Added ${name} to ${assignedShift === 'morning' ? 'Morning' : 'Afternoon'} roster`, 'success');
   }
 
   function addSubject() {
@@ -3917,10 +4006,11 @@
       }
 
       if (state.activeView === 'teacher-view') {
-        showToast('Generating All Staff Individual Timetables (.docx)...', 'info');
-        const blob = await DocxGenerator.generateTeacherTimetablesDocxBlob(state.teachers, state);
-        DocxGenerator.triggerDownload(blob, 'All_Faculty_Individual_Timetables.docx');
-        showToast('All Staff Schedules exported successfully', 'success');
+        const shiftTeachers = getTeachersForShift(state.activeShift);
+        showToast(`Generating ${state.activeShift === 'morning' ? 'Morning' : 'Afternoon'} Staff Individual Timetables (.docx)...`, 'info');
+        const blob = await DocxGenerator.generateTeacherTimetablesDocxBlob(shiftTeachers, state);
+        DocxGenerator.triggerDownload(blob, `${state.activeShift === 'morning' ? 'Morning' : 'Afternoon'}_Faculty_Individual_Timetables.docx`);
+        showToast('Staff Schedules exported successfully', 'success');
       } else if (state.activeView === 'duty-view') {
         downloadWeeklyDutyDocx();
       } else if (state.activeView === 'general-duty-view') {

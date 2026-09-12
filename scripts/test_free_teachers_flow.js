@@ -25,7 +25,12 @@ function testFreeTeachersLogic() {
   const period = state.periods[0]; // p1
   const day = 'Monday';
   const dayData = state.schedules[day] || {};
-  const activeTeachers = state.teachers;
+  const morningDefaults = ["Rakshita Ma'am", "Neelam Ma'am", "Geetanjali Ma'am"];
+  const activeTeachers = state.teachers.filter(t => {
+    const prof = (DEFAULT_DATA.teacherProfiles && DEFAULT_DATA.teacherProfiles[t]) || {};
+    const tShift = prof.assignedShift || (morningDefaults.includes(t) ? 'morning' : 'afternoon');
+    return tShift === 'afternoon' || tShift === 'both';
+  });
 
   // 1. Initial State: Determine free teachers for p1
   const pSlots = dayData[period.id] || {};

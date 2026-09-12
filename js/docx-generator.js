@@ -823,7 +823,12 @@ const DocxGenerator = (function() {
           const prof = (state.teacherProfiles && state.teacherProfiles[t]) || {};
           return prof.assignedShift === 'morning' || prof.assignedShift === 'both' || morningTeacherList.includes(t);
         })
-      : teachersList;
+      : (activeShift === 'afternoon'
+        ? teachersList.filter(t => {
+            const prof = (state.teacherProfiles && state.teacherProfiles[t]) || {};
+            return prof.assignedShift === 'afternoon' || prof.assignedShift === 'both' || (!prof.assignedShift && !morningTeacherList.includes(t));
+          })
+        : teachersList);
 
     const effectiveDaysToExport = (daysToExport || []).filter(d => {
       if (state && state.includeSaturday) return true;

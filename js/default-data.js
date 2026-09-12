@@ -1783,6 +1783,7 @@ const DEFAULT_DATA = {
   ],
   "teacherProfiles": {
     "Kavita Ma'am": {
+      "primarySubject": "",
       "halfDayAvailability": "all",
       "workSchedule": "full_day",
       "maxPeriods": 5,

@@ -131,6 +131,25 @@
   }
 
   /**
+   * Recursively sanitizes payload for Firestore to remove all undefined values.
+   */
+  function sanitizeForFirestore(val) {
+    if (val === undefined) return null;
+    if (val === null || typeof val !== 'object') return val;
+    if (Array.isArray(val)) {
+      return val.map(item => (item === undefined ? null : sanitizeForFirestore(item)));
+    }
+    const clean = {};
+    Object.keys(val).forEach(key => {
+      const v = val[key];
+      if (v !== undefined) {
+        clean[key] = sanitizeForFirestore(v);
+      }
+    });
+    return clean;
+  }
+
+  /**
    * Saves the timetable state to Firestore
    */
   let saveDebounceTimer = null;
@@ -149,7 +168,7 @@
           notifyStatus('syncing', { message: 'Saving to Cloud Firestore...' });
           isSavingLocally = true;
 
-          const payload = {
+          const rawPayload = {
             schoolProfile: state.schoolProfile || {},
             standards: state.standards || [],
             periods: state.periods || [],
@@ -174,8 +193,9 @@
             clientVersion: 'v4.1'
           };
 
+          const cleanPayload = sanitizeForFirestore(rawPayload);
           const docRef = db.collection(COLLECTION_NAME).doc(DOCUMENT_ID);
-          await withTimeout(docRef.set(payload), 8000, 'Cloud save timed out');
+          await withTimeout(docRef.set(cleanPayload), 10000, 'Cloud save timed out');
 
           lastSavedAt = new Date();
           notifyStatus('synced', { lastSavedAt });
@@ -210,7 +230,7 @@
     try {
       notifyStatus('syncing', { message: 'Fetching timetable from Cloud...' });
       const docRef = db.collection(COLLECTION_NAME).doc(DOCUMENT_ID);
-      const snap = await withTimeout(docRef.get(), 6000, 'Cloud fetch timed out');
+      const snap = await withTimeout(docRef.get(), 12000, 'Cloud fetch timed out');
 
       if (snap && snap.exists) {
         lastSavedAt = snap.data().updatedAt ? new Date(snap.data().updatedAt) : new Date();
@@ -218,14 +238,14 @@
         return snap.data();
       } else {
         notifyStatus('connected', { message: 'Database empty. Ready to upload initial data.' });
-        return null;
+        return { _emptyDoc: true };
       }
     } catch (err) {
       if (currentStatus !== 'error' && currentStatus !== 'offline') {
         console.warn('[Firebase Sync] Cloud fetch notice (offline fallback active):', err.message || err);
       }
       notifyStatus(navigator.onLine ? 'error' : 'offline', { message: err.message });
-      return null;
+      return { _fetchError: true, error: err };
     }
   }
 
